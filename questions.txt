@@ -1,0 +1,3 @@
+1. Nevím, jak v dataspeceru získat ontologii v angličtině. Je to tak ze čtvrtiny anglicky, zbytek česky.
+2. Když stáhnu artefakty z Dataspeceru, nevím, co představuje tu ontologii.
+3. Četl jsem článek na knowledge graphs, ale ještě jsem nepoužil knowledge graph, protože bych chtěl použít to, co je dostupné v Dataspeceru.
