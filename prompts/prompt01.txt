@@ -39,9 +39,16 @@ And given the following explanation for the database:
 Write a POSTGRESQL query for the following question. Do not explain the query. Return just the query, so it can be run
 verbatim from your response.
 Here's the question:
-//
+<question>
+------------
 How many people are under the service provider Poskytovatel Cislo Jedna.
+OUTPUT:
+SELECT COUNT(*) FROM person_sp_association WHERE sp_id = 'Poskytovatel Cislo Jedna';
 //
 Which service provider does Jaroslav Člověk belong to?
+OUTPUT:
+SELECT sp_id FROM person_sp_association WHERE pe_id = 'Jaroslav Člověk';
 //
 Show me the newest associations for each person.
+OUTPUT:
+SELECT pe_id, MAX(pspa_not_before) AS newest_association FROM person_sp_association GROUP BY pe_id;
