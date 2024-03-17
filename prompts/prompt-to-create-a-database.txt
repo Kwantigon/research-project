@@ -1,0 +1,14 @@
+Given the following description of entities, generate an SQL script, which can be used verbatim to create the necessary database:
+Person represents an user of our system. A person has the following attributes:
+	pe_id, which is the unique identifier of a person.
+	pe_name, which is the name of the person.
+	pe_last_change, which is the timestamp of when the latest change to person was made.
+Service provider represents the company, which a person works for. One service provider can have multiple people but one person can be associated to only one service provider. Service provider has the following attributes:
+	sp_id, which is the unique identifier of a service provider.
+	sp_name, which is the name of the service provider.
+Person can be associated to a service provider. This association has the following attributes:
+	pspa_id, which is the unique identifier of the association.
+	pspa_pe_id, which is the id of the person.
+	pspa_sp_id, which is the id of the service provider.
+	pspa_state, which is the state of the association. It has two values - either "Associated" or "NotAssociated".
+	pspa_not_before, which is a timestamp that represents the time validity of the association. An association is valid only if its timestamp is equal to or less than the current time. Only one association is considered active at a time. The active association is the one with the latest timestamp.

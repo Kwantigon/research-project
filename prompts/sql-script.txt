@@ -1,0 +1,22 @@
+CREATE TABLE person (
+	pe_id integer NOT NULL,
+	pe_full_name text NOT NULL,
+	CONSTRAINT person_pk PRIMARY KEY (pe_id)
+);
+
+CREATE TABLE service_provider (
+	sp_id integer NOT NULL,
+	sp_name text NOT NULL,
+	CONSTRAINT service_provider_pk PRIMARY KEY (sp_id)
+);
+
+CREATE TYPE association_state_type AS ENUM ('NotAssociated','Associated');
+
+CREATE TABLE person_sp_association (
+	pspa_id integer NOT NULL,
+	pe_id integer NOT NULL,
+	sp_id integer NOT NULL,
+	pspa_state association_state_type NOT NULL,
+	pspa_not_before timestamp NOT NULL,
+	CONSTRAINT person_sp_association_pk PRIMARY KEY (pspa_id)
+);
