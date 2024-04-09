@@ -1,0 +1,44 @@
+PREFIX ns0: <https://slovník.gov.cz/generický/věda-a-výzkum/pojem/>
+PREFIX ns1: <https://slovník.gov.cz/datový/školství/pojem/>
+CONSTRUCT {
+  ?v0 a ns0:téma-dizertační-práce .
+  ?v0 ns0:aktuálně-nabízeno ?v1 .
+  ?v0 ns0:doporučovaná-pracoviště-obecně ?v2 .
+  ?v0 ns0:kontext-tématu-dizertační-práce ?v3 .
+  ?v0 ns0:má-studijní-program ?v4 .
+  ?v4 a ns1:studijní-program .
+  ?v4 ns1:kód ?v5 .
+  ?v0 ns0:má-konkrétní-doporučované-pracoviště ?v6 .
+  ?v6 a ns0:výzkumné-pracoviště .
+  ?v6 ns0:orjk ?v7 .
+}
+WHERE {
+  ?v0 a ns0:téma-dizertační-práce .
+  OPTIONAL {
+    ?v0 ns0:aktuálně-nabízeno ?v1 .
+  }
+  OPTIONAL {
+    ?v0 ns0:doporučovaná-pracoviště-obecně ?v2 .
+  }
+  OPTIONAL {
+    ?v0 ns0:kontext-tématu-dizertační-práce ?v3 .
+  }
+  OPTIONAL {
+    ?v0 ns0:má-studijní-program ?v4 .
+    OPTIONAL {
+      ?v4 a ns1:studijní-program .
+    }
+    OPTIONAL {
+      ?v4 ns1:kód ?v5 .
+    }
+  }
+  OPTIONAL {
+    ?v0 ns0:má-konkrétní-doporučované-pracoviště ?v6 .
+    OPTIONAL {
+      ?v6 a ns0:výzkumné-pracoviště .
+    }
+    OPTIONAL {
+      ?v6 ns0:orjk ?v7 .
+    }
+  }
+}

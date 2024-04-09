@@ -1,0 +1,58 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "id": "@id",
+    "type": "@type",
+    "Téma dizertační práce": {
+      "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/téma-dizertační-práce",
+      "@context": {
+        "currently_offered": {
+          "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/aktuálně-nabízeno",
+          "@type": "xsd:boolean"
+        },
+        "recommended_workplaces_in_general": {
+          "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/doporučovaná-pracoviště-obecně",
+          "@container": "@language"
+        },
+        "the_context_of_the_dissertation_topic": {
+          "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/kontext-tématu-dizertační-práce",
+          "@container": "@language"
+        },
+        "has_a_study_program": {
+          "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/má-studijní-program",
+          "@container": "@set",
+          "@context": {
+            "Studijní program": {
+              "@id": "https://slovník.gov.cz/datový/školství/pojem/studijní-program",
+              "@context": {
+                "code": {
+                  "@id": "https://slovník.gov.cz/datový/školství/pojem/kód",
+                  "@type": "xsd:string"
+                }
+              }
+            }
+          }
+        },
+        "has_a_specific_recommended_workplace": {
+          "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/má-konkrétní-doporučované-pracoviště",
+          "@container": "@set",
+          "@context": {
+            "Výzkumné pracoviště": {
+              "@id": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/výzkumné-pracoviště",
+              "@context": {
+                "orjk": "https://slovník.gov.cz/generický/věda-a-výzkum/pojem/orjk"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+,
+  "id": "https://cDODZXwmLhmakLjRkY.rgkaZ6sNQxp1WbPAt5N3F8u3xJJfs5k8SvITAxezm,D?",
+  "type": [
+    "Téma dizertační práce",
+    "id aute labore minim Lorem"
+  ]
+}

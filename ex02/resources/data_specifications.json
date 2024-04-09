@@ -1,0 +1,1391 @@
+{
+    "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439": {
+        "iri": "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439",
+        "pim": "https://ofn.gov.cz/schema/1710339631573-b2cd-b1a3-b95e",
+        "psms": [
+            "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+        ],
+        "importsDataSpecifications": [],
+        "artefacts": [
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonschema",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/schema.json",
+                "publicUrl": "/nguyen-example/schema.json",
+                "generator": "http://example.com/generator/json-schema",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonExample",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/example.json",
+                "publicUrl": "/nguyen-example/example.json",
+                "generator": "https://schemas.dataspecer.com/generator/json-example",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonLd",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/context.jsonld",
+                "publicUrl": "/nguyen-example/context.jsonld",
+                "generator": "http://dataspecer.com/generator/json-ld",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsdCoreSchema",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/2022-07.xsd",
+                "publicUrl": "/nguyen-example/2022-07.xsd",
+                "generator": "http://example.com/generator/xml-common-schema",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xmlschema",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/schema.xsd",
+                "publicUrl": "/nguyen-example/schema.xsd",
+                "generator": "http://example.com/generator/xml-schema",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsltlifting",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/lifting.xslt",
+                "publicUrl": "/nguyen-example/lifting.xslt",
+                "generator": "http://example.com/generator/xslt-lifting",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsltlowering",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/lowering.xslt",
+                "publicUrl": "/nguyen-example/lowering.xslt",
+                "generator": "http://example.com/generator/xslt-lowering",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#csvschema",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/schema.csv-metadata.json",
+                "publicUrl": "/nguyen-example/schema.csv-metadata.json",
+                "generator": "http://example.com/generator/csv-schema",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#rdfToCsv",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/rdf-to-csv/",
+                "publicUrl": "/nguyen-example/rdf-to-csv/",
+                "generator": "http://example.com/generator/rdf-to-csv",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#sparqlschema",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/query.sparql",
+                "publicUrl": "/nguyen-example/query.sparql",
+                "generator": "http://example.com/generator/sparql",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shacl",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/shacl-shapes.ttl",
+                "publicUrl": "/nguyen-example/shacl-shapes.ttl",
+                "generator": "https://schemas.dataspecer.com/generator/shacl",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shex",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/validation.shex",
+                "publicUrl": "/nguyen-example/validation.shex",
+                "generator": "https://schemas.dataspecer.com/generator/shex",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shex-map",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/validation.shexmap",
+                "publicUrl": "/nguyen-example/validation.shexmap",
+                "generator": "https://schemas.dataspecer.com/generator/shex-map",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#openapi",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/openapi-specification.yaml",
+                "publicUrl": "/nguyen-example/openapi-specification.yaml",
+                "generator": "https://schemas.dataspecer.com/generator/openapi",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#LDkit",
+                "name": null,
+                "type": "schema",
+                "outputPath": "nguyen-example/ldkit-schema.ts",
+                "publicUrl": "/nguyen-example/ldkit-schema.ts",
+                "generator": "https://schemas.dataspecer.com/generator/LDkit",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "psm": "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc"
+            },
+            {
+                "iri": "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439#plantUml",
+                "name": null,
+                "type": "documentation",
+                "outputPath": "nguyen-example/conceptual-model.plantuml",
+                "publicUrl": "/nguyen-example/conceptual-model.plantuml",
+                "generator": "plant-uml",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "artefacts": []
+            },
+            {
+                "iri": "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439#plantUmlImage",
+                "name": null,
+                "type": "documentation",
+                "outputPath": "nguyen-example/conceptual-model.svg",
+                "publicUrl": "/nguyen-example/conceptual-model.svg",
+                "generator": "plant-uml/image",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "artefacts": []
+            },
+            {
+                "iri": "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439#respec",
+                "name": null,
+                "type": "documentation",
+                "outputPath": "nguyen-example/documentation.html",
+                "publicUrl": "/nguyen-example/documentation.html",
+                "generator": "https://schemas.dataspecer.com/generator/template-artifact",
+                "configuration": {
+                    "json": {
+                        "jsonIdKeyAlias": "id",
+                        "jsonIdRequired": true,
+                        "jsonTypeKeyAlias": "type",
+                        "jsonTypeRequired": true,
+                        "jsonLdBaseUrl": null,
+                        "jsonRootCardinality": "single",
+                        "jsonRootCardinalityObjectKey": "items",
+                        "jsonDefaultTypeKeyMapping": "human-label",
+                        "jsonDefaultTypeKeyMappingHumanLabelLang": "cs",
+                        "jsonLabelLanguage": "cs",
+                        "dereferenceSchema": false,
+                        "dereferenceContext": false,
+                        "includeContextInExample": true
+                    },
+                    "csv": {
+                        "enableMultipleTableSchema": false
+                    },
+                    "xml": {
+                        "rootClass": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "otherClasses": {
+                            "extractType": false,
+                            "extractGroup": false
+                        },
+                        "commonXmlSchemaExternalLocation": null
+                    },
+                    "bikeshed": {
+                        "abstract": "This document was generated automatically by [Dataspecer](https://dataspecer.com/).",
+                        "editor": "Dataspecer editor, https://dataspecer.com/",
+                        "otherMetadata": {
+                            "Logo": "https://ofn.gov.cz/static/images/logo.png"
+                        },
+                        "language": "cs",
+                        "useTechnicalLabelsInStructuralModels": true
+                    },
+                    "client": {
+                        "technicalLabelCasingConvention": "snake_case",
+                        "technicalLabelSpecialCharacters": "allow",
+                        "technicalLabelLanguages": "en"
+                    },
+                    "data-specification": {
+                        "useGenerators": {},
+                        "renameArtifacts": {},
+                        "publicBaseUrl": null,
+                        "instancesHaveIdentity": "ALWAYS",
+                        "instancesSpecifyTypes": "ALWAYS",
+                        "dataPsmIsClosed": "OPEN",
+                        "generatorsEnabledByDefault": true,
+                        "skipStructureNameIfOnlyOne": true
+                    },
+                    "template-artifact": {
+                        "templates": {
+                            "metadata": "{\n            specStatus: \"REC\",\n            thisVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            latestVersion: \"{{{artifact.template-artifact.publicUrl}}}\",\n            shortName: \"{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}\",\n            showPreviousVersion: false,\n            editors: [],\n          }",
+                            "abstract": "<section id=\"abstract\" class=\"introductory\">\n    <h2>Abstrakt</h2>\n    <p>\n        Tento dokument byl vygenerován automaticky nástrojem <a href=\"https://dataspecer.com/\">Dataspecer</a>.\n    </p>\n</section>",
+                            "artifactList": "<section>\n    <h2>Seznam artefaktů</h2>\n    Tato sekce obsahuje odkaz na všechny soubory, které jsou součástí této dokumentace.\n    <table class=\"def\">\n        <thead>\n            <tr><th>Artefakt</th><th>Odkaz</th></tr>\n        </thead>\n        <tbody>\n            {{#artifacts}}\n            <tr><td>{{title}}</td><td><a href=\"{{{relativePath}}}\">{{{relativePath}}}</a></td></tr>\n            {{/artifacts}}\n        </tbody>\n    </table>\n</section>",
+                            "conceptualModel": "<section>\n<h2>Konceptuální model</h2>\nV této sekci jsou definovány veškeré koncepty, třídy a asociace, potřebné pro <i>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</i>.\n\n<figure><img src=\"{{#artifact.image.publicUrl}}{{{relativePath}}}{{/artifact.image.publicUrl}}\"><figcaption>Diagram konceptuálního modelu.</figcaption></figure>\n\n{{#semanticModels}}\n{{#classes}}\n<section id=\"{{semanticModelLinkId}}\">\n<h3>{{#humanLabel}}{{translate}}{{/humanLabel}}</h3>\n<dl>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n{{#extends}}\n<dt>Nadřazený typ</dt>\n<dd><a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a></dd>\n{{/extends}}\n</dl>\n\n{{#properties}}\n<section id=\"{{semanticModelLinkId}}\">\n<h4>{{#dataTypes}}{{#isAssociation}}Vztah (asociace): {{/isAssociation}}{{/dataTypes}}{{#humanLabel}}{{translate}}{{/humanLabel}}</h4>\n<dl>\n<dt>Jméno</dt>\n<dd>{{#humanLabel}}{{translate}}{{/humanLabel}}</dd>\n{{#humanDescription}}{{#translate}}\n<dt>Popis</dt>\n<dd>{{.}}</dd>\n{{/translate}}{{/humanDescription}}\n<dt>Povinnost</dt>\n<dd>{{#cardinalityIsRequired}}povinné{{/cardinalityIsRequired}}{{^cardinalityIsRequired}}nepovinné{{/cardinalityIsRequired}}</dd>\n<dt>Kardinalita</dt>\n<dd>{{cardinalityRange}}</dd>\n{{#dataTypes}}{{#isAssociation}}\n<dt>Typ</dt>\n<dd>{{#class}}<a href=\"#{{semanticModelLinkId}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>{{/class}}</dd>\n{{/isAssociation}}{{/dataTypes}}\n<dt>Význam</dt>\n<dd>Koncept {{#humanLabel}}{{translate}}{{/humanLabel}} je definován v <a href=\"https://slovník.gov.cz/\">sémantickém slovníku pojmů</a> jako <a href=\"{{{cimIri}}}\">{{#humanLabel}}{{translate}}{{/humanLabel}}</a>.</dd>\n</section>\n{{/properties}}\n</section>\n{{/classes}}\n{{/semanticModels}}\n\n</section>"
+                        },
+                        "type": "respec",
+                        "template": "<!DOCTYPE html>\n<html lang=\"cs\">\n    <head>\n        <title>{{#semanticModels}}{{#humanLabel}}{{translate}}{{/humanLabel}}{{/semanticModels}}</title>\n        <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\" />\n        <meta content=\"width=device-width,initial-scale=1\" name=\"viewport\" />\n        <meta name=\"theme-color\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileColor\" content=\"#057fa5\">\n        <meta name=\"msapplication-TileImage\" content=\"https://ofn.gov.cz/static/favicons/ms-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"57x57\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-57x57.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"60x60\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-60x60.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"72x72\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-72x72.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"76x76\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-76x76.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"114x114\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-114x114.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"120x120\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-120x120.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"144x144\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-144x144.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"152x152\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-152x152.png\">\n        <link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://ofn.gov.cz/static/favicons/apple-icon-180x180.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"192x192\"  href=\"https://ofn.gov.cz/static/favicons/android-icon-192x192.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"https://ofn.gov.cz/static/favicons/favicon-32x32.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"96x96\" href=\"https://ofn.gov.cz/static/favicons/favicon-96x96.png\">\n        <link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"https://ofn.gov.cz/static/favicons/favicon-16x16.png\">\n        <link rel=\"manifest\" href=\"https://ofn.gov.cz/static/favicons/manifest.json\">\n        <script class=\"remove\" src=\"https://ofn.gov.cz/static/js/respec-odcz.js\"></script>\n        <script class=\"remove\">\n            var respecConfig = {{>metadata}};\n        </script>\n    </head>\n    <body>\n    \n{{>abstract}}\n\n{{>artifactList}}\n\n{{>conceptualModel}}\n\n{{#structureModels}}\n<section>\n<h2>Specifikace struktury pro {{#humanLabel}}{{translate}}{{/humanLabel}}</h2>\n<p>{{#humanDescription}}{{translate}}{{/humanDescription}}</p>\n\n{{#artifacts}}{{#getDocumentation}}{{#useTemplate}}{{/useTemplate}}{{/getDocumentation}}{{/artifacts}}\n</section>\n{{/structureModels}}\n\n    </body>\n</html>"
+                    }
+                },
+                "artefacts": [
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonschema",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonExample",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#jsonLd",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsdCoreSchema",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xmlschema",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsltlifting",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#xsltlowering",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#csvschema",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#rdfToCsv",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#sparqlschema",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shacl",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shex",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#shex-map",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#openapi",
+                    "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc#LDkit",
+                    "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439#plantUml",
+                    "https://ofn.gov.cz/data-specification/b05210c4-3045-465d-83d9-dd0f09da3439#plantUmlImage"
+                ],
+                "templateType": "respec"
+            }
+        ],
+        "artefactConfiguration": {
+            "client": {
+                "technicalLabelLanguages": "en"
+            }
+        },
+        "pimStores": [
+            {
+                "type": "https://ofn.gov.cz/store-descriptor/http",
+                "url": "https://backend.dataspecer.com/store/7a1b9cf1-56cd-4e58-b2f2-e444eb11d83d",
+                "isReadOnly": false
+            }
+        ],
+        "psmStores": {
+            "https://ofn.gov.cz/schema/1712492229576-785c-b4ee-99cc": [
+                {
+                    "type": "https://ofn.gov.cz/store-descriptor/http",
+                    "url": "https://backend.dataspecer.com/store/f09669a1-b26d-43d6-b58c-d3fe26d0b5f2",
+                    "isReadOnly": false
+                }
+            ]
+        },
+        "tags": [
+            "Quoc Anh Nguyen"
+        ],
+        "type": "http://dataspecer.com/vocabularies/data-specification/documentation",
+        "cimAdapters": [
+            "https://dataspecer.com/adapters/sgov-en"
+        ]
+    }
+}

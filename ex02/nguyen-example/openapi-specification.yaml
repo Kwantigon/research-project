@@ -1,0 +1,100 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Your API Title",
+    "version": "1.0.0",
+    "description": "Your API Description"
+  },
+  "paths": {
+    "/dissertation_topic": {
+      "parameters": [
+        {
+          "name": "currently_offered",
+          "in": "path",
+          "description": "Indicates whether the topic is currently offered for enrollment.",
+          "required": 0,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "recommended_workplaces_in_general",
+          "in": "path",
+          "description": "Faculties or institutes, or their parts, where possible work could be carried out. It is particularly relevant in cases where the proposal of the topic is drawn up by an institution other than the University (e.g. an institute of the Academy of Sciences of the Czech Republic, a company in which applied research is carried out) and typically depends on the field of work in question. It is mainly a general definition of a group of workplaces.",
+          "required": 0,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "the_context_of_the_dissertation_topic",
+          "in": "path",
+          "description": "Description of the context in which the topic of the dissertation is placed, e.g. the connection with other work carried out at the given workplace or led by the supervisor in question, the connection with the direction of the workplace, the supervisor, etc.",
+          "required": 0,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "has_a_study_program",
+          "in": "path",
+          "description": "The study program to which the topic of the dissertation falls, according to the International Standard Classification of Education (ISCED).",
+          "required": 0,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "has_a_specific_recommended_workplace",
+          "in": "path",
+          "description": "A specific recommended workplace that can be identified, where the given topic of the dissertation could be processed.",
+          "required": 0,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "dissertation_topic": {
+        "type": "object",
+        "properties": {
+          "currently_offered": {
+            "description": "Indicates whether the topic is currently offered for enrollment.",
+            "type": "string"
+          },
+          "recommended_workplaces_in_general": {
+            "description": "Faculties or institutes, or their parts, where possible work could be carried out. It is particularly relevant in cases where the proposal of the topic is drawn up by an institution other than the University (e.g. an institute of the Academy of Sciences of the Czech Republic, a company in which applied research is carried out) and typically depends on the field of work in question. It is mainly a general definition of a group of workplaces.",
+            "type": "string"
+          },
+          "the_context_of_the_dissertation_topic": {
+            "description": "Description of the context in which the topic of the dissertation is placed, e.g. the connection with other work carried out at the given workplace or led by the supervisor in question, the connection with the direction of the workplace, the supervisor, etc.",
+            "type": "string"
+          },
+          "has_a_study_program": {
+            "description": "The study program to which the topic of the dissertation falls, according to the International Standard Classification of Education (ISCED).",
+            "type": "string"
+          },
+          "has_a_specific_recommended_workplace": {
+            "description": "A specific recommended workplace that can be identified, where the given topic of the dissertation could be processed.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
