@@ -1,5 +1,0 @@
-- Nevím, jak v dataspeceru získat ontologii v angličtině. Je to tak ze čtvrtiny anglicky, zbytek česky.
-- Když stáhnu artefakty z Dataspeceru, nevím, co představuje tu ontologii.
-- Rád bych použil Wikidata, ale nevím, jestli to je implementované.
-- Četl jsem článek na knowledge graphs, ale ještě jsem nepoužil knowledge graph, protože bych chtěl použít to, co je dostupné v Dataspeceru.
-- Co udělat v nejbližší době: zkusit promptovat tak, abych už dostal správné výsledky. Pak zkusit říct LLM, aby navrhnul alespoň jednu další možnost, pokud nějaká existuje.
