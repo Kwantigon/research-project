@@ -1,0 +1,54 @@
+Given the database in POSTGRESQL described by the following SQL script:
+	CREATE TABLE person (
+		pe_id integer NOT NULL,
+		pe_full_name text NOT NULL,
+		CONSTRAINT person_pk PRIMARY KEY (pe_id)
+	);
+
+	CREATE TABLE service_provider (
+		sp_id integer NOT NULL,
+		sp_name text NOT NULL,
+		CONSTRAINT service_provider_pk PRIMARY KEY (sp_id)
+	);
+
+	CREATE TYPE association_state_type AS ENUM ('NotAssociated','Associated');
+
+	CREATE TABLE person_sp_association (
+		pspa_id integer NOT NULL,
+		pe_id integer NOT NULL,
+		sp_id integer NOT NULL,
+		pspa_state association_state_type NOT NULL,
+		pspa_not_before timestamp NOT NULL,
+		CONSTRAINT person_sp_association_pk PRIMARY KEY (pspa_id)
+	);
+	
+And given the following explanation for the database:
+	Table person represents an user of our system. Table person has the following columns:
+		pe_id, which is the unique identifier of a person.
+		pe_full_name, which is the full name of the person.
+	Table service_provider represents the company, which a person works for. One service provider can have multiple people but one person can be associated to only one service provider. Table service_provider has the following columns:
+		sp_id, which is the unique identifier of a service provider.
+		sp_name, which is the name of the service provider.
+	The table person_sp_association represents a relationship between a person and a service provider. One person can only be associated with one service provider while one service provider can be associated with multiple people. Table person_sp_association has the following columns:
+		pspa_id, which is the unique identifier of the association.
+		pe_id, which is the id of the person. It corresponds to a pe_id in table person.
+		sp_id, which is the id of the service provider. It corresponds to a sp_id in table service_provider.
+		pspa_state, which is the state of the association. It can be either "Associated" or "NotAssociated".
+		pspa_not_before, which is a timestamp that represents the time validity of the association. An association is valid only if its timestamp is equal to or less than the current time. If a person has more than one association to a service provider, then the valid association is the one with the latest timestamp that is not greater than the current time.
+
+Write a POSTGRESQL query for the following question. Do not explain the query. Return just the query, so it can be run
+verbatim from your response.
+Here's the question:
+<question>
+------------
+How many people are under the service provider Poskytovatel Cislo Jedna.
+OUTPUT:
+SELECT COUNT(*) FROM person_sp_association WHERE sp_id = 'Poskytovatel Cislo Jedna';
+//
+Which service provider does Jaroslav Člověk belong to?
+OUTPUT:
+SELECT sp_id FROM person_sp_association WHERE pe_id = 'Jaroslav Člověk';
+//
+Show me the newest associations for each person.
+OUTPUT:
+SELECT pe_id, MAX(pspa_not_before) AS newest_association FROM person_sp_association GROUP BY pe_id;
