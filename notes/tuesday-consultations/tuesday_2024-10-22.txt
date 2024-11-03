@@ -1,0 +1,20 @@
+Říct LLM, aby vracel strukturované odpovědi. Třeba v nějakém JSONu.
+Dávat takovou podobu, kterou ten LLM pravděpodobně viděl během trénování. To, co jsem dal je docela daleko.
+Stálo by za pokus tam dát **RDF schema** nebo **plant UML** notace.
+Je dobré dávat to RDF schema z pohledu budoucí rozšiřitelnosti. Zeptat se Štěpána, jestli můžu vytáhnout RDF schema.
+Potřebuju definici tříd, jejich propert a dědičnost. Já potřebuju vyexportovat do RDF schema definice.
+Zadefinovat strukturu, ve které nám bude dávat ten výstup.
+Prozatím potřebuju základní prompt s čím můžu pracovat. Prompty můžu ladit, až budu mít ty funkcionality.
+Většinou: "provide the output in the following structure" - dát vzorek bez hodnot.
+- Pak tomu budeme dávat příklady.
+- One-shot, n-shot strategy. Chain of thought strategy.
+- Vyhrávají spíše jednoduché prompty. Jde spíše o slova v promptu než jestli je to správně gramaticky.
+Json výstupy to umí dobře. Mám se snažit dostat nejdetailněji sémantiku do toho promptu - což je RDF graf.
+
+Shrnutí:
+Od Štěpána si zjistit, jestli by šlo nějak vyexportovat RDF.
+Napsat ručně RDF z toho malého příkladu, co mám a dát to do LLM.
+Definovat si výstupní JSON strukturu.
+Zhotovit šablony pro prompty, které budu posílat.
+Nechat si poradit od Petra Škody, co použít za front end.
+Zkoumat, co použít pro napojení na LLM. A jaký jazyk použít na back endu.

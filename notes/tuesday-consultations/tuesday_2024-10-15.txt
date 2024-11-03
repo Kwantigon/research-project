@@ -1,0 +1,60 @@
+Koncepty v users queries nejsou tak viditelné. Možná lepší napsat něco jako že ty koncepty schované v users queries.
+
+Dávám hodně artefaktů.
+My chceme jako výsledek Sparql. Já chci namapovat na ty modrý věci. Ale když mu dám ty technické artefakty, tak asi nedokáže namapovat na ty modré věci.
+Já zatím pracuju s artefakty. Ale potřeboval bych možná přístup přes Dataspecer core k PIM? Prostě dostat sémantickou vrstvu.
+
+Štěpán něco zpřístupnil pro Dominika. Zjistit si, co to je. Možná by se mi to hodilo.
+Převést graf sémantického modelu do textu a dát to do LLM.
+
+Je spousta možností co dát LLM a v jaké podobě.
+Podívejme se na badminton event data structure. Můžeme si představit nějaký graf s třemi uzly. Vypíšu to tak v té hierarchické struktuře textově do LLM.
+
+Přemýšlet, v jakém tvaru můžu dávat ty koncepty do LLM.
+Potřebuju vytáhnout všechny struktury a hierarchickou strukturu.
+popisky ke každé entitě taky potřebuju.
+
+Uživatel řekne, že chce pracovat pouze s nějakou strukturou, např. badminton event.
+Nejjednodušší je dát přímo to, co vidím v data structure editor.
+Já chci, aby LLM vzal textový dotaz a rozpoznat správně entity.
+Zkusit prozkoumat - datová struktura pro badminton event nemusí mít všechny atributy pro badminton event v sémentické vrstvě. Jen nejsou v té datové struktuře.
+	- Když to dám do LLM, pomůže to nějak?
+	- Nepoužije to do dotazu, ale aby pochopil ten badminton event.
+	- Co když to pomůže lépe sémanticky zpracovat uživatelský dotaz?
+
+Zkusit:
+- Nedávat artefakty. Jen stromeček.
+- Pro každou třídu vypsat atributy a asociace atd.
+- Dát bez popisků. Pak dát s popisky. Observe the difference.
+Hypotéza: čím více sémantického kontextu, tím chytřejší to bude.
+- Je riziko, že to přepísknu když tomu dávám informace (dám moc informací)
+- Nemůžu dávat všechno z Wikidat - třeba 19877 tříd, kam se to naváže.
+
+Stojí za úvahu v experimentování:
+Když mám dotaz, tak použít varianty, které jsou zamlženější.
+- Použít jiná slova než v datové specifikaci.
+- Jinou větnou konstrukci.
+
+Připravím několik datových specifikací. Připravit různé věty - varianty zamlženosti.
+Výsledek je SPARQL dotaz - to pak evaluovat.
+
+Research část je experiment: jaké je vhodné množství informací. Různé varianty otázek. Různé modely.
+Dominik zkoušel Llamu a Mistral.
+
+Pro research project stačí pár měření - 2 modely, pár dotazů.
+Připravit ručně data.
+
+Budeme muset měřit.
+
+Data můžu získat z Wikidat.
+Jak mám query.sparql, tak můžu pustit dotaz.
+- Přepsat CONSTRUCT na SELECT *
+- Připsat LIMIT
+
+Uživatel mi může dát dotaz, který se dá zodpovědět. Pak dá dotaz, který se nedá zodpovědět pomocí té datové specifikace.
+Připravit zodpověditelné dotazy i ty, které se nedají zodpovědět.
+Zadefinovat, jak se to má chovat na takovýchto dotazech.
+Definovat chování, co očekávám.
+Část dotazu, která se nedá zodpovědět třeba přeškrtnout. Připravit dotazy, kde se to projeví.
+
+Používám LLM pro: mapování konceptů, expanzi dotazů, identifikaci částí dotazů, které se dají odpovědět a které se nedají odpovědět. 
