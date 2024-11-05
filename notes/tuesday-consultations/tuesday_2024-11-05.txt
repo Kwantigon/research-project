@@ -1,0 +1,41 @@
+LLM Interface a prompty by měly být konfigurovatelné.
+
+Template, který jsem vytvořil:
+- Každý prompt by měl být nezávislý a nenavazovat na sebe.
+- Dávám to LLM jako jeden velký task.
+Vyzkoušet jiný setup:
+- Jde mi o to, abych rozpoznal třídy, které se mapují na otázku.
+- Dát místo ontologie výpis entit, název, popis - informace. Jen podmnožinu ontologie = třídy a informace o třídách relevantní pro uživatelský dotaz. Relevantní znamená jsou podobné v nějakém vektorovém embeddingu.
+- Vektor reprezentující dotaz a vektor reprezentující třídy a dát top K podobných.
+
+Prozkoumat více možností - nemít jen jednu promptovací strategii. **Retrieval augmented generation**
+Vzít si ontologii - řeknu si, co LLM má použít z té ontologie.
+- Pro každou třídu jeden dokument - název, popis, seznam properties, kde je ta třída doménou.
+- Jednou operací si udělám vector embedding. Vzít dotaz, zaembeddovat stejným modelem. Spočítat nejpodobnější (např. podle cosine distance).
+- Nemusí to být RDF reprezentace, ale bude to nějaké popisy.
+- V LlamaIndexu by to šlo jednoduše zaembeddovat. Zkusit hledat pojem RAG.
+
+Podívat se na GraphRAG - stojí za tím asi Microsoft.
+
+RAG nepomůže s mojí jednoduchou ontologií - malý příklad.
+Chtělo by to zkusit něco velkého. I mimo Dataspecer.
+- Třeba FIBO.
+
+Kdybych potřeboval vektorovou databázi, tak activeloop.ai
+
+Můj výstupní JSON:
+- Co když v původní otázce je to slovo vícekrát.
+
+Poutívat stateless prompty.
+My chceme, aby LLM jen vybral ty properties, které jsou relevantní uživatelskému dotazu.
+- Pro každý property se zeptat, jak by mohla být relevantní v kontextu dotazu.
+
+Zvážit možnou alternativu:
+- Pro vypsání možných properties použiju LLM. Ale alternativa je použít v módu embedding.
+- Každou property převedu na dokument - název, popisek, popisek domény a popisek range.
+- Co properta, to dokument. Zaembedduju do vektoru.
+- Zaembeddovat uživatelský dotaz. Vybrat si top K properties.
+- Otázka je jestli to vrátí lepší výsledky než bez embeddingu.
+
+Hlavní myšlenka je dávat jen podčást otologie, která je relevantní.
+Rozmyslet si, co odprezentovat týmu.
