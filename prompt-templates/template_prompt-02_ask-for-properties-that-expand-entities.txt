@@ -1,0 +1,15 @@
+Give me properties which I can add to my query to gain more information about the "<ENTITY NAME>" entity. Only use properties available in the semantics description I have given you. Give me only properties, which are not present in my original query.
+Do not include any explanations or apologies in your responses. Provide the output in the following JSON structure:
+{
+	"entity name": {
+		"property one": "explanation of the property one",
+		"property two": "explanation of the property two"
+	}
+}
+An example output:
+{
+	"subject": {
+		"code": "the code of the subject, for example, NSWI999",
+		"language": "the language that the subject will be taught in. Can be either Czech or English"
+	}
+}

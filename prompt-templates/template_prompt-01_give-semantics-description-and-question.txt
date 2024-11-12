@@ -1,0 +1,33 @@
+Given the semantics for a data specification, give me entities, which play a role in the question given in natural language below. For each of those entities, give me the words from the original question, which map to the entities and give me a short summary for each of them.
+Do not include any explanations or apologies in your responses. Provide the output in the following JSON structure:
+[
+	"entityOne": {
+		"mapsFrom": "Words from the original question",
+		"summary": "Summary for the entity"
+	},
+	"entityTwo": {
+		"mapsFrom": "Words from the original question",
+		"summary": "Summary for the entity"
+	}
+]
+An example output:
+[
+	"person": {
+		"mapsFrom": "who",
+		"summary": "any member of Homo sapiens, unique extant species of the genus Homo, from embryo to adult"
+	},
+	"school subject": {
+		"mapsFrom": "enrolled in",
+		"summary": "field of knowledge defined and organized for teaching in school"
+	}
+]
+
+The semantics is:
+```
+
+```
+
+The question is:
+```
+
+```
