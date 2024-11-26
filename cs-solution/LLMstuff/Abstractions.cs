@@ -1,8 +1,13 @@
-﻿namespace Abstractions
+﻿using System.Collections.Specialized;
+using System.Text;
+
+namespace Abstractions
 {
 	public interface ILanguageModelConnector
 	{
 		string SendPrompt(string prompt);
+
+		//Task<string> SendPromptAsync(string prompt);
 	}
 
 	public interface IResponseProcessor

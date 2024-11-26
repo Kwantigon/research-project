@@ -1,0 +1,34 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Testing API",
+    "description": "Trying out the ASP.NET core RESTful API",
+    "contact": {
+      "name": "Nguyen Quoc Anh",
+      "email": "nquocanh97@gmail.com"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "ApiTests"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": { }
+}

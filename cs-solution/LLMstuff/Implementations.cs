@@ -24,7 +24,6 @@ namespace Implementations
 		}
 
 		private Kernel _kernel;
-		const string PROMPT = "Hello, can you tell me the current date?";
 
 		public string SendPrompt(string prompt)
 		{
