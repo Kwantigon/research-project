@@ -1,0 +1,14 @@
+Write down the API.
+Create dummy DB entities where needed.
+Define the LLM interface.
+Write a dummy interface implementation.
+
+app.MapGet("/query-expansion-properties", ([FromBody] UserQuery userQuery) => Handler.Get.QueryExpansionProperties(userQuery));
+- GET requests should not contain a body.
+- If they do, the server should ignore the body.
+- How do I send the query to the server then?
+
+I really need to figure out a good way to pass the user's query to the server even when semantically, GET request makes the most sense.
+- For now, those GET requests pass it in the query part of the URL.
+
+Every query translation is immediately followed by a request for expansion properties. Therefore it probably makes sense to group both actions into one endpoint.
