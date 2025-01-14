@@ -1,0 +1,27 @@
+Nejdřív z manager zavolat něco, co dá uživateli javascript a načte UI. Čeká dokud se to nenačte.
+Měl bych si držet stav konverzace. Na začátku bych měl říct uživateli, že má dát query.
+- Musím navádět uživatele.
+
+Z názvu query-expansion-properties by se dalo čekat, že ty entity už máme rozpoznané.
+URI a metoda by měla reflektovat tu sémantiku.
+
+Moje POSTy nejsou idempotentní. Dodržovat PUT a POST
+BEZESTAVOVÝ SERVER.
+Na začátku zobrazit uživateli, že pracuje s touto konkrétní datovou specifikací.
+
+POST /conversations
+- vytvořím konverzaci
+GET /
+
+Konverzace je objekt, který má
+ID
+Sparql dotaz
+Sekvence user queries. Nebo sekvence textů s atributem (user nebo bot).
+
+Struktura URL by měla začínat /conversations.
+Každá konverzace má ID
+/conversations/{id}
+/conversations/{id}/data-specification
+
+Rozmyslet si víc model té konverzace.
+Možná si i pamatovat předchozí Sparql queries.
