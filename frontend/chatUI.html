@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Chatbot</title>
+	<link rel="stylesheet" href="ui-style.css">
+	<script src="ui-script.js" defer></script>
+</head>
+
+<body>
+	<div id="navigation-bar">
+		<ul>
+			<li>Chatbot</li>
+			<li>Manage data specifications</li>
+		</ul>
+	</div>
+	<div id="messages-and-message-input-container">
+		<div id="messages-container">
+			<ul id="messages-ul">
+				<!-- Wrap each message inside <p></p> to have some padding between messages -->
+				<li class="bot-message"><p>Bot message #1</p></li>
+				<li class="user-message"><p>User message #1</p></li>
+				<li class="bot-message"><p>Bot message #2</p></li>
+			</ul>
+		</div>
+
+		<div id="message-input-container">
+			<textarea id="message-input-textarea" placeholder="Type your message here" cols="70" rows="5"></textarea>
+			<button type="button" id="message-input-send-btn">Send</button>
+		</div>
+	</div>
+
+	<div id="chat-history-container">
+		<ul id="chat-history-ul">
+			<li class="chat-li" onclick="retrieveChatHistory(1)">Conversation #1</li>
+			<li class="chat-li" onclick="retrieveChatHistory(2)">Conversation #2</li>
+			<li class="chat-li" onclick="retrieveChatHistory(3)">Conversation #3</li>
+			<li class="chat-li" onclick="retrieveChatHistory(4)">Conversation #4</li>
+		</ul>
+	</div>
+</body>
+
+</html>
