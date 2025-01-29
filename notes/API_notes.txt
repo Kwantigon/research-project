@@ -3,12 +3,13 @@ Create dummy DB entities where needed.
 Define the LLM interface.
 Write a dummy interface implementation.
 
-app.MapGet("/query-expansion-properties", ([FromBody] UserQuery userQuery) => Handler.Get.QueryExpansionProperties(userQuery));
-- GET requests should not contain a body.
-- If they do, the server should ignore the body.
-- How do I send the query to the server then?
+The response to every user message from the frontend is that the query is:
+- Translated SPARQL query (simple string)
+- Properties for query expansion (indices of the words to be highlighted - those can be clicked on and potentially be used as expansions).
+So maybe I only need a single endpoint for every user message.
+And I will keep the conversation state on the server side.
 
-I really need to figure out a good way to pass the user's query to the server even when semantically, GET request makes the most sense.
-- For now, those GET requests pass it in the query part of the URL.
-
-Every query translation is immediately followed by a request for expansion properties. Therefore it probably makes sense to group both actions into one endpoint.
+When users click on a word to see more information, that should correspond to a request.
+Something like GET /conversations/{conversationId}/{property-name}
+- If this property summary has been retrieved from the LLM before, it should be cached.
+- I should give an ID to each property, because the user could use various words to refer to the same property. This could potentially solve the problem where user wants to see a summary for a property that is not in a message at all (they click on a message property then click on another property inside the summary).

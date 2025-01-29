@@ -1,0 +1,27 @@
+post data-specifications:
+- neni jasne, proc se to dela.
+- vice rozepsat, k cemu to je.
+- napsat, ze URI ukazuje na Dataspecer package.
+
+GET data-specifications
+- vratit i uri pro kazdou datovou specifikaci.
+
+POST /conversations
+- misto ID v tele by to melo byt odkaz na data-specifications/{id}
+
+GET /conversations
+- vratit odkaz misto ID.
+- mit jen informace jen o konverzaci.
+- zpravy vratit v GET messages.
+
+message source: user / system, ne 0 a 1.
+
+POST /..../messages
+- vratit rovnou url.
+- ocekavat jen user message.
+- presunout celou odpoved systemu na backend. Ne ze frontend si rekne o sparql a doplni do sablony a pak zavolat post. Je to divne rozdelene.
+
+Vytvorit lepsi priklad, kde jsou videt volani RESTu.
+Vice rozpracovat, jak bude vypadat prace s tou konverzaci. Ne kazda zprava od uzivatele se zpracovava stejne. Ja si celou dobu drzim nejakou vygenerovanou podstrukturu datove specifikace. Ty dalsi zpravy by mely nejak navazovat na tu strukturu.
+
+Stepan chce, abych rozmyslel i vraceni se v konverzaci.

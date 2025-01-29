@@ -35,3 +35,4 @@ C:\Users\nquoc\MatFyz\research-project\repo\research-project\cs-solution\API\obj
 C:\Users\nquoc\MatFyz\research-project\repo\research-project\cs-solution\API\obj\Debug\net9.0\BackendApi.pdb
 C:\Users\nquoc\MatFyz\research-project\repo\research-project\cs-solution\API\obj\Debug\net9.0\BackendApi.genruntimeconfig.cache
 C:\Users\nquoc\MatFyz\research-project\repo\research-project\cs-solution\API\obj\Debug\net9.0\ref\BackendApi.dll
+C:\Users\nquoc\MatFyz\research-project\repo\research-project\cs-solution\API\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll

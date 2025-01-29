@@ -3,16 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|c:\\users\\nquoc\\matfyz\\research-project\\repo\\research-project\\cs-solution\\api\\handler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|solutionrelative:handler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|c:\\users\\nquoc\\matfyz\\research-project\\repo\\research-project\\cs-solution\\api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|c:\\users\\nquoc\\matfyz\\research-project\\repo\\research-project\\cs-solution\\api\\dtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{787E80DE-020D-4554-81E1-939B2BCC8D1B}|BackendApi.csproj|solutionrelative:dtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,45 +14,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "DTOs.cs",
-              "DocumentMoniker": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\DTOs.cs",
-              "RelativeDocumentMoniker": "DTOs.cs",
-              "ToolTip": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\DTOs.cs",
-              "RelativeToolTip": "DTOs.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAACAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-01T15:59:28.241Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAuwDUAAAB7AAAAAAAAAA==",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAAAGEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-01T10:22:24.965Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Handler.cs",
-              "DocumentMoniker": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\Handler.cs",
-              "RelativeDocumentMoniker": "Handler.cs",
-              "ToolTip": "C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\cs-solution\\API\\Handler.cs",
-              "RelativeToolTip": "Handler.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAUwF0AAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-01T10:26:42.147Z",
+              "WhenOpened": "2025-01-18T10:44:15.03Z",
               "EditorCaption": ""
             }
           ]

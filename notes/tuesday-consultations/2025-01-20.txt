@@ -1,0 +1,4 @@
+Do dvou měsíců předložte komisi detailní specifikaci - co je detailní specifikace?
+
+Když si uživatel zobrazí summary pro například "player", tak tam vidí nějaký text.
+Když si v dalším dotazu zobrazí summary zase pro "player", tak je dost možný, že když se zeptám LLM znova, tak ten summary text bude jiný než předtím. To může být matoucí.

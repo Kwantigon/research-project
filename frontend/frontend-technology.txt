@@ -1,0 +1,2 @@
+Štěpán Stenchlák:
+preferoval bych tedy abys pro frontend použil Vite, React + Typescript a jako grafickou knihovnu shadcn/ui. Nakonec přímo ta oficiální knihovna UI pro chatbot přímo nemá, ale když dáš do google "shadcn chatbot" tak ti jich to pár najde. Pěkně vypadá třeba https://github.com/vercel/ai-chatbot, ale bude to trochu náročnější na vykuchání. Začni s vite tutoriálem a snad rychle vše pochopíš.

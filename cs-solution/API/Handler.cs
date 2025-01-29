@@ -1,100 +1,146 @@
-﻿using DTO;
+﻿using BackendApi.Abstractions;
+using BackendApi.Database;
+using BackendApi.DTO;
+using BackendApi.Implementation;
+using BackendApi.Model;
 
 namespace RequestHandler;
 public class Handler
 {
+	private static IDatabase database = new InMemoryDatabase();
+
+	private static ILlmConnector llmConnector = MockLlmConnector.GetInstance();
+
+	private static ILlmResponseProcessor llmResponseProcessor;
+
 	public static class GET
 	{
-		public static IReadOnlyList<uint> PreviousConversations()
+		public static IList<GetDataSpecificationsResponseDTO> AllDataSpecifications()
 		{
-			Console.WriteLine("Handler.Get.PreviousConversations()");
-
-			// Get previous chats from the databse.
-			// Get their IDs and put them into a list.
-			// Return that list.
-			return new List<uint>() { 1, 2, 3, 4 };
+			var dataSpecifications = database.GetAllDataSpecifications();
+			return dataSpecifications.Select(
+				dataSpec => new GetDataSpecificationsResponseDTO()
+				{
+					Id = dataSpec.Id,
+					Name = dataSpec.Name
+				}
+			).ToList();
 		}
 
-		public static List<ChatMessage> ConversationHistory(uint conversationId)
+		public static DataSpecification DataSpecification(uint dataSpecificationId)
 		{
-			Console.WriteLine("Handler.Get.ConversationHistory({id})", conversationId);
-			return new List<ChatMessage>()
-			{
-				new ChatMessage("user-message", "Message from the user"),
-				new ChatMessage("bot-message", "Reply from the chatbot"),
-				new ChatMessage("user-message", "Message from the user"),
-				new ChatMessage("bot-message", "Reply from the chatbot"),
-				new ChatMessage("user-message", "Message from the user"),
-				new ChatMessage("bot-message", "Reply from the chatbot")
-			};
+			return database.GetDataSpecificationById(dataSpecificationId);
 		}
 
-		public static IReadOnlyList<string> QueryExpansionProperties(string userQuery)
+		public static IList<GetConversationsResponseDTO> AllConversations()
 		{
-			Console.WriteLine("Handler.Get.PropertiesForExpansion()");
-			Console.WriteLine("User's query: {0}", userQuery);
-
-			return new List<string>() { "property one", "property number two" };
+			var conversations = database.GetAllConversations();
+			return conversations.Select(
+				c => new GetConversationsResponseDTO()
+				{
+					ConversationId = c.Id,
+					Title = c.Title
+				}
+			).ToList();
 		}
 
-		public static string PropertySummary(string entityName)
+		public static IList<Message> ConversationMessages(uint conversationId)
 		{
-			Console.WriteLine("Handler.Get.EntitySummary()");
-			return $"{{ \"entityName\": \"{entityName}\", \"summary\": \"<summary_here>\" }}";
+			Conversation conversation = database.GetConversationById(conversationId);
+			return conversation.Messages;
+		}
+
+		public static PropertySummary PropertySummary(uint dataSpecificationId, uint propertyId)
+		{
+			DataSpecification dataSpecification = database.GetDataSpecificationById(dataSpecificationId);
+			string summary = llmConnector.GetPropertySummary(dataSpecification, propertyId);
+			return llmResponseProcessor.ProcessPropertySummaryResponse(summary);
 		}
 	}
 
 	public static class POST
 	{
-		public static string DataSpecification(DataSpecificationUrl dataSpecUrl)
+		public static uint CreateConversation(PostConversationsRequestDTO postConversationsRequestDTO)
 		{
-			Console.WriteLine("Handler.Post.DataSpecification");
-			Console.WriteLine("The dataSpecUrl is: {0}", dataSpecUrl);
-
-			// ToDo: Implement
-			// Do not forget sanitization of the dataSpecUrl.
-
-			return "Data specification successfully loaded";
+			DataSpecification dataSpecification = database.GetDataSpecificationById(postConversationsRequestDTO.DataSpecificationId);
+			Conversation conversation = new Conversation(dataSpecification, postConversationsRequestDTO.ConversationTitle);
+			database.AddNewConversation(conversation);
+			return conversation.Id;
 		}
 
-		public static string UserInitialQuery(UserQuery initialQuery)
+		public static uint ProcessNewDataSpecification(PostDataSpecificationsRequestDTO dataSpecificationInfo)
 		{
-			Console.WriteLine("Received a POST /user-initial-query request.");
-			Console.WriteLine("The query is: {0}", initialQuery);
+			// Do some processing of the data specification....
 
-			// ToDo: Implement
-			// Do not forget sanitization of the initialQuery.
-
-			string sparqlQuery = $"{{ \"sparql\": \"<sparql_query_here>\" }}";
-			return sparqlQuery;
-		}
-
-		public static string UserExpandedQuery(UserQuery expandedQuery)
-		{
-			Console.WriteLine("Received a POST /user-expanded-query request.");
-			Console.WriteLine("The query is: {0}", expandedQuery);
-
-			// ToDo: Implement
-			// Do not forget sanitization of the expandedQuery.
-
-			string sparqlQuery = $"{{ \"sparql\": \"<sparql_query_here>\" }}";
-			return sparqlQuery;
-		}
-	}
-
-	public static class PUT
-	{
-		public static string ExpandQuery(ExpandQueryDTO expandQueryDTO)
-		{
-			Console.WriteLine("Handler.Get.ExpandedQuery()");
-			Console.WriteLine("User's query: {0}", expandQueryDTO.QueryToExpand);
-			Console.WriteLine("Properties:");
-			foreach (string property in expandQueryDTO.Properties)
+			// Then save it to the database.
+			if (dataSpecificationInfo.Uri == null)
 			{
-				Console.WriteLine("  {0}", property);
+				throw new Exception("Data specification URI is null");
 			}
 
-			return "<expanded_query_value>";
+			DataSpecification dataSpecification = new DataSpecification(dataSpecificationInfo.Name, dataSpecificationInfo.Uri);
+
+			database.AddNewDataSpecification(dataSpecification);
+			return dataSpecification.Id;
+		}
+
+		/*public static void AddBotMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
+		{
+			if (messageDTO.Source != 0)
+			{
+				throw new Exception("Message source is not the chatbot. Message source value=" + messageDTO.Source);
+			}
+			if (string.IsNullOrWhiteSpace(messageDTO.TextValue))
+			{
+				throw new Exception("Message does not contain any text");
+			}
+
+			Message message = new Message
+			{
+				Source = (MessageSource)messageDTO.Source,
+				TimeStamp = messageDTO.TimeStamp,
+				TextValue = messageDTO.TextValue,
+			};
+			Conversation conversation = database.GetConversationById(conversationId);
+			conversation.Messages.Add(message);
+		}*/
+
+		public static SparqlResponse AddNewMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
+		{
+			if (messageDTO.Source != 1)
+			{
+				throw new Exception("Message source is not the user. Message source value=" + messageDTO.Source);
+			}
+			if (string.IsNullOrWhiteSpace(messageDTO.TextValue))
+			{
+				throw new Exception("Message does not contain any text");
+			}
+
+			Message message = new Message
+			{
+				Source = (MessageSource)messageDTO.Source,
+				TimeStamp = messageDTO.TimeStamp,
+				TextValue = messageDTO.TextValue,
+			};
+			Conversation conversation = database.GetConversationById(conversationId);
+			conversation.Messages.Add(message);
+
+			string sparql = llmConnector.TranslateToSparql(messageDTO.TextValue);
+
+			// Just highlight some random word in the query.
+			string[] userMsg = message.TextValue.Split(' ');
+			Random rng = new Random();
+			int startingIndex = rng.Next(userMsg.Length);
+			HighlightedProperty highlightedProperty = new HighlightedProperty(startingIndex, 1);
+
+			SparqlResponse response = new SparqlResponse()
+			{
+				SparqlQuery = sparql,
+				HighlightedWords = new List<HighlightedProperty>()
+			};
+			response.HighlightedWords.Add(highlightedProperty);
+
+			return response;
 		}
 	}
 }
