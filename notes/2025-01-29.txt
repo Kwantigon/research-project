@@ -1,7 +1,8 @@
 post data-specifications:
 - neni jasne, proc se to dela.
-- vice rozepsat, k cemu to je.
+- vice rozepsat, *k cemu* to je. Proc vubec se vola tady ta operace.
 - napsat, ze URI ukazuje na Dataspecer package.
+- v tuto chvili to mam jako synchronni operaci. Muze ale trvat dlouho, v tom pripade z toho udelat asynchronni operaci.
 
 GET data-specifications
 - vratit i uri pro kazdou datovou specifikaci.
