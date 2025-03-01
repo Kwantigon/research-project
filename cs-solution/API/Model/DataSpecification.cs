@@ -4,16 +4,16 @@ public class DataSpecification
 {
 	private static uint _nextUnusedId = 0;
 
-	public DataSpecification(string? dataSpecificationName, string dataSpecificationUri)
+	public DataSpecification(string? dataSpecificationName, string dataspecerUri)
 	{
 		Id = _nextUnusedId++;
 		Name = dataSpecificationName != null ? dataSpecificationName : $"Unnamed data specification #{Id}";
-		Uri = dataSpecificationUri;
+		DataspecerUri = dataspecerUri;
 	}
 
 	public uint Id { get; set; }
 
 	public string Name { get; set; }
 
-	public string Uri { get; set; }
+	public string DataspecerUri { get; set; }
 }

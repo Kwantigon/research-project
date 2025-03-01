@@ -3,8 +3,14 @@ namespace BackendApi.DTO
 {
 	public class PostDataSpecificationsRequestDTO
 	{
-		public string? Name { get; set; }
+		/// <summary>
+		/// The URI to the Dataspecer package.
+		/// </summary>
+		public required string UriToDataspecer { get; set; }
 
-		public required string Uri { get; set; }
+		/// <summary>
+		/// The name to store this data specification under.
+		/// </summary>
+		public string? Name { get; set; }
 	}
 }

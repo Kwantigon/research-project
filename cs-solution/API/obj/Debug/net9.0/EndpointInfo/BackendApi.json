@@ -32,7 +32,7 @@
           "BackendApi"
         ],
         "summary": "Add a new data specification.",
-        "description": "Process the given URI, which should point to a data specification. Add that data specification to the database. If name is not specified, it will be named \"Unnamed data specification #{ID}\".",
+        "description": "Expects an URI, which points to a Dataspecer package. The server will process this package and store the internal representation of the package, further referred to as a data specification. Once stored, new conversations about this data specification can be created and users can query about this data specification. If a name is given, the server will store the data specification under that name, otherwise a default name will be used.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -53,8 +53,8 @@
         "tags": [
           "BackendApi"
         ],
-        "summary": "Get ID and Name of all data specifications.",
-        "description": "Returns the ID and Name of each data specification in the database. (ToDo: In the future maybe add a limit to the query part)",
+        "summary": "Get all data specifications stored on the server.",
+        "description": "Returns information about each data specification stored on the server.",
         "responses": {
           "200": {
             "description": "OK",
@@ -78,6 +78,7 @@
           "BackendApi"
         ],
         "summary": "Get details of a data specification",
+        "description": "Returns all available information about the data specification with the given ID.",
         "parameters": [
           {
             "name": "dataSpecificationId",
@@ -109,7 +110,7 @@
           "BackendApi"
         ],
         "summary": "Start a new conversation.",
-        "description": "Create a new conversation over the data specification with the given ID. The data specification must be already present in the database. If name is not specified, it will be named \"Unnamed conversation #{ID}\".",
+        "description": "Create a new conversation using the data specification given in the request body. Once created, messages can be sent into the conversation. If a title is given, the server will store the conversation under that title, otherwise a default title will be used.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -130,8 +131,8 @@
         "tags": [
           "BackendApi"
         ],
-        "summary": "Get ID and Name of all conversations.",
-        "description": "Returns the ID and Name of each conversation in the database. (ToDo: In the future maybe add a limit to the query part)",
+        "summary": "Get all ongoing conversations.",
+        "description": "Returns the location and name of all conversations stored on the server.",
         "responses": {
           "200": {
             "description": "OK",
@@ -349,7 +350,7 @@
             "type": "string",
             "nullable": true
           },
-          "uri": {
+          "dataspecerUri": {
             "type": "string",
             "nullable": true
           }
@@ -358,16 +359,16 @@
       },
       "GetConversationsResponseDTO": {
         "required": [
-          "conversationId",
+          "location",
           "title"
         ],
         "type": "object",
         "properties": {
-          "conversationId": {
-            "type": "integer",
-            "format": "int32"
-          },
           "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
             "type": "string",
             "nullable": true
           }
@@ -376,16 +377,21 @@
       },
       "GetDataSpecificationsResponseDTO": {
         "required": [
-          "id",
+          "dataspecerUri",
+          "location",
           "name"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "nullable": true
+          },
+          "dataspecerUri": {
             "type": "string",
             "nullable": true
           }
@@ -458,11 +464,14 @@
         "additionalProperties": false
       },
       "PostConversationsRequestDTO": {
+        "required": [
+          "dataSpecificationUri"
+        ],
         "type": "object",
         "properties": {
-          "dataSpecificationId": {
-            "type": "integer",
-            "format": "int32"
+          "dataSpecificationUri": {
+            "type": "string",
+            "nullable": true
           },
           "conversationTitle": {
             "type": "string",
@@ -473,15 +482,15 @@
       },
       "PostDataSpecificationsRequestDTO": {
         "required": [
-          "uri"
+          "uriToDataspecer"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "uriToDataspecer": {
             "type": "string",
             "nullable": true
           },
-          "uri": {
+          "name": {
             "type": "string",
             "nullable": true
           }

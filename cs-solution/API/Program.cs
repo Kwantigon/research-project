@@ -1,6 +1,5 @@
 using BackendApi.DTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using RequestHandler;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,12 +14,10 @@ builder.Services.AddCors(options =>
 	});
 });
 
-//builder.Services.AddOpenApi("api");
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.UseCors();
-//app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -41,20 +38,20 @@ app.MapPost(
 	{
 		uint dataSpecificationId = Handler.POST.ProcessNewDataSpecification(dataSpecificationInfo);
 		string createdUri = "/data-specifications/" + dataSpecificationId;
-		return Results.Created(uri: createdUri, $"{{ \"dataSpecificationId\": {dataSpecificationId} }}");
-	}
-).WithOpenApi(o =>
-{
-	o.Summary = "Add a new data specification.";
-	o.Description = "Process the given URI, which should point to a data specification. Add that data specification to the database. If name is not specified, it will be named \"Unnamed data specification #{ID}\".";
-	return o;
-});
+		return Results.Created(uri: createdUri, string.Empty);
+	})
+	.WithOpenApi(o =>
+	{
+		o.Summary = "Add a new data specification.";
+		o.Description = "Expects an URI, which points to a Dataspecer package. The server will process this package and store the internal representation of the package, further referred to as a data specification. Once stored, new conversations about this data specification can be created and users can query about this data specification. If a name is given, the server will store the data specification under that name, otherwise a default name will be used.";
+		return o;
+	});
 
 app.MapGet("/data-specifications", () => Handler.GET.AllDataSpecifications())
 	.WithOpenApi(o =>
 	{
-		o.Summary = "Get ID and Name of all data specifications.";
-		o.Description = "Returns the ID and Name of each data specification in the database. (ToDo: In the future maybe add a limit to the query part)";
+		o.Summary = "Get all data specifications stored on the server.";
+		o.Description = "Returns information about each data specification stored on the server.";
 		return o;
 	});
 
@@ -62,6 +59,7 @@ app.MapGet("/data-specifications/{dataSpecificationId}", ([FromRoute] uint dataS
 	.WithOpenApi(o =>
 	{
 		o.Summary = "Get details of a data specification";
+		o.Description = "Returns all available information about the data specification with the given ID.";
 		return o;
 	});
 
@@ -71,23 +69,27 @@ app.MapPost(
 	{
 		uint conversationId = Handler.POST.CreateConversation(postConversationsRequestDTO);
 		string createdUri = "/conversations/" + conversationId;
-		return Results.Created(uri: createdUri, $"{{ \"conversationId\": {conversationId} }}");
-	}
-).WithOpenApi(o =>
-{
-	o.Summary = "Start a new conversation.";
-	o.Description = "Create a new conversation over the data specification with the given ID. The data specification must be already present in the database. If name is not specified, it will be named \"Unnamed conversation #{ID}\".";
-	return o;
-});
+		return Results.Created(uri: createdUri, string.Empty);
+	})
+	.WithOpenApi(o =>
+	{
+		o.Summary = "Start a new conversation.";
+		o.Description = "Create a new conversation using the data specification given in the request body. Once created, messages can be sent into the conversation. If a title is given, the server will store the conversation under that title, otherwise a default title will be used.";
+		return o;
+	});
 
 app.MapGet("/conversations", () => Handler.GET.AllConversations())
 	.WithOpenApi(o =>
 	{
-		o.Summary = "Get ID and Name of all conversations.";
-		o.Description = "Returns the ID and Name of each conversation in the database. (ToDo: In the future maybe add a limit to the query part)";
+		o.Summary = "Get all ongoing conversations.";
+		o.Description = "Returns the location and name of all conversations stored on the server.";
 		return o;
 	});
 
+// All the previous requests are quite straightforward.
+
+
+// These, I will have to think about more.
 app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) => Handler.GET.ConversationMessages(conversationId))
 	.WithOpenApi(o =>
 	{
