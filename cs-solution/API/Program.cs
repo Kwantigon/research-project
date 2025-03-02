@@ -97,6 +97,17 @@ app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint convers
 		return o;
 	});
 
+// Problem: How do the API users know that there is this resource available?
+// I did not return the location for the property-summary calls.
+// Maybe make the location available in the system's response in the user's message?
+app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([FromRoute] uint dataSpecificationId, [FromQuery] uint propertyId) => $"Property summary for property with ID={propertyId} of data specification with ID={dataSpecificationId}.")
+	.WithOpenApi(o =>
+	{
+		o.Summary = "Get a summary for a property.";
+		o.Description = "Returns a summary of the requested property in the data specification with the given ID.";
+		return o;
+	});
+
 /*app.MapPost(
 	"/conversations/{conversationId}/bot-message",
 	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) =>
@@ -134,15 +145,7 @@ app.MapGet(
 	o.Summary = "Get words that should be highlighted in the user's message.";
 	o.Description = "Highlighted words are mapped to properties in the data specification. This resource returns the positions of the words to be highlighted and the IDs of the properties that they map to. The messageId must be an user's message, otherwise this resource will return an error.";
 	return o;
-});
-
-app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([FromRoute] uint dataSpecificationId, [FromQuery] uint propertyId) => Handler.GET.PropertySummary(dataSpecificationId, propertyId))
-	.WithOpenApi(o =>
-	{
-		o.Summary = "Get a summary of the specified property.";
-		o.Description = "Get a summary of the property with the given propertyId from the data specification with the given ID.";
-		return o;
-	});*/
+});*/
 
 #endregion
 

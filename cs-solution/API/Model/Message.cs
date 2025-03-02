@@ -24,5 +24,7 @@ public class SystemMessage : Message
 {
 	public string? SparqlQuery { get; set; }
 
-	public IList<string> HighlightedWords { get; set; } = new List<string>();
+	public List<string> HighlightedWords { get; set; } = new List<string>();
+
+	public List<string> MappedProperties { get; set; } = new List<string>();
 }
