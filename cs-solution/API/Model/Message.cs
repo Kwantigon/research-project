@@ -1,19 +1,28 @@
 ﻿namespace BackendApi.Model;
 
+public enum MessageSource
+{
+	User,
+	System
+}
+
 public class Message
 {
-	// Messages might also have to contain ID.
-	// For now they don't. I'll see later.
-
-	public required MessageSource Source { get; set; }
+	public uint Id { get; set; }
 
 	public required DateTime TimeStamp { get; set; }
 
 	public required string TextValue { get; set; }
 }
 
-public enum MessageSource
+public class UserMessage : Message
 {
-	ChatBot,
-	User
+	public SystemMessage? ResponseFromSystem { get; set; }
+}
+
+public class SystemMessage : Message
+{
+	public string? SparqlQuery { get; set; }
+
+	public IList<string> HighlightedWords { get; set; } = new List<string>();
 }

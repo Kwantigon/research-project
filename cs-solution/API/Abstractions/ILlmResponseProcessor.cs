@@ -4,7 +4,5 @@ namespace BackendApi.Abstractions;
 
 public interface ILlmResponseProcessor
 {
-	SparqlResponse ProcessSparqlTranslationQuery(string sparqlTranslationResponse);
-
-	PropertySummary ProcessPropertySummaryResponse(string propertySummaryResponse);
+	object ParseMappedDataSpecProperties(string llmResponse);
 }

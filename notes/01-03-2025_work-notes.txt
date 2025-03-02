@@ -1,1 +1,3 @@
 Co když nechám uživatele psát jen na začátku. Další zprávy už pouze klikáním. Nemá možnost psát / upravovat navrhované zprávy.
+
+Jaké typy zpráv budu mít? Měl bych je více oddělit nebo stačí UserMessage a SystemMessage?

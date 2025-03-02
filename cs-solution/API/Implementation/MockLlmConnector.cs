@@ -5,6 +5,7 @@ namespace BackendApi.Implementation;
 
 public class MockLlmConnector : ILlmConnector
 {
+
 	static private MockLlmConnector? _instance = null;
 
 	public static MockLlmConnector GetInstance()
@@ -16,7 +17,13 @@ public class MockLlmConnector : ILlmConnector
 
 	private MockLlmConnector() { }
 
-	public string TranslateToSparql(string prompt)
+	public string SendPromptAndReceiveResponse(string prompt)
+	{
+		Console.WriteLine("MockLlmConnector::SendPromptAndReceiveResponse() invoked.");
+		return "This is a dummy LLM response from the MockLlmConnector.";
+	}
+
+	/*public string TranslateToSparql(string prompt)
 	{
 		return """
 				SELECT ?player
@@ -52,5 +59,5 @@ public class MockLlmConnector : ILlmConnector
 	public string GetPropertySummary(DataSpecification dataSpecification, uint propertyId)
 	{
 		return "These are the players or teams that are taking part in the badminton tournament. Each participant can be an individual player or a group of players (like a team), and they represent different countries.";
-	}
+	}*/
 }

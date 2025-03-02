@@ -10,7 +10,7 @@ public interface IDatabase
 
 	IList<Conversation> GetAllConversations();
 
-	Conversation GetConversationById(uint  conversationId);
+	Conversation GetConversationById(uint conversationId);
 
 	void AddNewDataSpecification(DataSpecification dataSpecification);
 

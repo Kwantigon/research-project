@@ -11,7 +11,7 @@ public class DataSpecification
 		DataspecerUri = dataspecerUri;
 	}
 
-	public uint Id { get; set; }
+	public uint Id { get; }
 
 	public string Name { get; set; }
 

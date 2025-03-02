@@ -2,7 +2,7 @@
 using BackendApi.Model;
 using BackendApi.Exceptions;
 
-namespace BackendApi.Database;
+namespace BackendApi.Implementation.Database;
 
 public class InMemoryDatabase : IDatabase
 {

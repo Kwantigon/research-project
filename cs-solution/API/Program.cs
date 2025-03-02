@@ -1,4 +1,5 @@
 using BackendApi.DTO;
+using BackendApi.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
 using RequestHandler;
 
@@ -21,9 +22,11 @@ app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-#region Requests
+#region Handlers inicialization
+//GetRequestsHandler getRequestsHandler = new GetRequestsHandler();
+#endregion
 
-///
+#region Requests
 app.MapGet("/", () => "Hello there!")
 	.WithOpenApi(o =>
 	{
@@ -86,15 +89,11 @@ app.MapGet("/conversations", () => Handler.GET.AllConversations())
 		return o;
 	});
 
-// All the previous requests are quite straightforward.
-
-
-// These, I will have to think about more.
-app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) => Handler.GET.ConversationMessages(conversationId))
+app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint conversationId) => Handler.GET.ConversationMessages(conversationId))
 	.WithOpenApi(o =>
 	{
 		o.Summary = "Get all messages in the conversation.";
-		o.Description = "Returns an array of messages in the conversation. Each message contains the message's source (user or chatbot), a timestamp of when the message was added to the conversation and the string value of the message.";
+		o.Description = "Returns an array of messages in the conversation.";
 		return o;
 	});
 
@@ -107,7 +106,7 @@ app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) 
 	}
 );*/
 
-app.MapPost(
+/*app.MapPost(
 	"/conversations/{conversationId}/messages",
 	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) => Handler.POST.AddNewMessageToConversation(conversationId, messageDTO)
 ).WithOpenApi(o =>
@@ -137,15 +136,13 @@ app.MapGet(
 	return o;
 });
 
-/*app.MapGet("/conversations/{conversationId}/property-summary", ([FromRoute] uint conversationId, [FromQuery] int propertyId) => Handler.GET.PropertySummary(propertyId));*/
-
 app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([FromRoute] uint dataSpecificationId, [FromQuery] uint propertyId) => Handler.GET.PropertySummary(dataSpecificationId, propertyId))
 	.WithOpenApi(o =>
 	{
 		o.Summary = "Get a summary of the specified property.";
 		o.Description = "Get a summary of the property with the given propertyId from the data specification with the given ID.";
 		return o;
-	});
+	});*/
 
 #endregion
 

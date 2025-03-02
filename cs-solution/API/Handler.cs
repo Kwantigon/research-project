@@ -1,5 +1,5 @@
 ﻿using BackendApi.Abstractions;
-using BackendApi.Database;
+using BackendApi.Implementation.Database;
 using BackendApi.DTO;
 using BackendApi.Implementation;
 using BackendApi.Model;
@@ -11,7 +11,7 @@ public class Handler
 
 	private static ILlmConnector llmConnector = MockLlmConnector.GetInstance();
 
-	private static ILlmResponseProcessor llmResponseProcessor;
+	private static ILlmResponseProcessor llmResponseProcessor = MockLlmResponseProcessor.GetInstance();
 
 	public static class GET
 	{
@@ -49,13 +49,6 @@ public class Handler
 		{
 			Conversation conversation = database.GetConversationById(conversationId);
 			return conversation.Messages;
-		}
-
-		public static PropertySummary PropertySummary(uint dataSpecificationId, uint propertyId)
-		{
-			DataSpecification dataSpecification = database.GetDataSpecificationById(dataSpecificationId);
-			string summary = llmConnector.GetPropertySummary(dataSpecification, propertyId);
-			return llmResponseProcessor.ProcessPropertySummaryResponse(summary);
 		}
 	}
 
@@ -95,28 +88,7 @@ public class Handler
 			return dataSpecification.Id;
 		}
 
-		/*public static void AddBotMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
-		{
-			if (messageDTO.Source != 0)
-			{
-				throw new Exception("Message source is not the chatbot. Message source value=" + messageDTO.Source);
-			}
-			if (string.IsNullOrWhiteSpace(messageDTO.TextValue))
-			{
-				throw new Exception("Message does not contain any text");
-			}
-
-			Message message = new Message
-			{
-				Source = (MessageSource)messageDTO.Source,
-				TimeStamp = messageDTO.TimeStamp,
-				TextValue = messageDTO.TextValue,
-			};
-			Conversation conversation = database.GetConversationById(conversationId);
-			conversation.Messages.Add(message);
-		}*/
-
-		public static SparqlResponse AddNewMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
+		/*public static SparqlResponse AddNewMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
 		{
 			if (messageDTO.Source != 1)
 			{
@@ -152,7 +124,7 @@ public class Handler
 			response.HighlightedWords.Add(highlightedProperty);
 
 			return response;
-		}
+		}*/
 	}
 }
 
