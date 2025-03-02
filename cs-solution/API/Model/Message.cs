@@ -26,5 +26,7 @@ public class SystemMessage : Message
 
 	public List<string> HighlightedWords { get; set; } = new List<string>();
 
+	// ID of the properties so that the GET handler can create uri from them.
+	// Then users can send requests to those URIs to get a summary for those properties.
 	public List<string> MappedProperties { get; set; } = new List<string>();
 }
