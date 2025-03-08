@@ -1,7 +1,8 @@
 using BackendApi.DTO;
-using BackendApi.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
 using RequestHandler;
+
+// ToDo: Create DTOs for all request mappings.
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -108,14 +109,13 @@ app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([From
 		return o;
 	});
 
-/*app.MapPost(
-	"/conversations/{conversationId}/bot-message",
-	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) =>
-	{
-		Handler.POST.AddBotMessageToConversation(conversationId, messageDTO);
-		return Results.Accepted();
-	}
-);*/
+
+app.MapGet("/conversations/{conversationId}/messages/{messageId}/system-response", () => "GET .../system-response");
+
+app.MapGet("/conversations/{conversationId}/messages/{messageId}/question-preview", () => "GET .../question-preview");
+
+// Might break idempotency because the LLM could generate a different lexicalization for every call with the same parameters.
+app.MapPut("/conversations/{conversationId}/next-message-preview", (/*All properties that user has selected for the next message*/) => { });
 
 /*app.MapPost(
 	"/conversations/{conversationId}/messages",

@@ -17,16 +17,23 @@ public class Message
 
 public class UserMessage : Message
 {
-	public SystemMessage? ResponseFromSystem { get; set; }
+	public SystemMessage? SystemResponse { get; set; }
 }
 
-public class SystemMessage : Message
+public class UserPreviewMessage : Message
 {
-	public string? SparqlQuery { get; set; }
 
-	public List<string> HighlightedWords { get; set; } = new List<string>();
+}
 
-	// ID of the properties so that the GET handler can create uri from them.
-	// Then users can send requests to those URIs to get a summary for those properties.
-	public List<string> MappedProperties { get; set; } = new List<string>();
+public abstract class SystemMessage : Message { }
+
+/// <summary>
+/// When the user's query is something completely unrelated to the conversation's data specification,
+/// The system will answer with a negative message.
+/// </summary>
+public class NegativeSystemMessage : SystemMessage { }
+
+public class PositiveSystemMessage : SystemMessage
+{
+	List<MatchedDataSpecificationProperty> MatchedProperties { get; set; } = [];
 }

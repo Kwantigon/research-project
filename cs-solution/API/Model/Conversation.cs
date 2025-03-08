@@ -23,4 +23,6 @@ public class Conversation
 	public List<Message> Messages { get; set; }
 
 	public DataSpecificationSubstructure? DataSpecificationSubstructure { get; set; }
+
+	public UserPreviewMessage QuestionPreview { get; set; }
 }

@@ -1,0 +1,33 @@
+Co když nechám uživatele psát jen na začátku. Další zprávy už pouze klikáním. Nemá možnost psát / upravovat navrhované zprávy.
+
+Jaké typy zpráv budu mít? Měl bych je více oddělit nebo stačí UserMessage a SystemMessage?
+
+Na prvotní query systém odpoví:
+- Negativní odpověď: uživatel se zeptal na něco úplně mimo.
+- Positivní odpověď:
+	1. FE zobrazí Sparql query.
+		Tady potřebuje od BE čistě jen textovou odpověď, která obsahuje Sparql query.
+	2. FE řekne uživateli, že může kliknout na nějaká slova, aby si zobrazil summary.
+		Potřebuje vědět jaká slova. Ideálně pozici v původní větě a kolik znaků (nebo slov).
+
+Nejsem si jistý, jestli v kódu musím rozlišovat typy systémových zpráv. Pro začátek to budu rozlišovat a pokud se ukáže, že není potřeba, tak to upravím.
+
+V property summary bude jednodušší, když vyjmenuju všechny properties, které by uživatele mohlo zajímat.
+Uživatel pak může vybírat v tom seznamu.
+Je to jednodušší než nechat uživatele klikat přímo do summary.
+
+Když si uživatel zvolí, že chce použít nějaké property pro expanzi, tak jakou metodou to poslat na server? A na jaký endpoint?
+
+Idea je, že na serveru si stavím tu další otázku uživatele, ale ještě ji necommitnu do konverzace. Když si uživatel zvolí propertu, tak se přidá do té další otázky. Když uživatel pošle samotnou zprávu, kterou jsme spolu sestavili, tak BE opravdu přidá tu otázku do konverzace.
+- Jak zpracovat tu další otázku? Určitě ne stejným způsobem jako první otázka.
+- Přidat si ty zvolené properties do podstruktury, kterou stavím na back endu.
+- Nechat si přeložit tu podstrukturu do Sparqlu.
+- Říct LLM, aby mi dalo nějaké rozumné další properties?
+FE: POST question-preview + 1 property.
+BE: Přidá property do substructure preview + řekne LLM, aby lexikalizoval.
+FE: GET question-preview.
+BE: Vrátí lexikalizaci.
+FE: PUT question-preview + 1 property?
+Request na question-preview by možná vždycky měl obsahovat všechny properties, které uživatel tam chce. Tím umožním i to, že když uživatel chce odebrat property, tak stačí poslat PUT request s příslušnými parametry a BE vytvoří správné preview?
+- Takže správný HTTP verb bude PUT.
+FE si musí držet seznam properties, které si uživatel vybral.
