@@ -17,7 +17,7 @@ public class Message
 
 public class UserMessage : Message
 {
-	public SystemMessage? SystemResponse { get; set; }
+	public SystemMessage? SystemAnswer { get; set; }
 }
 
 public class UserPreviewMessage : Message

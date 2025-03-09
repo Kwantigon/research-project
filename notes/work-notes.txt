@@ -31,3 +31,16 @@ FE: PUT question-preview + 1 property?
 Request na question-preview by možná vždycky měl obsahovat všechny properties, které uživatel tam chce. Tím umožním i to, že když uživatel chce odebrat property, tak stačí poslat PUT request s příslušnými parametry a BE vytvoří správné preview?
 - Takže správný HTTP verb bude PUT.
 FE si musí držet seznam properties, které si uživatel vybral.
+
+Back end si udržuje stav konverzace.
+2 možnosti, jak uživatel může zadat svůj follow-up otázku.
+- Ručně napíše.
+- Vybírá si properties a pak potvrdí.
+- To by trochu zjednodušilo zpracování na back endu, když přijde zpráva.
+- Pokud uživatel potvrdil, na back endu můžu jen potvrdit question preview.
+- Pokud uživatel zadal ručně otázku, možná budu muset zpracovat jako první dotaz.
+
+Konkrétní data v databázi nemám, ale možná bych mohl použít LLM, abych mohl doplnit do dotazu to, co uživatel chce.
+Například chce: Tournaments that have taken place this year so far in which there are participants *from Vietnam*.
+- Já dokážu vyznačit to, že dotaz se bude týkat tournament a player a country.
+- Tak teď nějakým způsobem říct LLM, kam by měl uživatel doplnit specifické hodnoty, které chce ve svém dotazu mít - např. Vietnam.

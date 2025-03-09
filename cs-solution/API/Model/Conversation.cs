@@ -24,5 +24,5 @@ public class Conversation
 
 	public DataSpecificationSubstructure? DataSpecificationSubstructure { get; set; }
 
-	public UserPreviewMessage QuestionPreview { get; set; }
+	public UserPreviewMessage? NextQuestionPreview { get; set; }
 }

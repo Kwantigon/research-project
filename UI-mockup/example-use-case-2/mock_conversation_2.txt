@@ -1,0 +1,53 @@
+System: Your data specification has been loaded. What would you like to know?
+User: I would like to see all tournaments which have taken place this year.
+--
+FE: POST /conversations/{conversationId}/messages
+BE: Zařadí si zprávu do konverzace a přiřadí jí IDčko. Zpracuje příslušným mechanizmem (pošle do LLM, řekne si o mapování atd.)
+FE: GET /conversations/{conversationId}/messages/{messageId}/system-answer
+--
+System: The data you want can be retrieved using the following Sparql query: ....
+		Some parts of your question can be expanded and I have highlighted the relevant words. You can click on them for more information.
+
+Summary of "tournament":
+Badminton tournaments are organized by the Badminton World Federation (BWF). Tournaments are divided into grades and each grade is further divided into multiple levels. Different tournaments take place in different countries. Most tournaments are annual but some have longer repetition intervals.
+Some properties related to badminton tournament are:
+- Grade.
+- Repetition interval.
+- Sponsoring brand.
+- Participants.
+
+Summary of "grade":
+The grade of tournament determines how prestigious the tournament is.
+Some properties related to grade are: there are none.
+
+Summary of "sponsoring brand":
+Big companies that make and sell badminton equipment will often sponsor tournaments and players. A lot of tournaments even have the company's name in the tournament's name (for example Yonex All England Open).
+Some properties related to brand are:
+- Name.
+- Founding date.
+- Founder.
+- Sponsored players.
+
+Summary of "participants":
+A participant is a badminton player registered with the Badminton World Federation. Players specialize in one of the five forms of the game.
+Some properties related to players are:
+- Name.
+- Age.
+- Height.
+- Country.
+- Preferred hand.
+- World ranking.
+- World tour ranking.
+- Sponsors.
+
+User first selects "brand".
+Question preview: I would like to see all tournaments and their sponsors which have taken place this year.
+
+Then user navigates back and selects "participants".
+Question preview: I would like to see all tournaments and their sponsors and the players participating, which have taken place this year.
+
+Then user selects players -> "nationality".
+Question preview: I would like to see all tournaments, their sponsors, the players participating and their nationalities, which have taken place this year.
+
+Problem: I have only shown a select query which is easy but it would be nice to be able to filter using a WHERE clause. But WHERE clauses require some input from the user (need the actual value to filter by).
+Being able to navigate the user to a question like: "I would like to see all tournaments sponsored by <sponsor_values> which a player from <player_country> is participating in."

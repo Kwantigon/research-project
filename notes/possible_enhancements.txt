@@ -1,0 +1,5 @@
+# Future work
+
+## The data you want can be retrieved using the following Sparql
+
+Could add user configuration, what kind of query to translate to (Sparql or SQL etc.)
