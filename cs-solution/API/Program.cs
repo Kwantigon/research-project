@@ -82,6 +82,17 @@ app.MapPost(
 		return operation;
 	});
 
+app.MapPost(
+	"/conversations/{conversationId}/messages",
+	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) => "POST /conversations/{conversationId}/messages"
+)
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Add a message to the conversation.";
+		operation.Description = "Adds a new message to the existing conversation and returns an URI to that message's location. For now, this is a synchronous operation. I might change it to be asynchronous if necessary.";
+		return operation;
+	});
+
 app.MapGet("/conversations", () => Handler.GET.AllConversations())
 	.WithOpenApi(operation =>
 	{
@@ -105,33 +116,32 @@ app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([From
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get a summary for a property.";
-		operation.Description = "Returns a summary of the requested property in the data specification with the given ID.";
+		operation.Description = "Returns a summary of the requested property and URIs to get summaries of other properties that are related to the requested property..";
 		return operation;
 	});
 
-app.MapGet("/conversations/{conversationId}/messages/{messageId}", () => "GET .../messageId");
-
-/*app.MapGet("/conversations/{conversationId}/messages/{messageId}/system-answer", () => "GET .../system-answer")
-		.WithOpenApi(operation =>
-		{
-			operation.Summary = "Get the system's response to the user's message.";
-			operation.Description = "Returns the system's response including URIs leading to summarization of properties that have been mapped from the user's message to the data specification.";
-			return operation;
-		});*/
-
-app.MapGet("/conversations/{conversationId}/messages/{messageId}/question-preview", () => "GET .../question-preview");
-
-// Might break idempotency because the LLM could generate a different lexicalization for every call with the same parameters.
-app.MapPut("/conversations/{conversationId}/next-message-preview", (/*All properties that user has selected for the next message*/) => { });
-
-app.MapPost(
-	"/conversations/{conversationId}/messages",
-	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) => "POST /conversations/{conversationId}/messages"
-)
+app.MapGet("/conversations/{conversationId}/messages/{messageId}", () => "GET .../messageId")
 	.WithOpenApi(operation =>
 	{
-		operation.Summary = "Add a message to the conversation.";
-		operation.Description = "??????";
+		operation.Summary = "Get details of a concrete message.";
+		operation.Description = "Returns all available information about the requested message. Typically the front end will want to request a previously POSTed user's message to retrieve the system's answer to the message.";
+		return operation;
+	});
+
+app.MapPut("/conversations/{conversationId}/next-message-preview", (/*All properties that user has selected for the next message*/) => { })
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Send the properties that user has selected for preview.";
+		operation.Description = "Use the user's selected properties to generate a question in natural language. The selected properties and the message preview WILL NOT be added to the conversation yet. (On the back end side: create a temporary substructure of the data specification, which corresponds to the query expanded by these selected properties).";
+		return operation;
+	});
+
+
+app.MapGet("/conversations/{conversationId}/messages/{messageId}/next-message-preview", () => "GET .../question-preview")
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Get the natural language equivalent of the expanded query.";
+		operation.Description = "Returns a preview of the user's previous query expanded by their selected expansion properties. This preview will be in natural language and is meant to be displayed to the user.";
 		return operation;
 	});
 
