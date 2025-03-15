@@ -1,3 +1,7 @@
+using Backend.DTO;
+
+namespace Backend.Abstractions.RequestHandlers;
+
 public interface IGetRequestsHandler
 {
 	DataSpecificationListDTO GetAllDataSpecifications();

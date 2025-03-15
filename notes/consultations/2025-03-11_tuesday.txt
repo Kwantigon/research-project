@@ -1,0 +1,17 @@
+GET .../property-summary IRI nedává smysl.
+- Jdu do properties a pak summary.
+- Slovo property je matoucí - může znamenat více věcí. Summary properties tournamentu.
+- Tournament je třída, která má nějaké properties.
+- To highlightované někdy může být property, někdy class.
+- Data spec se skládá z různých prvků - summary nevím, jestli to je třída, nebo co. Ale to slovo je určitě namatchované na něco - třída nebo možná nějaká kombinace. 
+- ITEMS je asi dobré slovo.
+
+Jedno slovo se může namatchovat na více items. Participant - třída player nebo i property "participates in tournament".
+- Když vede na více věcí, tak to znamená 2 requesty na různé items.
+- Zobrazit obě summaries.
+
+Používat IRI místo URI.
+Úkoly:
+- Upravit IRI .../property-summary
+- Napsat nejmenší funkční back end.
+- Vytvořit POSTMAN příklad.

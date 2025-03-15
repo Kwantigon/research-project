@@ -1,6 +1,6 @@
 namespace Backend.DTO;
 
-public DataSpecificationDTO
+public class DataSpecificationDTO
 {
 	/// <summary>
 	/// The name of the data specification.

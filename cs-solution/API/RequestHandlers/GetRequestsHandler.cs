@@ -1,4 +1,6 @@
 ﻿using Backend.Abstractions;
+using Backend.Abstractions.RequestHandlers;
+using Backend.DTO;
 
 namespace Backend.RequestHandlers;
 
@@ -23,9 +25,9 @@ public class GetRequestsHandler(
 	#region Interface implementation
 	public DataSpecificationListDTO GetAllDataSpecifications()
 	{
-		var dataSpecifications = database.GetAllDataSpecifications();
+		var dataSpecifications = _database.GetAllDataSpecifications();
 		var dataSpecificationsDTOs = dataSpecifications.Select(
-			dataSpec => new DataSpecificationListDTO()
+			dataSpec => new DataSpecificationDTO()
 			{
 				Name = dataSpec.Name,
 				Location = "/data-specifications/" + dataSpec.Id,
@@ -48,7 +50,7 @@ public class GetRequestsHandler(
 
 	public ConversationListDTO GetAllConversations()
 	{
-		var conversations = database.GetAllConversations();
+		var conversations = _database.GetAllConversations();
 		var conversationDTOs = conversations.Select(
 			conversation => new ConversationDTO()
 			{
@@ -65,7 +67,7 @@ public class GetRequestsHandler(
 		return new ConversationDTO
 		{
 			Title = conversation.Title,
-			Location = "/conversations/" + conversation.Id;
+			Location = "/conversations/" + conversation.Id
 		};
 	}
 	#endregion

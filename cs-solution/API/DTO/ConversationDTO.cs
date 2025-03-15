@@ -1,6 +1,6 @@
 namespace Backend.DTO;
 
-public ConversationDTO
+public class ConversationDTO
 {
 	/// <summary>
 	/// The title of the conversation.

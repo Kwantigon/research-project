@@ -1,4 +1,5 @@
 using Backend.DTO;
+using Microsoft.AspNetCore.Mvc;
 using RequestHandler;
 
 // ToDo: Create DTOs for all request mappings.
@@ -41,7 +42,7 @@ app.MapPost(
 	{
 		uint dataSpecificationId = Handler.POST.ProcessNewDataSpecification(dataSpecificationInfo);
 		string createdIri = "/data-specifications/" + dataSpecificationId;
-		return Results.Created(iri: createdIri, string.Empty);
+		return Results.Created(createdIri, string.Empty);
 	})
 	.WithOpenApi(operation =>
 	{
@@ -72,7 +73,7 @@ app.MapPost(
 	{
 		uint conversationId = Handler.POST.CreateConversation(postConversationsRequestDTO);
 		string createdIri = "/conversations/" + conversationId;
-		return Results.Created(iri: createdIri, string.Empty);
+		return Results.Created(createdIri, string.Empty);
 	})
 	.WithOpenApi(operation =>
 	{
@@ -100,6 +101,14 @@ app.MapGet("/conversations", () => Handler.GET.AllConversations())
 		return operation;
 	});
 
+app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) => $"GET /conversations/{conversationId}")
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Get basic information about the conversation.";
+		operation.Description = "Returns basic information about the conversation with the requested ID.";
+		return operation;
+	});
+
 app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint conversationId) => Handler.GET.ConversationMessages(conversationId))
 	.WithOpenApi(operation =>
 	{
@@ -111,7 +120,7 @@ app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint convers
 // Problem: How do the API users know that there is this resource available?
 // I did not return the location for the property-summary calls.
 // Maybe make the location available in the system's response in the user's message?
-app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([FromRoute] uint dataSpecificationId, [FromQuery] uint propertyId) => $"Property summary for property with ID={propertyId} of data specification with ID={dataSpecificationId}.")
+app.MapGet("/data-specifications/{dataSpecificationId}/items/{itemId}/summary", ([FromRoute] uint dataSpecificationId, [FromQuery] uint itemId) => $"Property summary for property with ID={itemId} of data specification with ID={itemId}.")
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get a summary for a property.";
@@ -127,7 +136,7 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}", () => "GET ..
 		return operation;
 	});
 
-app.MapPut("/conversations/{conversationId}/next-message-preview", (/*All properties that user has selected for the next message*/) => { })
+app.MapPut("/conversations/{conversationId}/next-message-preview", (/*[FromBody] All properties that user has selected for the next message*/) => { })
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Send the properties that user has selected for preview.";
@@ -143,26 +152,6 @@ app.MapGet("/conversations/{conversationId}/next-message-preview", () => "GET ..
 		operation.Description = "Returns a preview of the user's previous query expanded by their selected expansion properties. This preview will be in natural language and is meant to be displayed to the user.";
 		return operation;
 	});
-
-/*app.MapGet(
-	"/conversations/{conversationId}/messages/{messageId}/sparql-query",
-	([FromRoute] uint conversationId, [FromRoute] uint messageId) => { Console.WriteLine("GET /conversations/{conversationId}/user-messages/{messageId}/sparql-query"); }
-).WithOpenApi(operation =>
-{
-	operation.Summary = "Get the Sparql query corresponding to the user's message.";
-	operation.Description = "Each user's message is processed to extract relevant properties and the message is also translated into a Sparql query. This resource returns the translated Sparql query. The messageId must be an user's message, otherwise this resource will return an error.";
-	return operation;
-});
-
-app.MapGet(
-	"/conversations/{conversationId}/messages/{messageId}/highlighted-words",
-	([FromRoute] uint conversationId, [FromRoute] uint messageId) => { Console.WriteLine("GET /conversations/{conversationId}/user-messages/{messageId}/highlighted-words"); }
-).WithOpenApi(operation =>
-{
-	operation.Summary = "Get words that should be highlighted in the user's message.";
-	operation.Description = "Highlighted words are mapped to properties in the data specification. This resource returns the positions of the words to be highlighted and the IDs of the properties that they map to. The messageId must be an user's message, otherwise this resource will return an error.";
-	return operation;
-});*/
 
 #endregion
 
