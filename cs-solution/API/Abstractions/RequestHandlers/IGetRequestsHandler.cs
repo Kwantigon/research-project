@@ -4,6 +4,8 @@ namespace Backend.Abstractions.RequestHandlers;
 
 public interface IGetRequestsHandler
 {
+	AboutDTO GetAbout();
+
 	List<DataSpecificationDTO> GetAllDataSpecifications();
 
 	DataSpecificationDTO GetDataSpecification(uint dataSpecificationId);
@@ -15,4 +17,8 @@ public interface IGetRequestsHandler
 	List<MessageBasicDTO> GetConversationMessages(uint conversationId);
 
 	MessageDTO GetMessageFromConversation(uint conversationId, uint messageId);
+
+	DataSpecificationItemSummaryDTO GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId);
+
+	NextMessagePreviewDTO GetNextMessagePreview(uint conversationId);
 }

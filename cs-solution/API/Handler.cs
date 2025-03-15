@@ -7,20 +7,7 @@ using Backend.Model;
 namespace RequestHandler;
 public class Handler
 {
-	private static IDatabase database = new InMemoryDatabase();
-
-	private static ILlmConnector llmConnector = MockLlmConnector.GetInstance();
-
-	private static ILlmResponseProcessor llmResponseProcessor = MockLlmResponseProcessor.GetInstance();
-
-	public static class GET
-	{
-		public static IList<Message> ConversationMessages(uint conversationId)
-		{
-			Conversation conversation = database.GetConversationById(conversationId);
-			return conversation.Messages;
-		}
-	}
+	private static IDatabase _database = new InMemoryDatabase();
 
 	public static class POST
 	{
@@ -36,9 +23,9 @@ public class Handler
 			}
 			uint.TryParse(iriParts[2], out uint dataSpecificationId);
 
-			DataSpecification dataSpecification = database.GetDataSpecificationById(dataSpecificationId);
+			DataSpecification dataSpecification = _database.GetDataSpecificationById(dataSpecificationId);
 			Conversation conversation = new Conversation(dataSpecification, postConversationsRequestDTO.ConversationTitle);
-			database.AddNewConversation(conversation);
+			_database.AddNewConversation(conversation);
 			return conversation.Id;
 		}
 
@@ -54,7 +41,7 @@ public class Handler
 
 			DataSpecification dataSpecification = new DataSpecification(dataSpecificationInfo.Name, dataSpecificationInfo.IriToDataspecer);
 
-			database.AddNewDataSpecification(dataSpecification);
+			_database.AddNewDataSpecification(dataSpecification);
 			return dataSpecification.Id;
 		}
 

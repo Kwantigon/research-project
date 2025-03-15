@@ -25,4 +25,15 @@ public class Conversation
 	public DataSpecificationSubstructure? DataSpecificationSubstructure { get; set; }
 
 	public UserPreviewMessage? NextQuestionPreview { get; set; }
+
+	public void AddUserMessage(string text, DateTime timestamp)
+	{
+		Messages.Add(new UserMessage
+			{
+				Id = _nextUnusedMessageId++,
+				TimeStamp = timestamp,
+				TextValue = text
+			}
+		);
+	}
 }

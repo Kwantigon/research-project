@@ -1,28 +1,27 @@
 ﻿using Backend.Abstractions;
 using Backend.Abstractions.RequestHandlers;
 using Backend.DTO;
+using Backend.Model;
 
-namespace Backend.RequestHandlers;
+namespace Backend.Implementation.RequestHandlers;
 
-public class GetRequestsHandler(
-	ILogger<GetRequestsHandler> logger,
-	IDatabase database,
-	IPromptConstructor promptConstructor,
-	ILlmConnector llmConnector,
-	ILlmResponseProcessor llmResponseProcessor
-) : IGetRequestsHandler
+public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase database)
+	: IGetRequestsHandler
 {
 	private readonly ILogger<GetRequestsHandler> _logger = logger;
 
 	private readonly IDatabase _database = database;
 
-	private readonly IPromptConstructor _promptConstructor = promptConstructor;
-
-	private readonly ILlmConnector _llmConnector = llmConnector;
-
-	private readonly ILlmResponseProcessor _llmResponseProcessor = llmResponseProcessor;
-
 	#region Interface implementation
+	public AboutDTO GetAbout()
+	{
+		return new AboutDTO
+		{
+			ServiceName = "Back end API",
+			Greeting = "Hello there!"
+		};
+	}
+
 	public List<DataSpecificationDTO> GetAllDataSpecifications()
 	{
 		var dataSpecifications = _database.GetAllDataSpecifications();
@@ -67,6 +66,41 @@ public class GetRequestsHandler(
 			Title = conversation.Title,
 			Location = "/conversations/" + conversation.Id
 		};
+	}
+
+	public List<MessageBasicDTO> GetConversationMessages(uint conversationId)
+	{
+		var conversation = _database.GetConversationById(conversationId);
+		return conversation.Messages.Select(message =>
+		{
+			switch (message)
+			{
+				case UserMessage userMsg:
+					return new MessageBasicDTO
+					{
+						Source = MessageSource.User,
+						TimeStamp = userMsg.TimeStamp,
+						Text = userMsg.TextValue
+					};
+				default:
+					throw new NotSupportedException("Unexpected message class: " + message.GetType().Name);
+			}
+		}).ToList();
+	}
+
+	public MessageDTO GetMessageFromConversation(uint conversationId, uint messageId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public DataSpecificationItemSummaryDTO GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId)
+	{
+		throw new NotImplementedException();
+	}
+
+	public NextMessagePreviewDTO GetNextMessagePreview(uint conversationId)
+	{
+		throw new NotImplementedException();
 	}
 	#endregion
 }

@@ -1,4 +1,6 @@
-﻿namespace Backend.Model;
+﻿using Backend.DTO;
+
+namespace Backend.Model;
 
 public class Message
 {
