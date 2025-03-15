@@ -1,5 +1,5 @@
 ﻿
-namespace BackendApi.DTO
+namespace Backend.DTO
 {
 	public class PostDataSpecificationsRequestDTO
 	{

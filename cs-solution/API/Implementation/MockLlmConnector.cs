@@ -1,7 +1,7 @@
-﻿using BackendApi.Abstractions;
-using BackendApi.Model;
+﻿using Backend.Abstractions;
+using Backend.Model;
 
-namespace BackendApi.Implementation;
+namespace Backend.Implementation;
 
 public class MockLlmConnector : ILlmConnector
 {

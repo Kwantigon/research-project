@@ -1,4 +1,4 @@
-﻿namespace BackendApi.DTO;
+﻿namespace Backend.DTO;
 
 public class GetDataSpecificationsResponseDTO
 {

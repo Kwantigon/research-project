@@ -1,6 +1,6 @@
-﻿using BackendApi.Model;
+﻿using Backend.Model;
 
-namespace BackendApi.Abstractions;
+namespace Backend.Abstractions;
 
 public interface IDatabase
 {

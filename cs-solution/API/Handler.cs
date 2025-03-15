@@ -1,8 +1,8 @@
-﻿using BackendApi.Abstractions;
-using BackendApi.Implementation.Database;
-using BackendApi.DTO;
-using BackendApi.Implementation;
-using BackendApi.Model;
+﻿using Backend.Abstractions;
+using Backend.Implementation.Database;
+using Backend.DTO;
+using Backend.Implementation;
+using Backend.Model;
 
 namespace RequestHandler;
 public class Handler

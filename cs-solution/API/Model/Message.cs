@@ -1,4 +1,4 @@
-﻿namespace BackendApi.Model;
+﻿namespace Backend.Model;
 
 public enum MessageSource
 {

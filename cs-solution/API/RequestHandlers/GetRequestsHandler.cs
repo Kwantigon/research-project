@@ -1,6 +1,6 @@
-﻿using BackendApi.Abstractions;
+﻿using Backend.Abstractions;
 
-namespace BackendApi.RequestHandlers;
+namespace Backend.RequestHandlers;
 
 public class GetRequestsHandler(
 	ILogger<GetRequestsHandler> logger,

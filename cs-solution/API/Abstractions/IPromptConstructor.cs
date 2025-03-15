@@ -1,4 +1,4 @@
-﻿namespace BackendApi.Abstractions;
+﻿namespace Backend.Abstractions;
 
 public interface IPromptConstructor
 {

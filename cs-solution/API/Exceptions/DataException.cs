@@ -1,4 +1,4 @@
-﻿namespace BackendApi.Exceptions;
+﻿namespace Backend.Exceptions;
 
 public class DataException : Exception
 {

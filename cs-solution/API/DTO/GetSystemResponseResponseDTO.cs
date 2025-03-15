@@ -1,6 +1,6 @@
-﻿using BackendApi.Model;
+﻿using Backend.Model;
 
-namespace BackendApi.DTO;
+namespace Backend.DTO;
 
 public class GetSystemResponseResponseDTO
 {

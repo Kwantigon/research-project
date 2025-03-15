@@ -1,8 +1,8 @@
-﻿using BackendApi.Abstractions;
-using BackendApi.Model;
-using BackendApi.Exceptions;
+﻿using Backend.Abstractions;
+using Backend.Model;
+using Backend.Exceptions;
 
-namespace BackendApi.Implementation.Database;
+namespace Backend.Implementation.Database;
 
 public class InMemoryDatabase : IDatabase
 {

@@ -1,6 +1,6 @@
-﻿using BackendApi.Abstractions;
+﻿using Backend.Abstractions;
 
-namespace BackendApi.Implementation
+namespace Backend.Implementation
 {
 	public class MockLlmResponseProcessor : ILlmResponseProcessor
 	{
