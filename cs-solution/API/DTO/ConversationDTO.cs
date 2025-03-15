@@ -1,6 +1,6 @@
-﻿namespace Backend.DTO;
+namespace Backend.DTO;
 
-public class GetConversationsResponseDTO
+public ConversationDTO
 {
 	/// <summary>
 	/// The title of the conversation.
@@ -9,7 +9,7 @@ public class GetConversationsResponseDTO
 	public required string Title { get; set; }
 
 	/// <summary>
-	/// The URI of the conversation on the server.
+	/// The IRI of the conversation on the server.
 	/// </summary>
 	public required string Location { get; set; }
 }

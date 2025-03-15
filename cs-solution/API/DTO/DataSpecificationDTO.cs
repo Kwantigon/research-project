@@ -1,6 +1,6 @@
-﻿namespace Backend.DTO;
+namespace Backend.DTO;
 
-public class GetDataSpecificationsResponseDTO
+public DataSpecificationDTO
 {
 	/// <summary>
 	/// The name of the data specification.
@@ -9,12 +9,12 @@ public class GetDataSpecificationsResponseDTO
 	public required string Name { get; set; }
 
 	/// <summary>
-	/// The URI of the data specification on the server.
+	/// The IRI of the data specification on the server.
 	/// </summary>
 	public required string Location { get; set; }
 
 	/// <summary>
-	/// The URI of the original Dataspecer package.
+	/// The IRI of the original Dataspecer package.
 	/// </summary>
-	public required string DataspecerUri { get; set; }
+	public required string DataspecerIri { get; set; }
 }

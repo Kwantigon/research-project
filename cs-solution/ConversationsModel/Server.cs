@@ -12,21 +12,21 @@ public class Server
 	/// Process the given data specification and save it.
 	/// Use the name stored in the DataSpecer as the name of the created data specification.
 	/// </summary>
-	/// <param name="uriOfDataSpec"></param>
+	/// <param name="iriOfDataSpec"></param>
 	/// <returns></returns>
-	public uint Post_DataSpecification(string uriOfDataSpec)
+	public uint Post_DataSpecification(string iriOfDataSpec)
 	{
 		string dataSpecName = "Name_taken_from_dataspecer";
-		return Post_DataSpecification(uriOfDataSpec, dataSpecName);
+		return Post_DataSpecification(iriOfDataSpec, dataSpecName);
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="uriOfDataSpec"></param>
+	/// <param name="iriOfDataSpec"></param>
 	/// <param name="nameOfDataSpec"></param>
 	/// <returns></returns>
-	public uint Post_DataSpecification(string uriOfDataSpec, string nameOfDataSpec)
+	public uint Post_DataSpecification(string iriOfDataSpec, string nameOfDataSpec)
 	{
 		Console.WriteLine("Processing the data specification"); // No implementation in this first version though.
 

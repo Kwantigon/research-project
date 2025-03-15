@@ -1,5 +1,4 @@
 using Backend.DTO;
-using Microsoft.AspNetCore.Mvc;
 using RequestHandler;
 
 // ToDo: Create DTOs for all request mappings.
@@ -41,13 +40,13 @@ app.MapPost(
 	([FromBody] PostDataSpecificationsRequestDTO dataSpecificationInfo) =>
 	{
 		uint dataSpecificationId = Handler.POST.ProcessNewDataSpecification(dataSpecificationInfo);
-		string createdUri = "/data-specifications/" + dataSpecificationId;
-		return Results.Created(uri: createdUri, string.Empty);
+		string createdIri = "/data-specifications/" + dataSpecificationId;
+		return Results.Created(iri: createdIri, string.Empty);
 	})
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Add a new data specification.";
-		operation.Description = "Expects an URI, which points to a Dataspecer package. The server will process this package and store the internal representation of the package, further referred to as a data specification. Once stored, new conversations about this data specification can be created and users can query about this data specification. If a name is given, the server will store the data specification under that name, otherwise a default name will be used.";
+		operation.Description = "Expects an IRI, which points to a Dataspecer package. The server will process this package and store the internal representation of the package, further referred to as a data specification. Once stored, new conversations about this data specification can be created and users can query about this data specification. If a name is given, the server will store the data specification under that name, otherwise a default name will be used.";
 		return operation;
 	});
 
@@ -72,8 +71,8 @@ app.MapPost(
 	([FromBody] PostConversationsRequestDTO postConversationsRequestDTO) =>
 	{
 		uint conversationId = Handler.POST.CreateConversation(postConversationsRequestDTO);
-		string createdUri = "/conversations/" + conversationId;
-		return Results.Created(uri: createdUri, string.Empty);
+		string createdIri = "/conversations/" + conversationId;
+		return Results.Created(iri: createdIri, string.Empty);
 	})
 	.WithOpenApi(operation =>
 	{
@@ -89,7 +88,7 @@ app.MapPost(
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Add a message to the conversation.";
-		operation.Description = "Adds a new message to the existing conversation and returns an URI to that message's location. For now, this is a synchronous operation. I might change it to be asynchronous if necessary.";
+		operation.Description = "Adds a new message to the existing conversation and returns an IRI to that message's location. For now, this is a synchronous operation. I might change it to be asynchronous if necessary.";
 		return operation;
 	});
 
@@ -116,7 +115,7 @@ app.MapGet("/data-specifications/{dataSpecificationId}/property-summary", ([From
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get a summary for a property.";
-		operation.Description = "Returns a summary of the requested property and URIs to get summaries of other properties that are related to the requested property..";
+		operation.Description = "Returns a summary of the requested property and IRIs to get summaries of other properties that are related to the requested property..";
 		return operation;
 	});
 
@@ -137,7 +136,7 @@ app.MapPut("/conversations/{conversationId}/next-message-preview", (/*All proper
 	});
 
 
-app.MapGet("/conversations/{conversationId}/messages/{messageId}/next-message-preview", () => "GET .../question-preview")
+app.MapGet("/conversations/{conversationId}/next-message-preview", () => "GET .../question-preview")
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get the natural language equivalent of the expanded query.";

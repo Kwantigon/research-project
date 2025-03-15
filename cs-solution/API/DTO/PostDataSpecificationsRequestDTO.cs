@@ -4,9 +4,9 @@ namespace Backend.DTO
 	public class PostDataSpecificationsRequestDTO
 	{
 		/// <summary>
-		/// The URI to the Dataspecer package.
+		/// The IRI to the Dataspecer package.
 		/// </summary>
-		public required string UriToDataspecer { get; set; }
+		public required string IriToDataspecer { get; set; }
 
 		/// <summary>
 		/// The name to store this data specification under.

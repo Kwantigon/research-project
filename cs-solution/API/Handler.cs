@@ -15,15 +15,15 @@ public class Handler
 
 	public static class GET
 	{
-		public static IList<GetDataSpecificationsResponseDTO> AllDataSpecifications()
+		public static IList<DataSpecificationListDTO> AllDataSpecifications()
 		{
 			var dataSpecifications = database.GetAllDataSpecifications();
 			return dataSpecifications.Select(
-				dataSpec => new GetDataSpecificationsResponseDTO()
+				dataSpec => new DataSpecificationListDTO()
 				{
 					Name = dataSpec.Name,
 					Location = "/data-specifications/" + dataSpec.Id,
-					DataspecerUri = dataSpec.DataspecerUri,
+					DataspecerIri = dataSpec.DataspecerIri,
 				}
 			).ToList();
 		}
@@ -33,11 +33,11 @@ public class Handler
 			return database.GetDataSpecificationById(dataSpecificationId);
 		}
 
-		public static IList<GetConversationsResponseDTO> AllConversations()
+		public static IList<ConversationListDTO> AllConversations()
 		{
 			var conversations = database.GetAllConversations();
 			return conversations.Select(
-				c => new GetConversationsResponseDTO()
+				c => new ConversationListDTO()
 				{
 					Title = c.Title,
 					Location = "/conversations/" + c.Id
@@ -56,15 +56,15 @@ public class Handler
 	{
 		public static uint CreateConversation(PostConversationsRequestDTO postConversationsRequestDTO)
 		{
-			string[] uriParts = postConversationsRequestDTO.DataSpecificationUri.Split('/');
-			// The uri looks like this: /data-specifications/{dataSpecificationId}
-			// So uriParts will be: [ "", "data-specification", "{dataSpecificationid" ]
-			if (uriParts.Length != 3)
+			string[] iriParts = postConversationsRequestDTO.DataSpecificationIri.Split('/');
+			// The iri looks like this: /data-specifications/{dataSpecificationId}
+			// So iriParts will be: [ "", "data-specification", "{dataSpecificationid" ]
+			if (iriParts.Length != 3)
 			{
-				Console.WriteLine("Cannot extract the data specification's ID from the URI: {0}", postConversationsRequestDTO.DataSpecificationUri);
-				throw new Exception("The data specification URI is in an unexpected format.");
+				Console.WriteLine("Cannot extract the data specification's ID from the IRI: {0}", postConversationsRequestDTO.DataSpecificationIri);
+				throw new Exception("The data specification IRI is in an unexpected format.");
 			}
-			uint.TryParse(uriParts[2], out uint dataSpecificationId);
+			uint.TryParse(iriParts[2], out uint dataSpecificationId);
 
 			DataSpecification dataSpecification = database.GetDataSpecificationById(dataSpecificationId);
 			Conversation conversation = new Conversation(dataSpecification, postConversationsRequestDTO.ConversationTitle);
@@ -77,12 +77,12 @@ public class Handler
 			// Do some processing of the data specification....
 
 			// Then save it to the database.
-			if (dataSpecificationInfo.UriToDataspecer == null)
+			if (dataSpecificationInfo.IriToDataspecer == null)
 			{
-				throw new Exception("Data specification URI is null");
+				throw new Exception("Data specification IRI is null");
 			}
 
-			DataSpecification dataSpecification = new DataSpecification(dataSpecificationInfo.Name, dataSpecificationInfo.UriToDataspecer);
+			DataSpecification dataSpecification = new DataSpecification(dataSpecificationInfo.Name, dataSpecificationInfo.IriToDataspecer);
 
 			database.AddNewDataSpecification(dataSpecification);
 			return dataSpecification.Id;
@@ -127,4 +127,3 @@ public class Handler
 		}*/
 	}
 }
-
