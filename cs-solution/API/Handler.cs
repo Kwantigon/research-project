@@ -28,59 +28,5 @@ public class Handler
 			_database.AddNewConversation(conversation);
 			return conversation.Id;
 		}
-
-		public static uint ProcessNewDataSpecification(PostDataSpecificationsRequestDTO dataSpecificationInfo)
-		{
-			// Do some processing of the data specification....
-
-			// Then save it to the database.
-			if (dataSpecificationInfo.IriToDataspecer == null)
-			{
-				throw new Exception("Data specification IRI is null");
-			}
-
-			DataSpecification dataSpecification = new DataSpecification(dataSpecificationInfo.Name, dataSpecificationInfo.IriToDataspecer);
-
-			_database.AddNewDataSpecification(dataSpecification);
-			return dataSpecification.Id;
-		}
-
-		/*public static SparqlResponse AddNewMessageToConversation(uint conversationId, PostConversationMessageDTO messageDTO)
-		{
-			if (messageDTO.Source != 1)
-			{
-				throw new Exception("Message source is not the user. Message source value=" + messageDTO.Source);
-			}
-			if (string.IsNullOrWhiteSpace(messageDTO.TextValue))
-			{
-				throw new Exception("Message does not contain any text");
-			}
-
-			Message message = new Message
-			{
-				Source = (MessageSource)messageDTO.Source,
-				TimeStamp = messageDTO.TimeStamp,
-				TextValue = messageDTO.TextValue,
-			};
-			Conversation conversation = database.GetConversationById(conversationId);
-			conversation.Messages.Add(message);
-
-			string sparql = llmConnector.TranslateToSparql(messageDTO.TextValue);
-
-			// Just highlight some random word in the query.
-			string[] userMsg = message.TextValue.Split(' ');
-			Random rng = new Random();
-			int startingIndex = rng.Next(userMsg.Length);
-			HighlightedProperty highlightedProperty = new HighlightedProperty(startingIndex, 1);
-
-			SparqlResponse response = new SparqlResponse()
-			{
-				SparqlQuery = sparql,
-				HighlightedWords = new List<HighlightedProperty>()
-			};
-			response.HighlightedWords.Add(highlightedProperty);
-
-			return response;
-		}*/
 	}
 }

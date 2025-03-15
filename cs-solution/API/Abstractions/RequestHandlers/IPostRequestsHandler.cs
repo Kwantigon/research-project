@@ -11,7 +11,7 @@ public interface IPostRequestsHandler
 	/// <returns>???</returns>
 	IResult PostDataSpecifications(PostDataSpecificationsRequestDTO payload);
 
-	void PostConversations();
+	IResult PostConversations(PostConversationsRequestDTO payload);
 
 	void PostConversationMessages();
 }

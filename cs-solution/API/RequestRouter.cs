@@ -134,14 +134,14 @@ app.MapPost("/data-specifications",
 		return operation;
 	});
 
-app.MapPost(
-	"/conversations",
-	([FromBody] PostConversationsRequestDTO postConversationsRequestDTO) =>
-	{
+app.MapPost("/conversations",
+				([FromBody] PostConversationsRequestDTO payload,
+				IPostRequestsHandler handler) => handler.PostConversations(payload)
+	/*{
 		uint conversationId = Handler.POST.CreateConversation(postConversationsRequestDTO);
 		string createdIri = "/conversations/" + conversationId;
 		return Results.Created(createdIri, string.Empty);
-	})
+	}*/)
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Start a new conversation.";

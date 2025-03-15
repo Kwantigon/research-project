@@ -5,7 +5,7 @@ public class PostConversationsRequestDTO
 	/// <summary>
 	/// The data specification that will be used for the conversation.
 	/// </summary>
-	public required string DataSpecificationIri { get; set; }
+	public string? DataSpecificationIri { get; set; }
 
 	/// <summary>
 	/// The title to store the conversation under.

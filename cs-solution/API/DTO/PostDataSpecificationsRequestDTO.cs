@@ -6,7 +6,7 @@ namespace Backend.DTO
 		/// <summary>
 		/// The IRI to the Dataspecer package.
 		/// </summary>
-		public required string IriToDataspecer { get; set; }
+		public string? IriToDataspecer { get; set; }
 
 		/// <summary>
 		/// The name to store this data specification under.
