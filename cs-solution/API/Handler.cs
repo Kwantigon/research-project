@@ -15,36 +15,6 @@ public class Handler
 
 	public static class GET
 	{
-		public static IList<DataSpecificationListDTO> AllDataSpecifications()
-		{
-			var dataSpecifications = database.GetAllDataSpecifications();
-			return dataSpecifications.Select(
-				dataSpec => new DataSpecificationListDTO()
-				{
-					Name = dataSpec.Name,
-					Location = "/data-specifications/" + dataSpec.Id,
-					DataspecerIri = dataSpec.DataspecerIri,
-				}
-			).ToList();
-		}
-
-		public static DataSpecification DataSpecification(uint dataSpecificationId)
-		{
-			return database.GetDataSpecificationById(dataSpecificationId);
-		}
-
-		public static IList<ConversationListDTO> AllConversations()
-		{
-			var conversations = database.GetAllConversations();
-			return conversations.Select(
-				c => new ConversationListDTO()
-				{
-					Title = c.Title,
-					Location = "/conversations/" + c.Id
-				}
-			).ToList();
-		}
-
 		public static IList<Message> ConversationMessages(uint conversationId)
 		{
 			Conversation conversation = database.GetConversationById(conversationId);

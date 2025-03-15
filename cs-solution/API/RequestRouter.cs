@@ -1,4 +1,6 @@
+using Backend.Abstractions.RequestHandlers;
 using Backend.DTO;
+using Backend.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
 using RequestHandler;
 
@@ -16,18 +18,20 @@ builder.Services.AddCors(options =>
 	});
 });
 
+#region Services for dependency injection
+
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IGetRequestsHandler, GetRequestsHandler>();
+
+#endregion
 
 var app = builder.Build();
 app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-#region Handlers inicialization
-//GetRequestsHandler getRequestsHandler = new GetRequestsHandler();
-#endregion
+#region Request mappings
 
-#region Requests
 app.MapGet("/", () => "Hello there!")
 	.WithOpenApi(operation =>
 	{
@@ -51,7 +55,7 @@ app.MapPost(
 		return operation;
 	});
 
-app.MapGet("/data-specifications", () => Handler.GET.AllDataSpecifications())
+app.MapGet("/data-specifications", (IGetRequestsHandler handler) => handler.GetAllDataSpecifications())
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get all data specifications stored on the server.";
@@ -59,7 +63,7 @@ app.MapGet("/data-specifications", () => Handler.GET.AllDataSpecifications())
 		return operation;
 	});
 
-app.MapGet("/data-specifications/{dataSpecificationId}", ([FromRoute] uint dataSpecificationId) => Handler.GET.DataSpecification(dataSpecificationId))
+app.MapGet("/data-specifications/{dataSpecificationId}", ([FromRoute] uint dataSpecificationId, IGetRequestsHandler handler) => handler.GetDataSpecification(dataSpecificationId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get details of a data specification";
@@ -93,7 +97,7 @@ app.MapPost(
 		return operation;
 	});
 
-app.MapGet("/conversations", () => Handler.GET.AllConversations())
+app.MapGet("/conversations", (IGetRequestsHandler handler) => handler.GetAllConversations())
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get all ongoing conversations.";
@@ -101,7 +105,7 @@ app.MapGet("/conversations", () => Handler.GET.AllConversations())
 		return operation;
 	});
 
-app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) => $"GET /conversations/{conversationId}")
+app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId, IGetRequestsHandler handler) => handler.GetConversation(conversationId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get basic information about the conversation.";
@@ -109,11 +113,22 @@ app.MapGet("/conversations/{conversationId}", ([FromRoute] uint conversationId) 
 		return operation;
 	});
 
-app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint conversationId) => Handler.GET.ConversationMessages(conversationId))
+app.MapGet("/conversations/{conversationId}/messages", ([FromRoute] uint conversationId, IGetRequestsHandler handler) => handler.GetConversationMessages(conversationId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get all messages in the conversation.";
-		operation.Description = "Returns an array of messages in the conversation.";
+		operation.Description = "Returns all messages in the conversation. Each message will contain only the most basic information, which is its source (either user or system), timestamp and the textual value. Messages are ordered by their timestamp.";
+		return operation;
+	});
+
+app.MapGet("/conversations/{conversationId}/messages/{messageId}",
+			([FromRoute] uint conversationId,
+			[FromRoute] uint messageId,
+			IGetRequestsHandler handler) => handler.GetMessageFromConversation(conversationId, messageId))
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Get details of a concrete message.";
+		operation.Description = "Returns all available information about the requested message. Typically the front end will want to request a previously POSTed user's message to retrieve the system's answer to the message.";
 		return operation;
 	});
 
@@ -125,14 +140,6 @@ app.MapGet("/data-specifications/{dataSpecificationId}/items/{itemId}/summary", 
 	{
 		operation.Summary = "Get a summary for a property.";
 		operation.Description = "Returns a summary of the requested property and IRIs to get summaries of other properties that are related to the requested property..";
-		return operation;
-	});
-
-app.MapGet("/conversations/{conversationId}/messages/{messageId}", () => "GET .../messageId")
-	.WithOpenApi(operation =>
-	{
-		operation.Summary = "Get details of a concrete message.";
-		operation.Description = "Returns all available information about the requested message. Typically the front end will want to request a previously POSTed user's message to retrieve the system's answer to the message.";
 		return operation;
 	});
 

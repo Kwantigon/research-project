@@ -1,11 +1,5 @@
 ﻿namespace Backend.Model;
 
-public enum MessageSource
-{
-	User,
-	System
-}
-
 public class Message
 {
 	public uint Id { get; set; }
@@ -17,23 +11,24 @@ public class Message
 
 public class UserMessage : Message
 {
-	public SystemMessage? SystemAnswer { get; set; }
+	public SystemAnswer? SystemAnswer { get; set; }
 }
 
 public class UserPreviewMessage : Message
 {
-
 }
 
-public abstract class SystemMessage : Message { }
+public class PlainTextSystemMessage : Message { }
+
+public abstract class SystemAnswer : Message { }
 
 /// <summary>
 /// When the user's query is something completely unrelated to the conversation's data specification,
 /// The system will answer with a negative message.
 /// </summary>
-public class NegativeSystemMessage : SystemMessage { }
+public class NegativeSystemAnswer : SystemAnswer { }
 
-public class PositiveSystemMessage : SystemMessage
+public class PositiveSystemAnswer : SystemAnswer
 {
-	List<MatchedDataSpecificationProperty> MatchedProperties { get; set; } = [];
+	List<MatchedDataSpecificationItem> MatchedItems { get; set; } = [];
 }

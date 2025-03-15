@@ -23,10 +23,10 @@ public class GetRequestsHandler(
 	private readonly ILlmResponseProcessor _llmResponseProcessor = llmResponseProcessor;
 
 	#region Interface implementation
-	public DataSpecificationListDTO GetAllDataSpecifications()
+	public List<DataSpecificationDTO> GetAllDataSpecifications()
 	{
 		var dataSpecifications = _database.GetAllDataSpecifications();
-		var dataSpecificationsDTOs = dataSpecifications.Select(
+		return dataSpecifications.Select(
 			dataSpec => new DataSpecificationDTO()
 			{
 				Name = dataSpec.Name,
@@ -34,7 +34,6 @@ public class GetRequestsHandler(
 				DataspecerIri = dataSpec.DataspecerIri,
 			}
 		).ToList();
-		return new DataSpecificationListDTO { DataSpecifications = dataSpecificationsDTOs };
 	}
 
 	public DataSpecificationDTO GetDataSpecification(uint dataSpecificationId)
@@ -48,17 +47,16 @@ public class GetRequestsHandler(
 		};
 	}
 
-	public ConversationListDTO GetAllConversations()
+	public List<ConversationDTO> GetAllConversations()
 	{
 		var conversations = _database.GetAllConversations();
-		var conversationDTOs = conversations.Select(
+		return conversations.Select(
 			conversation => new ConversationDTO()
 			{
 				Title = conversation.Title,
 				Location = "/conversations/" + conversation.Id
 			}
 		).ToList();
-		return new ConversationListDTO { Conversations = conversationDTOs };
 	}
 
 	public ConversationDTO GetConversation(uint conversationId)
