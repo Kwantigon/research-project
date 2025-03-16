@@ -5,7 +5,6 @@ using Backend.Implementation;
 using Backend.Implementation.Database;
 using Backend.Implementation.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
-using RequestHandler;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -29,6 +28,7 @@ builder.Services
 	.AddSingleton<ILlmResponseProcessor, MockLlmResponseProcessor>()
 	.AddSingleton<IGetRequestsHandler, GetRequestsHandler>()
 	.AddSingleton<IPostRequestsHandler, PostRequestsHandler>()
+	.AddSingleton<IPutRequestsHandler, PutRequestsHandler>()
 	;
 #endregion
 
@@ -136,12 +136,7 @@ app.MapPost("/data-specifications",
 
 app.MapPost("/conversations",
 				([FromBody] PostConversationsRequestDTO payload,
-				IPostRequestsHandler handler) => handler.PostConversations(payload)
-	/*{
-		uint conversationId = Handler.POST.CreateConversation(postConversationsRequestDTO);
-		string createdIri = "/conversations/" + conversationId;
-		return Results.Created(createdIri, string.Empty);
-	}*/)
+				IPostRequestsHandler handler) => handler.PostConversations(payload))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Start a new conversation.";
@@ -149,10 +144,10 @@ app.MapPost("/conversations",
 		return operation;
 	});
 
-app.MapPost(
-	"/conversations/{conversationId}/messages",
-	([FromRoute] uint conversationId, [FromBody] PostConversationMessageDTO messageDTO) => "POST /conversations/{conversationId}/messages"
-)
+app.MapPost("/conversations/{conversationId}/messages",
+				([FromRoute] uint conversationId,
+				[FromBody] PostConversationMessagesDTO payload,
+				IPostRequestsHandler handler) => handler.PostConversationMessages(conversationId, payload))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Add a message to the conversation.";
@@ -164,7 +159,10 @@ app.MapPost(
 
 #region PUT requests.
 
-app.MapPut("/conversations/{conversationId}/next-message-preview", (/*[FromBody] All properties that user has selected for the next message*/) => { })
+app.MapPut("/conversations/{conversationId}/next-message-preview",
+				([FromRoute] uint conversationId,
+				[FromBody] PutConversationNextMessagePreviewDTO payload,
+				IPutRequestsHandler handler) => handler.PutConversationNextMessagePreview(conversationId, payload))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Send the properties that user has selected for preview.";

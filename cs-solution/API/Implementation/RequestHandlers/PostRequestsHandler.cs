@@ -66,7 +66,7 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 		return Results.Created($"/conversations/{conversation.Id}", string.Empty);
 	}
 
-	public void PostConversationMessages()
+	public IResult PostConversationMessages(uint conversationId, PostConversationMessagesDTO payload)
 	{
 		throw new NotImplementedException();
 	}

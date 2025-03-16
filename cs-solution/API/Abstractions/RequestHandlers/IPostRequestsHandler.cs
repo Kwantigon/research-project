@@ -13,5 +13,5 @@ public interface IPostRequestsHandler
 
 	IResult PostConversations(PostConversationsRequestDTO payload);
 
-	void PostConversationMessages();
+	IResult PostConversationMessages(uint conversationId, PostConversationMessagesDTO payload);
 }
