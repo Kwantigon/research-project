@@ -57,7 +57,9 @@ app.MapGet("/data-specifications", (IGetRequestsHandler handler) => handler.GetA
 		return operation;
 	});
 
-app.MapGet("/data-specifications/{dataSpecificationId}", ([FromRoute] uint dataSpecificationId, IGetRequestsHandler handler) => handler.GetDataSpecification(dataSpecificationId))
+app.MapGet("/data-specifications/{dataSpecificationId}",
+				([FromRoute] uint dataSpecificationId,
+				IGetRequestsHandler handler) => handler.GetDataSpecification(dataSpecificationId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get details of a data specification";

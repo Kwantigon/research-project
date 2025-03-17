@@ -6,13 +6,13 @@ public interface IDatabase
 {
 	IList<DataSpecification> GetAllDataSpecifications();
 
-	DataSpecification GetDataSpecificationById(uint dataSpecificationId);
+	DataSpecification? GetDataSpecificationById(uint dataSpecificationId);
 
 	IList<Conversation> GetAllConversations();
 
-	Conversation GetConversationById(uint conversationId);
+	Conversation? GetConversationById(uint conversationId);
 
-	void AddNewDataSpecification(DataSpecification dataSpecification);
+	bool AddNewDataSpecification(DataSpecification dataSpecification);
 
-	void AddNewConversation(Conversation conversation);
+	bool AddNewConversation(Conversation conversation);
 }

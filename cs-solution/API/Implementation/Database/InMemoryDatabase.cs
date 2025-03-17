@@ -4,33 +4,21 @@ using Backend.Exceptions;
 
 namespace Backend.Implementation.Database;
 
-public class InMemoryDatabase : IDatabase
+public class InMemoryDatabase(ILogger<InMemoryDatabase> logger) : IDatabase
 {
-	public InMemoryDatabase()
-	{
-		_dataSpecifications = new Dictionary<uint, DataSpecification>();
-		_conversations = new Dictionary<uint, Conversation>();
-	}
-
-	private Dictionary<uint, DataSpecification> _dataSpecifications;
-
-	private Dictionary<uint, Conversation> _conversations;
+	private readonly ILogger<InMemoryDatabase> _logger = logger;
+	private Dictionary<uint, DataSpecification> _dataSpecifications = new Dictionary<uint, DataSpecification>();
+	private Dictionary<uint, Conversation> _conversations = new Dictionary<uint, Conversation>();
 
 	public IList<DataSpecification> GetAllDataSpecifications()
 	{
 		return _dataSpecifications.Values.ToList();
 	}
 
-	public DataSpecification GetDataSpecificationById(uint dataSpecificationId)
+	public DataSpecification? GetDataSpecificationById(uint dataSpecificationId)
 	{
-		if (_dataSpecifications.TryGetValue(dataSpecificationId, out var dataSpecification))
-		{
-			return dataSpecification;
-		}
-		else
-		{
-			throw new DataException($"Data specification with ID {dataSpecificationId} not found");
-		}
+		_dataSpecifications.TryGetValue(dataSpecificationId, out var dataSpecification);
+		return dataSpecification;
 	}
 
 	public IList<Conversation> GetAllConversations()
@@ -38,25 +26,31 @@ public class InMemoryDatabase : IDatabase
 		return _conversations.Values.ToList();
 	}
 
-	public Conversation GetConversationById(uint conversationId)
+	public Conversation? GetConversationById(uint conversationId)
 	{
-		if (_conversations.TryGetValue(conversationId, out var conversation))
-		{
-			return conversation;
-		}
-		else
-		{
-			throw new DataException($"Data specification with ID {conversationId} not found");
-		}
+		_conversations.TryGetValue(conversationId, out var conversation);
+		return conversation;
 	}
 
-	public void AddNewDataSpecification(DataSpecification dataSpecification)
+	public bool AddNewDataSpecification(DataSpecification dataSpecification)
 	{
+		if (_dataSpecifications.ContainsKey(dataSpecification.Id))
+		{
+			_logger.LogError("The database already contains a data specification with ID {DataSpecId}", dataSpecification.Id);
+			return false;
+		}
 		_dataSpecifications.Add(dataSpecification.Id, dataSpecification);
+		return true;
 	}
 
-	public void AddNewConversation(Conversation conversation)
+	public bool AddNewConversation(Conversation conversation)
 	{
+		if (_conversations.ContainsKey(conversation.Id))
+		{
+			_logger.LogError("The database already contains a conversation with ID {ConversationId}", conversation.Id);
+			return false;
+		}
 		_conversations.Add(conversation.Id, conversation);
+		return true;
 	}
 }

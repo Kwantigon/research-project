@@ -60,7 +60,13 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 			});
 		}
 
-		DataSpecification dataSpecification = _database.GetDataSpecificationById(dataSpecificationId);
+		DataSpecification? dataSpecification = _database.GetDataSpecificationById(dataSpecificationId);
+		if (dataSpecification is null)
+		{
+			_logger.LogError("Failed to retrieve the data specification with ID {DataSpecId} from the database.", dataSpecificationId);
+			throw new Exception("Could not find the requested data specification");
+		}
+
 		Conversation conversation = new Conversation(dataSpecification, payload.ConversationTitle);
 		_database.AddNewConversation(conversation);
 		return Results.Created($"/conversations/{conversation.Id}", string.Empty);

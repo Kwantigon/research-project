@@ -38,6 +38,12 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 	public DataSpecificationDTO GetDataSpecification(uint dataSpecificationId)
 	{
 		var dataSpecification = _database.GetDataSpecificationById(dataSpecificationId);
+		if (dataSpecification is null)
+		{
+			_logger.LogError("Failed to retrieve the data specification with ID {DataSpecId} from the database.", dataSpecificationId);
+			throw new Exception("Could not find the requested data specification");
+		}
+
 		return new DataSpecificationDTO
 		{
 			Name = dataSpecification.Name,
@@ -61,6 +67,12 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 	public ConversationDTO GetConversation(uint conversationId)
 	{
 		var conversation = _database.GetConversationById(conversationId);
+		if (conversation is null)
+		{
+			_logger.LogError("Failed to retrieve the data specification with ID {ConversationId} from the database.", conversationId);
+			throw new Exception("Could not find the requested conversation");
+		}
+
 		return new ConversationDTO
 		{
 			Title = conversation.Title,
@@ -71,6 +83,12 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 	public List<MessageBasicDTO> GetConversationMessages(uint conversationId)
 	{
 		var conversation = _database.GetConversationById(conversationId);
+		if (conversation is null)
+		{
+			_logger.LogError("Failed to retrieve the data specification with ID {ConversationId} from the database.", conversationId);
+			throw new Exception("Could not find the requested conversation");
+		}
+
 		return conversation.Messages.Select(message =>
 		{
 			switch (message)
