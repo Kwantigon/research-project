@@ -56,11 +56,7 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 	{
 		var conversations = _database.GetAllConversations();
 		return conversations.Select(
-			conversation => new ConversationDTO()
-			{
-				Title = conversation.Title,
-				Location = "/conversations/" + conversation.Id
-			}
+			conversation => (ConversationDTO)conversation
 		).ToList();
 	}
 
@@ -69,15 +65,11 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 		var conversation = _database.GetConversationById(conversationId);
 		if (conversation is null)
 		{
-			_logger.LogError("Failed to retrieve the data specification with ID {ConversationId} from the database.", conversationId);
+			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
 			throw new Exception("Could not find the requested conversation");
 		}
 
-		return new ConversationDTO
-		{
-			Title = conversation.Title,
-			Location = "/conversations/" + conversation.Id
-		};
+		return conversation;
 	}
 
 	public List<MessageBasicDTO> GetConversationMessages(uint conversationId)
@@ -85,28 +77,32 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 		var conversation = _database.GetConversationById(conversationId);
 		if (conversation is null)
 		{
-			_logger.LogError("Failed to retrieve the data specification with ID {ConversationId} from the database.", conversationId);
+			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
 			throw new Exception("Could not find the requested conversation");
 		}
 
 		return conversation.Messages.Select(message =>
 		{
-			switch (message)
+			MessageSource source;
+			if (message is UserMessage)
 			{
-				case UserMessage userMsg:
-					return new MessageBasicDTO
-					{
-						Source = MessageSource.User,
-						TimeStamp = userMsg.TimeStamp,
-						Text = userMsg.TextValue
-					};
-				default:
-					throw new NotSupportedException("Unexpected message class: " + message.GetType().Name);
+				source = MessageSource.User;
 			}
+			else
+			{
+				source = MessageSource.System;
+			}
+
+			return new MessageBasicDTO
+			{
+				Source = source,
+				TimeStamp = message.TimeStamp,
+				Text = message.TextValue
+			};
 		}).ToList();
 	}
 
-	public MessageDTO GetMessageFromConversation(uint conversationId, uint messageId)
+	public MessageDetailedDTO GetMessageFromConversation(uint conversationId, uint messageId)
 	{
 		throw new NotImplementedException();
 	}

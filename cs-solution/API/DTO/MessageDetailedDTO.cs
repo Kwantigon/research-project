@@ -8,7 +8,7 @@ public enum MessageType
 	PositiveSystemAnswer
 }
 
-public class MessageDTO
+public class MessageDetailedDTO
 {
 	public required MessageType Type { get; set; }
 

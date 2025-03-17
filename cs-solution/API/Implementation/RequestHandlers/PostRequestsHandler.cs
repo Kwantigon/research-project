@@ -19,12 +19,24 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 			return Results.BadRequest(new ErrorResponseDTO()
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
-				ErrorMessage = "No URI to a Dataspecer package was given"
+				ErrorMessage = "No IRI to a Dataspecer package was given"
 			});
 		}
 
 		DataSpecification dataSpecNew = new DataSpecification(payload.Name, payload.IriToDataspecer);
-		return Results.Created(uri: "/data-specifications/0", string.Empty);
+		if (_database.AddNewDataSpecification(dataSpecNew) is false)
+		{
+			_logger.LogError("Failed to add the data specification {DataSpec} to the database.", dataSpecNew);
+			return Results.InternalServerError(new ErrorResponseDTO()
+			{
+				ErrorCode = HttpStatusCode.InternalServerError,
+				ErrorMessage = "Failed to create a new data specification"
+			});
+		}
+		else
+		{
+			return Results.Created(uri: $"/data-specifications/{dataSpecNew.Id}", dataSpecNew);
+		}
 	}
 
 	public IResult PostConversations(PostConversationsRequestDTO payload)
@@ -68,13 +80,47 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 		}
 
 		Conversation conversation = new Conversation(dataSpecification, payload.ConversationTitle);
-		_database.AddNewConversation(conversation);
-		return Results.Created($"/conversations/{conversation.Id}", string.Empty);
+		if (_database.AddNewConversation(conversation) is false)
+		{
+			_logger.LogError("Failed to add the conversation {Conversation} to the database.", conversation);
+			return Results.InternalServerError(new ErrorResponseDTO()
+			{
+				ErrorCode = HttpStatusCode.InternalServerError,
+				ErrorMessage = "Failed to start a new conversation"
+			});
+		}
+
+		conversation.InitializeConversation();
+		return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
 	}
 
 	public IResult PostConversationMessages(uint conversationId, PostConversationMessagesDTO payload)
 	{
-		throw new NotImplementedException();
+		if (string.IsNullOrEmpty(payload.TextValue))
+		{
+			return Results.BadRequest(new ErrorResponseDTO()
+			{
+				ErrorCode = HttpStatusCode.BadRequest,
+				ErrorMessage = "The text in the message was either null or empty"
+			});
+		}
+
+		var conversation = _database.GetConversationById(conversationId);
+		if (conversation is null)
+		{
+			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
+			throw new Exception("Could not find the requested conversation");
+		}
+
+		var message = conversation.AddUserMessage(payload.TextValue, payload.TimeStamp);
+		return Results.Created(
+			uri: $"/conversations/{conversationId}/messages/{message.Id}",
+			value: new MessageBasicDTO()
+			{
+				Source = MessageSource.User,
+				TimeStamp = message.TimeStamp,
+				Text = message.TextValue
+			});
 	}
 	#endregion
 }
