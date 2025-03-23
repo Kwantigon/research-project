@@ -1,4 +1,6 @@
-﻿namespace Backend.DTO;
+﻿using System.Text.Json.Serialization;
+
+namespace Backend.DTO;
 
 public class MessageBasicDTO
 {
@@ -9,6 +11,7 @@ public class MessageBasicDTO
 	public required string Text { get; set; }
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter<MessageSource>))]
 public enum MessageSource
 {
 	User,

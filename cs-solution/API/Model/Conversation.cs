@@ -4,8 +4,6 @@ public class Conversation
 {
 	private static uint _nextUnusedConversationId = 0;
 
-	private uint _nextUnusedMessageId = 0;
-
 	private enum ConversationState
 	{
 		NotInitialized,
@@ -22,6 +20,8 @@ public class Conversation
 		DataSpecification = dataSpecification;
 		Messages = new List<Message>();
 	}
+
+	public uint NextUnusedMessageId { get; set; } = 0;
 
 	public uint Id { get; }
 
@@ -44,7 +44,7 @@ public class Conversation
 
 		var msg = new UserMessage()
 		{
-			Id = _nextUnusedMessageId++,
+			Id = NextUnusedMessageId++,
 			TimeStamp = timestamp,
 			TextValue = text
 		};
@@ -62,7 +62,7 @@ public class Conversation
 	{
 		Messages.Add(new PlainTextSystemMessage()
 		{
-			Id = _nextUnusedMessageId++,
+			Id = NextUnusedMessageId++,
 			TimeStamp = DateTime.Now,
 			TextValue = "Your data specification has been loaded.\nWhat would you like to know?"
 		});

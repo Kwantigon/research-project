@@ -44,3 +44,17 @@ Konkrétní data v databázi nemám, ale možná bych mohl použít LLM, abych m
 Například chce: Tournaments that have taken place this year so far in which there are participants *from Vietnam*.
 - Já dokážu vyznačit to, že dotaz se bude týkat tournament a player a country.
 - Tak teď nějakým způsobem říct LLM, kam by měl uživatel doplnit specifické hodnoty, které chce ve svém dotazu mít - např. Vietnam.
+
+Když v RequestHandleru budu zpracovávat rovnou všechny operace, tak bude dělat moc různých věcí.
+Přidám další abstrakci: IDataSpecificationService, IConversationService atd.
+RequestHandler bude jen volat operace na těchto servisách.
+
+RequestHandler bude mít zodpovědnost:
+- Zkontrolovat příchozí payload.
+- Volat metody na dalších I...Service ve správném pořadí.
+- Sestavit výslednou HTTP odpověď a vrátit.
+- Bude vždy vracet IResults.
+- Objekt, který se má vracet bude v tom results body.
+Jen přemýšlím, jestli bych měl vytvořit třídu, která bude vracet ty objekty.
+Chtěl bych, aby na první pohled bylo vidět, co vrací která metoda.
+- Ale když všechno bude vracet IResults, tak to není vidět.

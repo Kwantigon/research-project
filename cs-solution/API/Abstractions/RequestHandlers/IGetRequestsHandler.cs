@@ -1,4 +1,5 @@
 using Backend.DTO;
+using Microsoft.AspNetCore.Http;
 
 namespace Backend.Abstractions.RequestHandlers;
 
@@ -16,9 +17,9 @@ public interface IGetRequestsHandler
 
 	List<MessageBasicDTO> GetConversationMessages(uint conversationId);
 
-	MessageDetailedDTO GetMessageFromConversation(uint conversationId, uint messageId);
+	IResult GetMessageFromConversation(uint conversationId, uint messageId);
 
-	DataSpecificationItemSummaryDTO GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId);
+	IResult GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId);
 
 	NextMessagePreviewDTO GetNextMessagePreview(uint conversationId);
 }

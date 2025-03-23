@@ -1,0 +1,8 @@
+Z architektury není vůbec poznat, že se jedná o...vlastně o tu věc, o kterou se snažím. Vypadá to spíše jako nějaký obecný chatovací interface.
+Chybí tam komponenta, která nějak vede tu konverzaci.
+Komponenta, která rozhoduje, co udělat s user message.
+- Musím rozbít ty handlery. Mají v sobě moc věcí.
+
+Odpověď na POST user message by měla obsahovat jen IRI na system response.
+- Protože může potenciálně trvat dlouho než se system response vytvoří.
+- Front end mezitím bude muset opakovaně se ptát.

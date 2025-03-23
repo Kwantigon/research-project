@@ -1,5 +1,8 @@
-﻿namespace Backend.DTO;
+﻿using System.Text.Json.Serialization;
 
+namespace Backend.DTO;
+
+[JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]
 public enum MessageType
 {
 	UserMessage,
@@ -10,24 +13,15 @@ public enum MessageType
 
 public class MessageDetailedDTO
 {
-	public required MessageType Type { get; set; }
+	public MessageType Type { get; set; }
 
-	public uint Id { get; set; }
-
-	public required DateTime TimeStamp { get; set; }
-
-	public required string TextValue { get; set; }
-
-	public SystemAnswerDTO? SystemAnswer { get; set; }
-}
-
-public class SystemAnswerDTO
-{
-	public required MessageType AnswerType { get; set; }
+	public required uint Id { get; set; }
 
 	public required DateTime TimeStamp { get; set; }
 
 	public required string TextValue { get; set; }
+
+	public string? SystemAnswerIri { get; set; }
 
 	public List<MatchedDataSpecificationItem>? MatchedDataSpecificationItems { get; set; }
 }

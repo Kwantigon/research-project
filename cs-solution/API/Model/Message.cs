@@ -32,5 +32,5 @@ public class NegativeSystemAnswer : SystemAnswer { }
 
 public class PositiveSystemAnswer : SystemAnswer
 {
-	List<MatchedDataSpecificationItem> MatchedItems { get; set; } = [];
+	public List<MatchedDataSpecificationItem> MatchedItems { get; set; } = [];
 }
