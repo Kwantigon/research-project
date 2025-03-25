@@ -6,12 +6,18 @@ using System.Net;
 
 namespace Backend.Implementation.RequestHandlers;
 
-public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase database)
-	: IGetRequestsHandler
+public class GetRequestsHandler(
+	ILogger<GetRequestsHandler> logger,
+	IDatabase database,
+	IPromptConstructor promptConstructor,
+	ILlmConnector llmConnector,
+	ILlmResponseProcessor llmResponseProcessor) : IGetRequestsHandler
 {
 	private readonly ILogger<GetRequestsHandler> _logger = logger;
-
 	private readonly IDatabase _database = database;
+	private readonly IPromptConstructor _promptConstructor = promptConstructor;
+	private readonly ILlmConnector _llmConnector = llmConnector;
+	private readonly ILlmResponseProcessor _llmResponseProcessor = llmResponseProcessor;
 
 	#region Interface implementation
 
@@ -188,19 +194,39 @@ public class GetRequestsHandler(ILogger<GetRequestsHandler> logger, IDatabase da
 		}
 
 		string itemSummaryPrompt = _promptConstructor.CreateItemSummaryPrompt(dataSpecificationItem);
-		string itemSummaryResponse = _llmConnector.SendPrompt(itemSummaryPrompt);
-		DataSpecificationItemSummary summary = _llmResponseProcessor.ProcessSummaryResponse(itemSummaryResponse);
+		string itemSummaryResponse = _llmConnector.SendPromptAndReceiveResponse(itemSummaryPrompt);
+		DataSpecificationItemSummary summary = _llmResponseProcessor.ProcessItemsSummaryResponse(itemSummaryResponse);
 
 		return Results.Ok(new DataSpecificationItemSummaryDTO
 		{
-			TextualSummary = summary.Text,
-			IriOfRelatedItems = summary.RelatedItems.Select(item => $"/data-specifications/{dataSpecificationId}/{item.Id}").ToList()
+			TextualSummary = summary.TextualSummary,
+			IriOfRelatedItems = summary.RelatedItemsIds.Select(relatedItemId => $"/data-specifications/{dataSpecificationId}/{relatedItemId}").ToList()
 		});
 	}
 
-	public NextMessagePreviewDTO GetNextMessagePreview(uint conversationId)
+	public IResult GetNextMessagePreview(uint conversationId)
 	{
-		throw new NotImplementedException();
+		var conversation = _database.GetConversationById(conversationId);
+		if (conversation is null)
+		{
+			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
+			return Results.NotFound(new ErrorResponseDTO()
+			{
+				ErrorCode = HttpStatusCode.NotFound,
+				ErrorMessage = $"Failed to find the conversation with ID {conversationId}"
+			});
+		}
+
+		if (conversation.NextQuestionPreview is null)
+		{
+			return Results.NotFound(new ErrorResponseDTO
+			{
+				ErrorCode = HttpStatusCode.NotFound,
+				ErrorMessage = "The preview for the next question has not been generated yet."
+			});
+		}
+		
+		return Results.Ok(new NextMessagePreviewDTO { TextualValue = conversation.NextQuestionPreview.TextValue });
 	}
 	#endregion
 }

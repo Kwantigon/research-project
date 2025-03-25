@@ -4,5 +4,7 @@ namespace Backend.Abstractions;
 
 public interface ILlmResponseProcessor
 {
-	object ParseMappedDataSpecProperties(string llmResponse);
+	List<DataSpecificationItem> ProcessItemsMappingResponse(string llmResponse);
+
+	DataSpecificationItemSummary ProcessItemsSummaryResponse(string llmResponse);
 }

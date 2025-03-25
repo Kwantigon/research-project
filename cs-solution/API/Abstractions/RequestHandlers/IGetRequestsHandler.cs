@@ -21,5 +21,5 @@ public interface IGetRequestsHandler
 
 	IResult GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId);
 
-	NextMessagePreviewDTO GetNextMessagePreview(uint conversationId);
+	IResult GetNextMessagePreview(uint conversationId);
 }

@@ -58,3 +58,6 @@ RequestHandler bude mít zodpovědnost:
 Jen přemýšlím, jestli bych měl vytvořit třídu, která bude vracet ty objekty.
 Chtěl bych, aby na první pohled bylo vidět, co vrací která metoda.
 - Ale když všechno bude vracet IResults, tak to není vidět.
+
+Eventually budu chtít použít nějaký ExceptionHandler, aby transformoval vyjímky na HTTP odpovědi.
+- Zatím se soustředím na to, abych měl funkční back end.

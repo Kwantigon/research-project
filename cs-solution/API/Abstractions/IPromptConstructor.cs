@@ -1,4 +1,6 @@
-﻿namespace Backend.Abstractions;
+﻿using Backend.Model;
+
+namespace Backend.Abstractions;
 
 public interface IPromptConstructor
 {
@@ -8,5 +10,7 @@ public interface IPromptConstructor
 	/// </summary>
 	/// <param name="userQuery">The user's query in natural language</param>
 	/// <returns>A prompt ready to be sent to the LLM.</returns>
-	string ConstructQueryToDataSpecPropertiesPrompt(string userQuery);
+	string CreateItemsMappingPrompt(string userQuery);
+
+	string CreateItemSummaryPrompt(DataSpecificationItem dataSpecificationItem);
 }

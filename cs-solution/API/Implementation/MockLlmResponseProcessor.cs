@@ -4,7 +4,7 @@ namespace Backend.Implementation
 {
 	public class MockLlmResponseProcessor : ILlmResponseProcessor
 	{
-		public object ParseMappedDataSpecProperties(string llmResponse)
+		public object ProcessItemsMappingResponse(string llmResponse)
 		{
 			throw new NotImplementedException();
 		}

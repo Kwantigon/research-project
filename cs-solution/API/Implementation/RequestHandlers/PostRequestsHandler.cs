@@ -7,10 +7,24 @@ using System.Text;
 
 namespace Backend.Implementation.RequestHandlers;
 
-public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase database) : IPostRequestsHandler
+public class PostRequestsHandler(
+	ILogger<PostRequestsHandler> logger,
+	IDatabase database,
+	IDataSpecificationService dataSpecificationService,
+	IConversationService conversationService,
+	ISparqlTranslationService sparqlTranslationService,
+	IPromptConstructor promptConstructor,
+	ILlmConnector llmConnector,
+	ILlmResponseProcessor llmResponseProcessor) : IPostRequestsHandler
 {
 	private readonly ILogger<PostRequestsHandler> _logger = logger;
 	private readonly IDatabase _database = database;
+	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
+	private readonly IConversationService _conversationService = conversationService;
+	private readonly ISparqlTranslationService _sparqlTranslationService = sparqlTranslationService;
+	private readonly IPromptConstructor _promptConstructor = promptConstructor;
+	private readonly ILlmConnector _llmConnector = llmConnector;
+	private readonly ILlmResponseProcessor _llmResponseProcessor = llmResponseProcessor;
 
 	#region Interface implementation.
 	public IResult PostDataSpecifications(PostDataSpecificationsRequestDTO payload)
@@ -134,12 +148,12 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 		if (conversation.State is ConversationState.AwaitingFirstUserMessage)
 		{
 			string itemsMappingPrompt = _promptConstructor.CreateItemsMappingPrompt(userMessage.TextValue);
-			string itemsMappingResponse = _llmConnector.SendPrompt(itemsMappingPrompt);
-			DataSpecificationItemsFromLlm mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
+			string itemsMappingResponse = _llmConnector.SendPromptAndReceiveResponse(itemsMappingPrompt);
+			List<DataSpecificationItem> mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
 			// To do: If the response processor fails to parse, it's likely because the LLM returned an invalid answer format.
 			// Try to resend the prompt and ask for the correct answer format.
 
-			substructure = _dataSpecificationService.CreateNewSubstructureOrSmthingIdk(mappedItems);
+			substructure = _conversationService.CreateDataSpecificationSubstructureForConversation(conversation, mappedItems);
 		}
 		
 		if (conversation.State is ConversationState.AwaitingUserFollowUpMessage)
@@ -152,13 +166,13 @@ public class PostRequestsHandler(ILogger<PostRequestsHandler> logger, IDatabase 
 
 				// I think for now, just process like the first message.
 				string itemsMappingPrompt = _promptConstructor.CreateItemsMappingPrompt(userMessage.TextValue);
-				string itemsMappingResponse = _llmConnector.SendPrompt(itemsMappingPrompt);
-				DataSpecificationItemsFromLlm mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
-				substructure = _dataSpecificationService.CreateNewSubstructureOrSmthingIdk(mappedItems);
+				string itemsMappingResponse = _llmConnector.SendPromptAndReceiveResponse(itemsMappingPrompt);
+				List<DataSpecificationItem> mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
+				substructure = _conversationService.CreateDataSpecificationSubstructureForConversation(conversation, mappedItems);
 			}
 			else
 			{
-				substructure = _dataSpecificationService.ConfirmPreviewSubstructure(conversation);
+				substructure = _conversationService.ConfirmSubstructurePreview(conversation);
 			}
 		}
 
