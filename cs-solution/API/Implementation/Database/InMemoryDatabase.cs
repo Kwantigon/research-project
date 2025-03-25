@@ -66,7 +66,7 @@ public class InMemoryDatabase(ILogger<InMemoryDatabase> logger) : IDatabase
 		if (dataSpecification is null)
 			return [];
 		else
-			return dataSpecification.Items;
+			return dataSpecification.Items.Where(item => dataSpecificationItemIdList.Contains(item.Id)).ToList();
 	}
 
 	public bool DataSpecificationExists(uint dataSpecificationId)

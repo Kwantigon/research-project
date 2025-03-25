@@ -193,14 +193,19 @@ public class GetRequestsHandler(
 			});
 		}
 
-		string itemSummaryPrompt = _promptConstructor.CreateItemSummaryPrompt(dataSpecificationItem);
-		string itemSummaryResponse = _llmConnector.SendPromptAndReceiveResponse(itemSummaryPrompt);
-		DataSpecificationItemSummary summary = _llmResponseProcessor.ProcessItemsSummaryResponse(itemSummaryResponse);
+		if (dataSpecificationItem.Summary is null)
+		{
+			string itemSummaryPrompt = _promptConstructor.CreateItemSummaryPrompt(dataSpecificationItem);
+			string itemSummaryResponse = _llmConnector.SendPromptAndReceiveResponse(itemSummaryPrompt);
+			DataSpecificationItemSummary summary = _llmResponseProcessor.ProcessItemsSummaryResponse(itemSummaryResponse);
+			dataSpecificationItem.Summary = summary;
+		}
+		
 
 		return Results.Ok(new DataSpecificationItemSummaryDTO
 		{
-			TextualSummary = summary.TextualSummary,
-			IriOfRelatedItems = summary.RelatedItemsIds.Select(relatedItemId => $"/data-specifications/{dataSpecificationId}/{relatedItemId}").ToList()
+			TextualSummary = dataSpecificationItem.Summary.TextualSummary,
+			IriOfRelatedItems = dataSpecificationItem.Summary.RelatedItemsIds.Select(relatedItemId => $"/data-specifications/{dataSpecificationId}/items/{relatedItemId}/summary").ToList()
 		});
 	}
 

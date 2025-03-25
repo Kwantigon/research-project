@@ -15,4 +15,6 @@ public interface IConversationService
 	void AddItemsToSubstructurePreview(Conversation conversation, IReadOnlyList<DataSpecificationItem> itemsToAdd);
 
 	void UpdateQuestionPreview(Conversation conversation, string questionText);
+
+	PositiveSystemAnswer GeneratePositiveSystemAnswer(string sparqlQuery, IReadOnlyList<DataSpecificationItem> mappedItems, Conversation conversation);
 }

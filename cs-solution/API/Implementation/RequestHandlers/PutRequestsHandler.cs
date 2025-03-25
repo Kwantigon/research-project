@@ -46,22 +46,6 @@ public class PutRequestsHandler(
 			});
 		}
 
-		foreach (uint itemId in payload.SelectedItemsIds)
-		{
-			if (_database.DataSpecificationItemExists(conversation.DataSpecification.Id, itemId) is false)
-			{
-				_logger.LogError("Item with ID {ItemId} does not exist in the database.", itemId);
-				return Results.NotFound(new ErrorResponseDTO
-				{
-					ErrorCode = HttpStatusCode.NotFound,
-					ErrorMessage = $"Failed to find the item with ID {itemId}"
-				});
-			}
-		}
-		// Add all items at once instead of one by one in the loop above.
-		// Because if I find an invalid item in the loop, I want to return immediately,
-		// but then I will have some items added to the substructure already.
-
 		List<DataSpecificationItem> userSelectedItems = _database.GetDataSpecificationItems(conversation.DataSpecification.Id, payload.SelectedItemsIds);
 		List<uint> itemIdsNotFound = userSelectedItems
 			.Select(item => item.Id)
@@ -78,7 +62,7 @@ public class PutRequestsHandler(
 		}
 
 		_conversationService.AddItemsToSubstructurePreview(conversation, userSelectedItems);
-		// conversation.NextQuestionSubstructurePreview should now not be initialized and assigned to.
+		// conversation.NextQuestionSubstructurePreview should now be initialized and assigned to after the previous call.
 		string questionPreviewPrompt = _promptConstructor.CreateQuestionPreviewPrompt(conversation.NextQuestionSubstructurePreview!);
 
 		string questionPreviewResponse = _llmConnector.SendPromptAndReceiveResponse(questionPreviewPrompt);

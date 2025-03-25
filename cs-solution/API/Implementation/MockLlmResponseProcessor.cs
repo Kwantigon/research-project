@@ -32,13 +32,14 @@ namespace Backend.Implementation
 			return new DataSpecificationItemSummary
 			{
 				TextualSummary = mockSummaryString,
-				RelatedItemsIds = new List<uint> { 1, 3, 4 }
+				RelatedItemsIds = new List<uint> { 1, 2, 3 }
 			};
 		}
 
 		public string ProcessQuestionPreviewResponse(string llmResponse)
 		{
-			return "I would like to see all tournaments, their sponsors, the players participating and their nationalities, which have taken place this year.";
+			//return "I would like to see all tournaments, their sponsors, the players participating and their nationalities, which have taken place this year.";
+			return "I would like to see all tournaments that which have taken place this year and the tournament sponsors and the participating players.";
 		}
 	}
 }

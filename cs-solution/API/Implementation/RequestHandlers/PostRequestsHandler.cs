@@ -111,6 +111,7 @@ public class PostRequestsHandler(
 	}
 
 	// To do: This method should be async.
+	// But when converting to async, I have to figure out how to handle the ID of the SystemAnswer.
 	public IResult PostConversationMessages(uint conversationId, PostConversationMessagesDTO payload)
 	{
 		if (string.IsNullOrEmpty(payload.TextValue))
@@ -172,45 +173,20 @@ public class PostRequestsHandler(
 			}
 		}
 
-		// To do: Should logic should maybe be elsewhere.
-		uint systemAnswerId = conversation.NextUnusedMessageId++;
 		SystemAnswer systemAnswer;
 		if (substructure is null)
 		{
-			systemAnswer = new NegativeSystemAnswer { Id = systemAnswerId, TextValue = "Mock negative answer.", TimeStamp = DateTime.Now };
+			systemAnswer = new NegativeSystemAnswer { Id = conversation.NextUnusedMessageId++, TextValue = "Mock negative answer.", TimeStamp = DateTime.Now };
 		}
 		else
 		{
 			string sparqlQuery = _sparqlTranslationService.TranslateSubstructure(substructure);
-			StringBuilder answerBuilder = new StringBuilder();
-			answerBuilder.Append("The data you want can be retrieved using the following Sparql query: ");
-			answerBuilder.Append(sparqlQuery);
-			answerBuilder.AppendLine();
-			answerBuilder.AppendLine();
-			answerBuilder.Append("Some parts of your question can be expanded. The following list contains words, which I think can be expanded upon. You can click on each word for more information.");
-			List<DataSpecificationItemDTO> dataSpecificationItemsDTO = [];
-			foreach (var item in mappedItems)
-			{
-				answerBuilder.Append("- ");
-				answerBuilder.AppendLine(item.Name);
-				dataSpecificationItemsDTO.Add(
-					new DataSpecificationItemDTO
-					{
-						Name = item.Name,
-						Location = $"/data-specifications/{conversation.DataSpecification.Id}/items/{item.Id}"
-					});
-			}
-
-			systemAnswer = new PositiveSystemAnswer()
-			{
-				Id = systemAnswerId,
-				TimeStamp = DateTime.Now,
-				TextValue = answerBuilder.ToString(),
-				MatchedItems = mappedItems
-			};
+			systemAnswer = _conversationService.GeneratePositiveSystemAnswer(sparqlQuery, mappedItems, conversation);
 		}
 		
 		// To do: This should really be elsewhere.
+		conversation.Messages.Add(systemAnswer);
+		conversation.State = ConversationState.AwaitingFollowUpUserMessage;
 		userMessage.SystemAnswer = systemAnswer;
 
 		return Results.Created(
@@ -221,7 +197,7 @@ public class PostRequestsHandler(
 				Id = userMessage.Id,
 				TimeStamp = userMessage.TimeStamp,
 				TextValue = userMessage.TextValue,
-				SystemAnswerIri = $"/conversations/{conversationId}/messages/{systemAnswerId}"
+				SystemAnswerIri = $"/conversations/{conversationId}/messages/{systemAnswer.Id}"
 			}
 		);
 	}

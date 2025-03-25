@@ -107,7 +107,7 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 
 app.MapGet("/data-specifications/{dataSpecificationId}/items/{itemId}/summary",
 			([FromRoute] uint dataSpecificationId,
-			[FromQuery] uint itemId,
+			[FromRoute] uint itemId,
 			IGetRequestsHandler handler) => handler.GetItemSummaryFromDataSpecification(dataSpecificationId, itemId))
 	.WithOpenApi(operation =>
 	{
