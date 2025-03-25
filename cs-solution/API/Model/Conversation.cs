@@ -4,15 +4,6 @@ public class Conversation
 {
 	private static uint _nextUnusedConversationId = 0;
 
-	private enum ConversationState
-	{
-		NotInitialized,
-		AwaitingFirstUserMessage,
-		AwaitingFollowUpUserMessage
-	}
-
-	private ConversationState _state = ConversationState.NotInitialized;
-
 	public Conversation(DataSpecification dataSpecification, string? title)
 	{
 		Id = _nextUnusedConversationId++;
@@ -35,24 +26,9 @@ public class Conversation
 
 	public UserPreviewMessage? NextQuestionPreview { get; set; }
 
-	public UserMessage AddUserMessage(string text, DateTime timestamp)
-	{
-		if (_state is not ConversationState.AwaitingFirstUserMessage)
-		{
-			throw new InvalidOperationException("The conversation is not accepting user messages at this time.");
-		}
+	public DataSpecificationSubstructure? NextQuestionSubstructurePreview { get; set; }
 
-		var msg = new UserMessage()
-		{
-			Id = NextUnusedMessageId++,
-			TimeStamp = timestamp,
-			TextValue = text
-		};
-		Messages.Add(msg);
-
-		_state = ConversationState.AwaitingFollowUpUserMessage;
-		return msg;
-	}
+	public ConversationState State { get; set; } = ConversationState.NotInitialized;
 
 	/// <summary>
 	/// Initialize the conversation by adding the very first system message,
@@ -60,13 +36,19 @@ public class Conversation
 	/// </summary>
 	public void InitializeConversation()
 	{
-		Messages.Add(new PlainTextSystemMessage()
+		Messages.Add(new PlainTextSystemMessage
 		{
 			Id = NextUnusedMessageId++,
 			TimeStamp = DateTime.Now,
 			TextValue = "Your data specification has been loaded.\nWhat would you like to know?"
 		});
-		_state = ConversationState.AwaitingFirstUserMessage;
+		State = ConversationState.AwaitingFirstUserMessage;
 	}
 }
 
+public enum ConversationState
+{
+	NotInitialized,
+	AwaitingFirstUserMessage,
+	AwaitingFollowUpUserMessage
+}

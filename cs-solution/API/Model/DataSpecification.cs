@@ -1,4 +1,6 @@
-﻿namespace Backend.Model;
+﻿using Backend.DTO;
+
+namespace Backend.Model;
 
 public class DataSpecification
 {
@@ -16,4 +18,6 @@ public class DataSpecification
 	public string Name { get; set; }
 
 	public string DataspecerIri { get; set; }
+
+	public List<DataSpecificationItem> Items { get; set; } = [];
 }

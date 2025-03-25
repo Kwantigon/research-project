@@ -15,7 +15,7 @@ public interface IGetRequestsHandler
 
 	ConversationDTO GetConversation(uint conversationId);
 
-	List<MessageBasicDTO> GetConversationMessages(uint conversationId);
+	IResult GetConversationMessages(uint conversationId);
 
 	IResult GetMessageFromConversation(uint conversationId, uint messageId);
 

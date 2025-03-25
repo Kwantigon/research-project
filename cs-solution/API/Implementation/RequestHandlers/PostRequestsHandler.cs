@@ -31,18 +31,20 @@ public class PostRequestsHandler(
 	{
 		if (string.IsNullOrEmpty(payload.IriToDataspecer))
 		{
-			return Results.BadRequest(new ErrorResponseDTO()
+			return Results.BadRequest(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
 				ErrorMessage = "No IRI to a Dataspecer package was given"
 			});
 		}
 
-		DataSpecification dataSpecNew = new DataSpecification(payload.Name, payload.IriToDataspecer);
-		if (_database.AddNewDataSpecification(dataSpecNew) is false)
+		DataSpecification dataSpecification = _dataSpecificationService.CreateDataSpecificationFromDataspecerPackage(payload.IriToDataspecer);
+		dataSpecification.Name = payload.Name ?? $"Unnamed data specification #{dataSpecification.Id}";
+
+		if (_database.AddNewDataSpecification(dataSpecification) is false)
 		{
-			_logger.LogError("Failed to add the data specification {DataSpec} to the database.", dataSpecNew);
-			return Results.InternalServerError(new ErrorResponseDTO()
+			_logger.LogError("Failed to add the data specification {DataSpec} to the database.", dataSpecification);
+			return Results.InternalServerError(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.InternalServerError,
 				ErrorMessage = "Failed to create a new data specification"
@@ -50,7 +52,7 @@ public class PostRequestsHandler(
 		}
 		else
 		{
-			return Results.Created(uri: $"/data-specifications/{dataSpecNew.Id}", dataSpecNew);
+			return Results.Created(uri: $"/data-specifications/{dataSpecification.Id}", (DataSpecificationDTO)dataSpecification);
 		}
 	}
 
@@ -58,29 +60,29 @@ public class PostRequestsHandler(
 	{
 		if (string.IsNullOrEmpty(payload.DataSpecificationIri))
 		{
-			return Results.BadRequest(new ErrorResponseDTO()
+			return Results.BadRequest(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
-				ErrorMessage = "The data specification was either null or empty"
+				ErrorMessage = "The data specification's IRI was either null or empty"
 			});
 		}
 
 		string[] iriParts = payload.DataSpecificationIri.Split('/');
 		// The iri looks like this: /data-specifications/{dataSpecificationId}
-		// So iriParts will be: [ "", "data-specification", "{dataSpecificationid" ]
+		// So iriParts will be: [ "", "data-specification", "{dataSpecificationId}" ]
 		if (iriParts.Length != 3)
 		{
-			_logger.LogError("Data specification IRI has too many \'/\' characters: {0}", payload.DataSpecificationIri);
-			return Results.BadRequest(new ErrorResponseDTO()
+			_logger.LogError("The iriParts has an unexpected length of {IriPartsLength}. IRI: {0}", iriParts.Length, payload.DataSpecificationIri);
+			return Results.BadRequest(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
 				ErrorMessage = "The data specification's IRI has an unexpected format"
 			});
 		}
-		if (!uint.TryParse(iriParts[2], out uint dataSpecificationId))
+		if (uint.TryParse(iriParts[2], out uint dataSpecificationId) is false)
 		{
 			_logger.LogError("Failed to parse {ID} as an uint.", iriParts[2]);
-			return Results.BadRequest(new ErrorResponseDTO()
+			return Results.BadRequest(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
 				ErrorMessage = "The data specification's ID in the IRI has an invalid format"
@@ -94,18 +96,17 @@ public class PostRequestsHandler(
 			throw new Exception("Failed to find the requested data specification");
 		}
 
-		Conversation conversation = new Conversation(dataSpecification, payload.ConversationTitle);
+		Conversation conversation = _conversationService.CreateNewConversation(dataSpecification);
 		if (_database.AddNewConversation(conversation) is false)
 		{
 			_logger.LogError("Failed to add the conversation {Conversation} to the database.", conversation);
-			return Results.InternalServerError(new ErrorResponseDTO()
+			return Results.InternalServerError(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.InternalServerError,
 				ErrorMessage = "Failed to start a new conversation"
 			});
 		}
 
-		conversation.InitializeConversation();
 		return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
 	}
 
@@ -114,7 +115,7 @@ public class PostRequestsHandler(
 	{
 		if (string.IsNullOrEmpty(payload.TextValue))
 		{
-			return Results.BadRequest(new ErrorResponseDTO()
+			return Results.BadRequest(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.BadRequest,
 				ErrorMessage = "The text in the message was either null or empty"
@@ -125,38 +126,33 @@ public class PostRequestsHandler(
 		if (conversation is null)
 		{
 			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
-			return Results.NotFound(new ErrorResponseDTO()
+			return Results.NotFound(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.NotFound,
 				ErrorMessage = $"Failed to find the conversation with ID {conversationId}"
 			});
 		}
 
-		var userMessage = new UserMessage()
-		{
-			Id = conversation.NextUnusedMessageId++,
-			TimeStamp = payload.TimeStamp,
-			TextValue = payload.TextValue
-		};
-		_conversationService.AddMessageToConversation(conversation, userMessage);
+		UserMessage userMessage = _conversationService.AddAndReturnUserMessageToConversation(conversation, payload.TextValue, payload.TimeStamp);
 
 		// Jsou tu 3 moznosti:
 		// Jedna se o uplne prvni zpravu od uzivatele
 		// Jedna se o preview zpravu, kterou uzivatel jen potvrdil.
 		// Jedna se o preview zpravu, kterou uzivatel upravil.
-		DataSpecificationSubstructure substructure;
+		DataSpecificationSubstructure? substructure = null;
+		List<DataSpecificationItem> mappedItems = [];
 		if (conversation.State is ConversationState.AwaitingFirstUserMessage)
 		{
-			string itemsMappingPrompt = _promptConstructor.CreateItemsMappingPrompt(userMessage.TextValue);
+			string itemsMappingPrompt = _promptConstructor.CreateItemsMappingPrompt(payload.TextValue);
 			string itemsMappingResponse = _llmConnector.SendPromptAndReceiveResponse(itemsMappingPrompt);
-			List<DataSpecificationItem> mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
+			mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
 			// To do: If the response processor fails to parse, it's likely because the LLM returned an invalid answer format.
 			// Try to resend the prompt and ask for the correct answer format.
 
 			substructure = _conversationService.CreateDataSpecificationSubstructureForConversation(conversation, mappedItems);
 		}
 		
-		if (conversation.State is ConversationState.AwaitingUserFollowUpMessage)
+		if (conversation.State is ConversationState.AwaitingFollowUpUserMessage)
 		{
 			if (payload.UserModifiedPreviewMessage)
 			{
@@ -167,7 +163,7 @@ public class PostRequestsHandler(
 				// I think for now, just process like the first message.
 				string itemsMappingPrompt = _promptConstructor.CreateItemsMappingPrompt(userMessage.TextValue);
 				string itemsMappingResponse = _llmConnector.SendPromptAndReceiveResponse(itemsMappingPrompt);
-				List<DataSpecificationItem> mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
+				mappedItems = _llmResponseProcessor.ProcessItemsMappingResponse(itemsMappingResponse);
 				substructure = _conversationService.CreateDataSpecificationSubstructureForConversation(conversation, mappedItems);
 			}
 			else
@@ -176,16 +172,12 @@ public class PostRequestsHandler(
 			}
 		}
 
+		// To do: Should logic should maybe be elsewhere.
 		uint systemAnswerId = conversation.NextUnusedMessageId++;
+		SystemAnswer systemAnswer;
 		if (substructure is null)
 		{
-			var systemAnswer = new NegativeSystemAnswer()
-			{
-				Id = systemAnswerId,
-				TimeStamp = DateTime.Now,
-				TextValue = "Sorry, I could not come up with an answer to your question." // To do: This string should be a constant somewhere.
-			};
-			_conversationService.AddSystemAnswer(conversation, systemAnswer);
+			systemAnswer = new NegativeSystemAnswer { Id = systemAnswerId, TextValue = "Mock negative answer.", TimeStamp = DateTime.Now };
 		}
 		else
 		{
@@ -195,17 +187,31 @@ public class PostRequestsHandler(
 			answerBuilder.Append(sparqlQuery);
 			answerBuilder.AppendLine();
 			answerBuilder.AppendLine();
-			answerBuilder.Append("Some parts of your question can be expanded and I have highlighted the relevant words. You can click on them for more information.");
+			answerBuilder.Append("Some parts of your question can be expanded. The following list contains words, which I think can be expanded upon. You can click on each word for more information.");
+			List<DataSpecificationItemDTO> dataSpecificationItemsDTO = [];
+			foreach (var item in mappedItems)
+			{
+				answerBuilder.Append("- ");
+				answerBuilder.AppendLine(item.Name);
+				dataSpecificationItemsDTO.Add(
+					new DataSpecificationItemDTO
+					{
+						Name = item.Name,
+						Location = $"/data-specifications/{conversation.DataSpecification.Id}/items/{item.Id}"
+					});
+			}
 
-			var systemAnswer = new PositiveSystemAnswer()
+			systemAnswer = new PositiveSystemAnswer()
 			{
 				Id = systemAnswerId,
 				TimeStamp = DateTime.Now,
-				TextValue = answerBuilder.ToString()
+				TextValue = answerBuilder.ToString(),
+				MatchedItems = mappedItems
 			};
-			systemAnswer.MatchedItems = _dataSpecificationService.GetHighlightableItems(conversation);
-			// To do: I will go the route without highlighting to make it easier.
 		}
+		
+		// To do: This should really be elsewhere.
+		userMessage.SystemAnswer = systemAnswer;
 
 		return Results.Created(
 			uri: $"/conversations/{conversationId}/messages/{userMessage.Id}",

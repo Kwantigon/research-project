@@ -53,4 +53,33 @@ public class InMemoryDatabase(ILogger<InMemoryDatabase> logger) : IDatabase
 		_conversations.Add(conversation.Id, conversation);
 		return true;
 	}
+
+	public DataSpecificationItem? GetDataSpecificationItem(uint dataSpecificationId, uint itemId)
+	{
+		_dataSpecifications.TryGetValue(dataSpecificationId, out var dataSpecification);
+		return dataSpecification?.Items.Find(item => item.Id == itemId);
+	}
+
+	public List<DataSpecificationItem> GetDataSpecificationItems(uint dataSpecificationId, IReadOnlyList<uint> dataSpecificationItemIdList)
+	{
+		_dataSpecifications.TryGetValue(dataSpecificationId, out var dataSpecification);
+		if (dataSpecification is null)
+			return [];
+		else
+			return dataSpecification.Items;
+	}
+
+	public bool DataSpecificationExists(uint dataSpecificationId)
+	{
+		return _dataSpecifications.ContainsKey(dataSpecificationId);
+	}
+
+	public bool DataSpecificationItemExists(uint dataSpecificationId, uint itemId)
+	{
+		_dataSpecifications.TryGetValue(dataSpecificationId, out var dataSpecification);
+		if (dataSpecification is null)
+			return false;
+		else
+			return dataSpecification.Items.Select(item => item.Id == itemId).Any();
+	}
 }

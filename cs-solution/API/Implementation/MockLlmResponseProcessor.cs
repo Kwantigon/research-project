@@ -1,12 +1,44 @@
 ﻿using Backend.Abstractions;
+using Backend.Model;
 
 namespace Backend.Implementation
 {
 	public class MockLlmResponseProcessor : ILlmResponseProcessor
 	{
-		public object ProcessItemsMappingResponse(string llmResponse)
+		public List<DataSpecificationItem> ProcessItemsMappingResponse(string llmResponse)
 		{
-			throw new NotImplementedException();
+			
+			return new List<DataSpecificationItem>
+			{
+				new DataSpecificationItem
+				{
+					Id = 0,
+					Name = "Tournament"
+				}
+			};
+		}
+
+		public DataSpecificationItemSummary ProcessItemsSummaryResponse(string llmResponse)
+		{
+			const string mockSummaryString =
+				"""
+				Badminton tournaments are organized by the Badminton World Federation (BWF). Tournaments are divided into grades and each grade is further divided into multiple levels. Different tournaments take place in different countries. Most tournaments are annual but some have longer repetition intervals.
+				Some properties related to badminton tournament are:
+				- Grade.
+				- Repetition interval.
+				- Sponsoring brand.
+				- Participants.
+				""";
+			return new DataSpecificationItemSummary
+			{
+				TextualSummary = mockSummaryString,
+				RelatedItemsIds = new List<uint> { 1, 3, 4 }
+			};
+		}
+
+		public string ProcessQuestionPreviewResponse(string llmResponse)
+		{
+			return "I would like to see all tournaments, their sponsors, the players participating and their nationalities, which have taken place this year.";
 		}
 	}
 }

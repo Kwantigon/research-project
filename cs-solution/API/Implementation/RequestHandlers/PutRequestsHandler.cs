@@ -11,10 +11,12 @@ public class PutRequestsHandler(
 	IDatabase database,
 	IPromptConstructor promptConstructor,
 	ILlmConnector llmConnector,
-	ILlmResponseProcessor llmResponseProcessor) : IPutRequestsHandler
+	ILlmResponseProcessor llmResponseProcessor,
+	IConversationService conversationService) : IPutRequestsHandler
 {
 	private readonly ILogger<PutRequestsHandler> _logger = logger;
 	private readonly IDatabase _database = database;
+	private readonly IConversationService _conversationService = conversationService;
 	private readonly IPromptConstructor _promptConstructor = promptConstructor;
 	private readonly ILlmConnector _llmConnector = llmConnector;
 	private readonly ILlmResponseProcessor _llmResponseProcessor = llmResponseProcessor;
@@ -46,7 +48,7 @@ public class PutRequestsHandler(
 
 		foreach (uint itemId in payload.SelectedItemsIds)
 		{
-			if (_database.DataSpecificationItemExists(itemId) is false)
+			if (_database.DataSpecificationItemExists(conversation.DataSpecification.Id, itemId) is false)
 			{
 				_logger.LogError("Item with ID {ItemId} does not exist in the database.", itemId);
 				return Results.NotFound(new ErrorResponseDTO
@@ -59,12 +61,31 @@ public class PutRequestsHandler(
 		// Add all items at once instead of one by one in the loop above.
 		// Because if I find an invalid item in the loop, I want to return immediately,
 		// but then I will have some items added to the substructure already.
-		_conversationService.AddItemsToSubstructure(conversation, payload.SelectedItemsIds);
 
-		string questionPreviewPrompt = _promptConstructor.CreateQuestionPreviewPrompt(conversation.SubstructurePreview);
+		List<DataSpecificationItem> userSelectedItems = _database.GetDataSpecificationItems(conversation.DataSpecification.Id, payload.SelectedItemsIds);
+		List<uint> itemIdsNotFound = userSelectedItems
+			.Select(item => item.Id)
+			.Except(payload.SelectedItemsIds)
+			.ToList();
+		if (itemIdsNotFound.Any())
+		{
+			_logger.LogError("Some data specification items were not found in the database: {NotFoundItemsIds}", itemIdsNotFound);
+			return Results.NotFound(new ErrorResponseDTO
+			{
+				ErrorCode = HttpStatusCode.NotFound,
+				ErrorMessage = "Failed to find one or more data specification items"
+			});
+		}
+
+		_conversationService.AddItemsToSubstructurePreview(conversation, userSelectedItems);
+		// conversation.NextQuestionSubstructurePreview should now not be initialized and assigned to.
+		string questionPreviewPrompt = _promptConstructor.CreateQuestionPreviewPrompt(conversation.NextQuestionSubstructurePreview!);
+
 		string questionPreviewResponse = _llmConnector.SendPromptAndReceiveResponse(questionPreviewPrompt);
 		string questionPreview = _llmResponseProcessor.ProcessQuestionPreviewResponse(questionPreviewResponse);
 		_conversationService.UpdateQuestionPreview(conversation, questionPreview);
+
+		return Results.Created();
 	}
 	#endregion
 }

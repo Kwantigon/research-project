@@ -80,16 +80,20 @@ public class GetRequestsHandler(
 		return conversation;
 	}
 
-	public List<MessageBasicDTO> GetConversationMessages(uint conversationId)
+	public IResult GetConversationMessages(uint conversationId)
 	{
 		var conversation = _database.GetConversationById(conversationId);
 		if (conversation is null)
 		{
 			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
-			throw new Exception("Failed to find the requested conversation");
+			return Results.NotFound(new ErrorResponseDTO
+			{
+				ErrorCode = HttpStatusCode.NotFound,
+				ErrorMessage = "Failed to find the requested conversation"
+			});
 		}
 
-		return conversation.Messages.Select(message =>
+		var messagesList = conversation.Messages.Select(message =>
 		{
 			MessageSource source;
 			if (message is UserMessage)
@@ -108,6 +112,8 @@ public class GetRequestsHandler(
 				Text = message.TextValue
 			};
 		}).ToList();
+
+		return Results.Ok(messagesList);
 	}
 
 	public IResult GetMessageFromConversation(uint conversationId, uint messageId)
@@ -116,7 +122,7 @@ public class GetRequestsHandler(
 		if (conversation is null)
 		{
 			_logger.LogError("Conversation with ID {ConversationId} not found.", conversationId);
-			return Results.NotFound(new ErrorResponseDTO()
+			return Results.NotFound(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.NotFound,
 				ErrorMessage = $"Failed to find the conversation with ID {conversationId}"
@@ -127,7 +133,7 @@ public class GetRequestsHandler(
 		if (message is null)
 		{
 			_logger.LogError("Conversation with ID {ConversationId} does not contain the message with ID {MessageId}.", conversationId, messageId);
-			return Results.NotFound(new ErrorResponseDTO()
+			return Results.NotFound(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.NotFound,
 				ErrorMessage = $"Failed to find the message with ID {messageId}"
@@ -150,7 +156,12 @@ public class GetRequestsHandler(
 				}
 				break;
 			case PositiveSystemAnswer positiveSystemAnswer:
-				messageDTO.MatchedDataSpecificationItems = positiveSystemAnswer.MatchedItems;
+				messageDTO.MatchedDataSpecificationItems = positiveSystemAnswer.MatchedItems
+					.Select(item => new DataSpecificationItemDTO
+					{
+						Name = item.Name,
+						Location = $"/data-specifications/{conversation.DataSpecification.Id}/items/{item.Id}"
+					}).ToList();
 				break;
 			default:
 				break;
@@ -161,17 +172,6 @@ public class GetRequestsHandler(
 
 	public IResult GetItemSummaryFromDataSpecification(uint dataSpecificationId, uint itemId)
 	{
-		/*DataSpecification? dataSpecification = _database.GetDataSpecificationById(dataSpecificationId);
-		if (dataSpecification is null)
-		{
-			_logger.LogError("Failed to retrieve the data specification with ID {DataSpecId} from the database.", dataSpecificationId);
-			return Results.NotFound(new ErrorResponseDTO()
-			{
-				ErrorCode = HttpStatusCode.NotFound,
-				ErrorMessage = "Failed to find the data specification"
-			});
-		}*/
-
 		if (_database.DataSpecificationExists(dataSpecificationId) is false)
 		{
 			_logger.LogError("The data specification with ID {DataSpecId} does not exist in the database.", dataSpecificationId);
@@ -189,7 +189,7 @@ public class GetRequestsHandler(
 			return Results.NotFound(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.NotFound,
-				ErrorMessage = $"Failed to find the data specification item with ID {itemId}"
+				ErrorMessage = "Failed to find the data specification item"
 			});
 		}
 
@@ -210,7 +210,7 @@ public class GetRequestsHandler(
 		if (conversation is null)
 		{
 			_logger.LogError("Failed to retrieve the conversation with ID {ConversationId} from the database.", conversationId);
-			return Results.NotFound(new ErrorResponseDTO()
+			return Results.NotFound(new ErrorResponseDTO
 			{
 				ErrorCode = HttpStatusCode.NotFound,
 				ErrorMessage = $"Failed to find the conversation with ID {conversationId}"

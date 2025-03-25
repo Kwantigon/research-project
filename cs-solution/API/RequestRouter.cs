@@ -23,6 +23,9 @@ builder.Services.AddCors(options =>
 builder.Services
 	.AddSwaggerGen()
 	.AddSingleton<IDatabase, InMemoryDatabase>()
+	.AddSingleton<IConversationService, ConversationService>()
+	.AddSingleton<IDataSpecificationService, DataSpecificationService>()
+	.AddSingleton<ISparqlTranslationService, SparqlTranslationService>()
 	.AddSingleton<IPromptConstructor, MockPromptConstructor>()
 	.AddSingleton<ILlmConnector, MockLlmConnector>()
 	.AddSingleton<ILlmResponseProcessor, MockLlmResponseProcessor>()

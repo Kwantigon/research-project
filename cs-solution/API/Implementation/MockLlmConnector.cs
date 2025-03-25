@@ -7,6 +7,6 @@ public class MockLlmConnector : ILlmConnector
 {
 	public string SendPromptAndReceiveResponse(string prompt)
 	{
-		throw new NotImplementedException();
+		return "Mock LLM response.";
 	}
 }

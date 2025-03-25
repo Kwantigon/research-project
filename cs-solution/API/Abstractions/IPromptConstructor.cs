@@ -13,4 +13,6 @@ public interface IPromptConstructor
 	string CreateItemsMappingPrompt(string userQuery);
 
 	string CreateItemSummaryPrompt(DataSpecificationItem dataSpecificationItem);
+
+	string CreateQuestionPreviewPrompt(DataSpecificationSubstructure substructure);
 }

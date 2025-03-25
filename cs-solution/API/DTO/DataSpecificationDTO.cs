@@ -1,3 +1,5 @@
+using Backend.Model;
+
 namespace Backend.DTO;
 
 public class DataSpecificationDTO
@@ -17,4 +19,14 @@ public class DataSpecificationDTO
 	/// The IRI of the original Dataspecer package.
 	/// </summary>
 	public required string DataspecerIri { get; set; }
+
+	public static explicit operator DataSpecificationDTO(DataSpecification dataSpecification)
+	{
+		return new DataSpecificationDTO
+		{
+			Name = dataSpecification.Name,
+			Location = $"/data-specifications/{dataSpecification.Id}",
+			DataspecerIri = dataSpecification.DataspecerIri
+		};
+	}
 }
