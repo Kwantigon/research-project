@@ -1,6 +1,6 @@
 ﻿using Backend.Model;
 
-namespace Backend.Abstractions;
+namespace Backend.Abstractions.LlmServices;
 
 public interface IPromptConstructor
 {

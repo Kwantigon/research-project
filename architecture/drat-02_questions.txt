@@ -1,0 +1,4 @@
+1) Budu potřebovat nějaké další boxy (komponenty / moduly)?
+2) Dává smysl si říct, že pouze data specification service a conversation service budou komunikovat s databází?
+3) Posledně jsme mluvili o tom, že možná nebudu psát nějaký translation service, ale nějakým způsobem to předhodím LLM.
+- Ale i v tom případě tam bude box pro Sparql, který bude volat správné metody na LLM vrstvě.

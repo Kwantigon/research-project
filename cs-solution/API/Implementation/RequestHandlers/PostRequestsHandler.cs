@@ -1,9 +1,9 @@
 ﻿using Backend.Abstractions;
+using Backend.Abstractions.LlmServices;
 using Backend.Abstractions.RequestHandlers;
 using Backend.DTO;
 using Backend.Model;
 using System.Net;
-using System.Text;
 
 namespace Backend.Implementation.RequestHandlers;
 
@@ -152,7 +152,7 @@ public class PostRequestsHandler(
 
 			substructure = _conversationService.CreateDataSpecificationSubstructureForConversation(conversation, mappedItems);
 		}
-		
+
 		if (conversation.State is ConversationState.AwaitingFollowUpUserMessage)
 		{
 			if (payload.UserModifiedPreviewMessage)
@@ -183,7 +183,7 @@ public class PostRequestsHandler(
 			string sparqlQuery = _sparqlTranslationService.TranslateSubstructure(substructure);
 			systemAnswer = _conversationService.GeneratePositiveSystemAnswer(sparqlQuery, mappedItems, conversation);
 		}
-		
+
 		// To do: This should really be elsewhere.
 		conversation.Messages.Add(systemAnswer);
 		conversation.State = ConversationState.AwaitingFollowUpUserMessage;

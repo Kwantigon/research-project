@@ -1,7 +1,7 @@
-﻿using Backend.Abstractions;
+﻿using Backend.Abstractions.LlmServices;
 using Backend.Model;
 
-namespace Backend.Implementation;
+namespace Backend.Implementation.LlmServices;
 
 public class MockPromptConstructor : IPromptConstructor
 {

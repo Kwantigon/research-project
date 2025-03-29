@@ -61,3 +61,21 @@ Chtěl bych, aby na první pohled bylo vidět, co vrací která metoda.
 
 Eventually budu chtít použít nějaký ExceptionHandler, aby transformoval vyjímky na HTTP odpovědi.
 - Zatím se soustředím na to, abych měl funkční back end.
+
+*29/03/2025*
+Nakreslil jsem si trochu pořádněji architekturu.
+Popsal jsem boxy architektury ve specifikaci.
+
+Teď přemýšlím, jestli potřebuju nějaký box navíc - třeba nějaký MessagesService nebo něco.
+- Myslím, že toto je na konzultaci s panem Nečaským.
+Ještě jsem se nerozhodl, jestli komunikace s databází bude exkluzivně ze serviců nebo jestli RequestHandlers mají taky komunikovat s databází.
+- To je zase na konzultaci (možná s panem Škodou?).
+
+To do: Vytvořit jeden úplně kompletní příklad. Dovést to až do konce. Ne jenom říct, že se to bude opakovat.
+- Jeden příklad, kde rozšíření dotazu budou jen selecty.
+- Jeden příklad, kde rozšíření dotazu je i nějaké filtrování.
+
+Na další konzultaci bych si chtěl s panem Nečaským vyjasnit, jak a co bude ta moje aplikace dělat.
+Mám pocit, že teď ani jeden z nás nemá přesnou představu.
+- Projdeme si to od začátku - co je cílem projektu, jak dosáhneme toho cílu.
+- Jestli moje navrhovaná architektura toho dosáhne.

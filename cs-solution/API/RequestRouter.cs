@@ -1,8 +1,11 @@
 using Backend.Abstractions;
+using Backend.Abstractions.Database;
+using Backend.Abstractions.LlmServices;
 using Backend.Abstractions.RequestHandlers;
 using Backend.DTO;
 using Backend.Implementation;
 using Backend.Implementation.Database;
+using Backend.Implementation.LlmServices;
 using Backend.Implementation.RequestHandlers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,7 +53,7 @@ app.MapGet("/", () => "Hello there!")
 		return operation;
 	});
 
-app.MapGet("/about", (IGetRequestsHandler handler) => handler.GetAbout());
+//app.MapGet("/about", (IGetRequestsHandler handler) => handler.GetAbout());
 
 app.MapGet("/data-specifications", (IGetRequestsHandler handler) => handler.GetAllDataSpecifications())
 	.WithOpenApi(operation =>
