@@ -1,4 +1,5 @@
 ﻿using Backend.Abstractions;
+using Backend.Abstractions.Database;
 using Backend.Abstractions.LlmServices;
 using Backend.Abstractions.RequestHandlers;
 using Backend.DTO;

@@ -1,0 +1,36 @@
+Úvod: shrnout, co dokument obsahuje.
+dát nějaké obrazky do use casu pro ujasnění.
+upozornit, že to není návrh UI, ale jen pro logiku.
+uživatel má možnost si říct o Sparql.
+
+3 kapitoly:
+Analýza požadavků
+Architektura.
+Výběr technologií.
+
+Stavím to celé kolem 3 user stories. Analyzuju tyto stories podrobněji - use casy. Vyberu si datovou specifikaci a začnu konverzaci.
+
+Já jsem začal detailními scénáři.
+
+technologie ještě nepsát do popisu architektury.
+Taky říct, že kolem back endu jsou další externí věci: LLM, Dataspecer, Database
+
+Conversation service by měl mít nějakou vnitřní strukturu.
+Do conversation service více popsat to, co mám rozmyšlené v kódu. Jak si stavím podstrukturu atd.
+Napsat přímo, jaké hlavní operace bude ten modul dělat.
+
+Nejdůležitější na obrázku:
+services
+dataspecer connector
+Např. LLM mám jen jednu velkou krabici a pak ke každé menší krabici popsat jednou větou, proč to mít a co dělá.
+nakreslit krabičky nebo popsat krabičky v textu nebo obojí.
+Model mi chybí v obrázku: conversation model
+přidat class diagram modelu.
+
+Na konci napsat ty technologie.
+- patří sem to, že děláme to obecně nezávisle na LLM. Z pohledu specifikace je jedno, jestli je to open AI nebo cokoliv.
+- v rámci projektu ale budu pracovat s modelem nasazeným lokálně a tyto modely.
+
+Napsat ještě k databázi:
+- co budu ukládat za data.
+- je to relační databáze? tak přidat schémata.
