@@ -1,0 +1,171 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36" version="26.2.12">
+  <diagram name="Page-1" id="5FYyBF0_oAJCgi1BuuIq">
+    <mxGraphModel dx="1715" dy="473" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-1" value="Large language model" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1000" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-2" value="Dataspecer" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="1000" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-3" value="" style="endArrow=none;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint y="960" as="sourcePoint" />
+            <mxPoint x="850" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-33" value="Sends prompts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-5" target="SQ55-SY6DKUMrh-pWb_Q-1">
+          <mxGeometry x="-0.403" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-5" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30.5" y="780" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-7" value="Prompt constructor" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="50.5" y="790" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-9" value="Response processor" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180.5" y="790" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-11" value="" style="endArrow=none;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="0.5" y="720" as="sourcePoint" />
+            <mxPoint x="850.5" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-12" value="Connectors&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;layer&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="0.5" y="720" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-39" value="Retrieves packages" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-13" target="SQ55-SY6DKUMrh-pWb_Q-2">
+          <mxGeometry x="-0.403" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-13" value="Dataspecer connector" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="560.5" y="780" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-38" value="Sends queries" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-15" target="SQ55-SY6DKUMrh-pWb_Q-17">
+          <mxGeometry x="-0.403" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-15" value="Database connector" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="345.5" y="780" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-17" value="Database" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="1000" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-18" value="LLM connector" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="110.5" y="750" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-19" value="" style="endArrow=none;html=1;rounded=0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="0.5" y="280" as="sourcePoint" />
+            <mxPoint x="850.5" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-23" value="Business core layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="0.5" y="280" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-25" value="Client layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="0.5" y="10" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-40" value="Data specification&lt;div&gt;service&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="540" width="220.5" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-43" value="Stores processed&lt;div&gt;Dataspecer packages&lt;/div&gt;" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-40" target="SQ55-SY6DKUMrh-pWb_Q-15">
+          <mxGeometry x="-0.4911" y="-1" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="535" y="650" as="sourcePoint" />
+            <mxPoint x="485" y="700" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-44" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="450" width="260" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-45" value="Asks for&lt;div&gt;Dataspecer packages&lt;/div&gt;" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-40" target="SQ55-SY6DKUMrh-pWb_Q-13">
+          <mxGeometry x="-0.5125" y="5" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="700" as="sourcePoint" />
+            <mxPoint x="390" y="750" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-59" value="Asks for&lt;br&gt;&lt;div&gt;translation&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-49" target="SQ55-SY6DKUMrh-pWb_Q-50">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="200" y="605" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-49" value="Reply message&lt;div&gt;generator&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="279.5" y="460" width="100" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-50" value="Sparql translation&lt;div&gt;service&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="20.75" y="550" width="149.5" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-51" value="Data specification&lt;div&gt;substructure&lt;/div&gt;&lt;div&gt;builder&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="399.5" y="560" width="100" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-53" value="Question&lt;div&gt;mapper&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="279.5" y="560" width="100" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-56" value="Conversation&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;service&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="419.38" y="460" width="100.62" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-60" value="Asks for&lt;div&gt;items mapping&lt;/div&gt;" style="endArrow=classic;html=1;rounded=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-53" target="SQ55-SY6DKUMrh-pWb_Q-5">
+          <mxGeometry x="-0.2124" y="4" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="354.5" y="670" as="sourcePoint" />
+            <mxPoint x="304.5" y="720" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-61" value="Retrieves and&lt;div&gt;stores data&lt;/div&gt;" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-44" target="SQ55-SY6DKUMrh-pWb_Q-15">
+          <mxGeometry x="-0.5285" y="7" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="690" as="sourcePoint" />
+            <mxPoint x="390" y="740" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-62" value="External systems" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="0.5" y="960" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-65" value="Web front end" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="186" y="40" width="159.5" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-75" value="Provides Dataspecer package URI" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-66" target="SQ55-SY6DKUMrh-pWb_Q-40">
+          <mxGeometry x="-0.4363" y="10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-76" value="Call methods based on incoming requests" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-66" target="SQ55-SY6DKUMrh-pWb_Q-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-66" value="Request handler" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="310" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-69" value="Dataspecer manager" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460.13" y="40" width="159.5" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-72" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-69" target="SQ55-SY6DKUMrh-pWb_Q-66">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="460" y="190" as="sourcePoint" />
+            <mxPoint x="410" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-73" value="Sends HTTP POST&lt;div&gt;with package URI&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="SQ55-SY6DKUMrh-pWb_Q-72">
+          <mxGeometry x="-0.4937" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SQ55-SY6DKUMrh-pWb_Q-74" value="Sends HTTP requests" style="endArrow=classic;html=1;rounded=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="SQ55-SY6DKUMrh-pWb_Q-65" target="SQ55-SY6DKUMrh-pWb_Q-66">
+          <mxGeometry x="-0.4806" y="-3" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="240" as="sourcePoint" />
+            <mxPoint x="460" y="190" as="targetPoint" />
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
