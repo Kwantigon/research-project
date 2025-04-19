@@ -1,0 +1,12 @@
+Také by měla označit části dotazu v natural language, které nejdou datovou specifikací pokrýt ne?
+- Nejsem si jisté, zda by se to dalo rozpoznat, že je to nějaký koncept, který nelze namapovat na datovou specifikaci.
+- Prozatím to nechám takto a pokud by se to dalo implementovat, tak to bude jako feature navíc.
+
+Odkázat na figure 1 po větě: "but the end result is always a query that can be run"
+
+Tady mi nedochází, proč potřebujeme kopírovat?
+- Protože v momentě, kdy já potřebuju tu strukturu rozšířit pro suggested message, tak uživatel tu otázku ještě nepoložil do chatu. Proto rozšiřuju kopii a ne tu podstrukturu, kterou už mám.
+
+To bych klidně doplnil i obrázkem hypotetického UI, kde ta anotace bude vidět
+- Nejsem si jistý, co vůbec ukázat na obrázku.
+- Podle mě je to v pohodě i bez toho, takže to nechám.
