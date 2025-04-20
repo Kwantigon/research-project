@@ -1,5 +1,4 @@
 ﻿using Backend.Model;
-using Backend.Exceptions;
 using Backend.Abstractions.Database;
 
 namespace Backend.Implementation.Database;

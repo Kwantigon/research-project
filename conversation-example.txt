@@ -1,0 +1,61 @@
+The user has chosen a data specification about badminton.
+
+App:
+	Your data specification has been loaded. What would you like to know?
+
+User:
+	I would like to see all tournaments which have taken place this year.
+
+App:
+	The data you want can be retrieved using the following Sparql query
+	```
+	SELECT DISTINCT ?tournament
+	WHERE {
+		?tournament http://example.com/tournaments/date-held http://example.com/years:2025 .
+	}
+	```
+
+	Some words in your question can be expanded. You can click on each item to see more information.
+	- Tournaments [Badminton tournaments are organized by the Badminton World Federation (BWF). Tournaments are divided into grades and each grade is further divided into multiple levels. Different tournaments take place in different countries. Most tournaments are annual but some have longer repetition intervals.]
+		- Tournament grade [The grade of tournament determines how prestigious the tournament is.]
+		- Participants [A participant is a badminton player registered with the Badminton World Federation. Players specialize in one of the five forms of the game.]
+		- Sponsor [Big companies that make and sell badminton equipment will often sponsor tournaments and players. A lot of tournaments even have the company's name in the tournament's name (for example Yonex All England Open).]
+			- Name [Name of the sponsoring company.]
+
+User:
+	*Chooses name (under sponsor)*
+
+App:
+	*Shows suggested message*
+	I would like to see all tournaments and the names of their sponsors, which have taken place this year.
+
+User:
+	*Adds participants (in addition to sponsor name)*
+
+App:
+	*Shows suggested message*
+	I would like to see tournaments that have taken place this year including the participants and names of tournament sponsors.
+
+User:
+	*Sends the suggested message*
+	I would like to see tournaments that have taken place this year including the participants and names of tournament sponsors.
+
+App:
+	The data you want can be retrieved using the following Sparql query
+	```
+	SELECT DISTINCT ?tournament ?participant ?sponsorName
+	WHERE {
+		?tournament http://example.com/tournaments/date-held http://example.com/years:2025 ;
+					http://example.com/tournaments/sponsors ?sponsor ;
+					http://example.com/tournaments/participants ?participant .
+		?sponsor http://example.com/companies/name ?sponsorName .
+	}
+	```
+	
+	Some words in your question can be expanded. You can click on each item to see more information.
+	- Tournaments [Badminton tournaments are organized by the Badminton World Federation (BWF). Tournaments are divided into grades and each grade is further divided into multiple levels. Different tournaments take place in different countries. Most tournaments are annual but some have longer repetition intervals.]
+		- Tournament grade [The grade of tournament determines how prestigious the tournament is.]
+	- Participants [A participant is a badminton player registered with the Badminton World Federation. Players specialize in one of the five forms of the game.]
+		- Name [Name of the player.]
+		- Country [The country that the player is representing.]
+	

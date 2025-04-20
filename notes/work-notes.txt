@@ -70,7 +70,23 @@ To do: Vytvořit jeden úplně kompletní příklad. Dovést to až do konce. Ne
 - Jeden příklad, kde rozšíření dotazu budou jen selecty.
 - Jeden příklad, kde rozšíření dotazu je i nějaké filtrování.
 
-Na další konzultaci bych si chtěl s panem Nečaským vyjasnit, jak a co bude ta moje aplikace dělat.
-Mám pocit, že teď ani jeden z nás nemá přesnou představu.
-- Projdeme si to od začátku - co je cílem projektu, jak dosáhneme toho cílu.
-- Jestli moje navrhovaná architektura toho dosáhne.
+*20/04/2025*
+Jak píšu tu mock konverzaci, tak se mi zdá, že pořád bude lepší mít jen seznam namapovaných slov. Potom ty související itemy zobrazit až když uživatel si rozklikne to slovo.
+- A nebo to nechat jako seznam, ale vhodně odrazit.
+- Když item patří třeba do tournaments, tak vylistovat hned pod tournaments a ještě odrazit.
+- JAJA to zní dobře.
+Nevýhoda tohoto přístupu je, že se musím zastavit po nějakém stupni zanoření. Když to zobrazím v separátním oknu, tak teoreticky uživatel může klikat a jít do jakékoliv hloubky.
+
+Major části, které musím nastudovat a implementovat.
+1. Co poslat do LLM a jak promptovat, abych získal výstup, který potřebuju.
+	3.a) Musím si vytvořit nějaký Dataspecer package. Nebo použít již existující.
+	3.b) Musím získat přístup na náš LLM server - napsat do chatu.
+2. Co si vytáhnout z toho Dataspecer package pro zpracování.
+	- Vyřeším, pokud udělám krok 1.
+3. Jak stáhnout Dataspecer package v kódu.
+	- Poradit se se Štěpánem.
+4. Přidat databázi.
+	4.a) Podívat se na Entity Framework guide.
+	4.b) Rozběhnout Sqlite nebo Postgres.
+5. Nastudovat, jak převést data specification substructure na Sparql query (pro implementaci Sparql translation service).
+6. Implementovat front end.
