@@ -90,3 +90,32 @@ Major části, které musím nastudovat a implementovat.
 	4.b) Rozběhnout Sqlite nebo Postgres.
 5. Nastudovat, jak převést data specification substructure na Sparql query (pro implementaci Sparql translation service).
 6. Implementovat front end.
+
+26/04/2025
+Když si exportuju specifikaci z Dataspeceru, tak tam je .owl.ttl soubor, což je RDF.
+
+Když mám data jako RDF, tak to je vždycky node, šipka a další node ne? Takže můžu teoreticky reprezentovat tady ty 2 věci v kódu?
+- Určitě můžu uložit typ class.
+- Určitě můžu uložit typ relationship.
+- Myslím si, že typ property můžu taky.
+Když se zeptám na summary RDF, tak mi LLAMA popíše class, property a relationship. Takže tady ty 3 věci budou items.
+
+Když řeknu "summarize class ...", tak to popíše to, co je napsaný v tom RDF. Já si pod "summarize" představuju spíše kousek textu, který je srozumitelný pro netechnického člověka.
+
+Please summarize the class "barrier-free access" in a few sentences so that a non-technical person can understand it.
+The "Barrier-Free Access" class refers to information about how easily people with disabilities can access and use a particular location, such as a building or tourist destination. It describes the
+accessibility features of the location from the user's point of view. This class is used to provide details about the accessibility of a place, which can be helpful for people who need to plan their
+visits accordingly.
+- Toto už je trochu lepší, ale je dost možné, že si bude domýšlet. Ale to asi nevadí, protože bych chtěl, aby z kontextu té datové specifikace udělal to shrnutí.
+
+Data specification:
+- Určitě si uložím RDF string.
+- Uložím si items. Ale pokud je datová specifikace velká, tak asi nemůžu uložit všechno ne?
+- Ještě bych si mohl uložit další věci jako datové struktury atd. Prostě kontext kolem toho.
+Data specification item:
+- Uložím si typ (class, property, relationship).
+- Summary (některé si už můžu předem vygenerovat).
+
+Otázky:
+- Jak bych měl ukládat ten OWL soubor? Jako text v databázi pod data specification?
+- Co použít jako ID itemu?
