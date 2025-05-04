@@ -16,7 +16,7 @@ public class DataSpecificationItem
 
 public enum ItemType
 {
-	Class,
-	ObjectProperty,
-	DataProperty
+	Class, // Entities.
+	ObjectProperty, // Relationship between entities.
+	DataProperty // Attributes of entities.
 }

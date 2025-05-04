@@ -58,4 +58,13 @@ public class ConversationController(
 
 		return Results.Ok(message);
 	}
+
+	public IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload)
+	{
+		//Message userMessage = new(MessageType.UserMessage, 69, payload.TextValue, payload.TimeStamp);
+
+		// Some LLM shaenanigans needed here.
+		Message userMessage = _conversationService.AddUserMessage(conversationId, payload.TimeStamp, payload.TextValue);
+		return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", userMessage);
+	}
 }

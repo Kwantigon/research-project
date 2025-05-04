@@ -4,4 +4,5 @@ namespace DataspecNavigationHelper.ConnectorsLayer;
 
 public class DataspecerConnectorMock : IDataspecerConnector
 {
+
 }

@@ -144,3 +144,11 @@ Přemýšlím, co si uložit pod datovou specifikaci. Jestli všechny její tř�
 - Takže si jen uložím ten OWL.
 Jako podstrukturu si uložím prostě seznam itemů.
 - K tomu ještě třeba suggested message.
+
+Napadlo mě, jestli reprezentace datové specifikace může mít vliv na výsledný query podle jazyku.
+- Např. já chci na výstupu vydat Sparql, tak možná reprezentovat datovou specifikaci jako RDF bude lepší než reprezentovat jako něco jiného.
+- Kdybych chtěl SQL query, tak možná RDF bude mít horší performance.
+
+Kde jsem skončil:
+- Přidal jsem metodu AddUserMessage.
+- Musím přidat zpracování, které bere v úvahu RDF itemy.

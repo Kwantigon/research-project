@@ -1,5 +1,6 @@
 using DataspecNavigationHelper.BusinessCoreLayer;
 using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+using DataspecNavigationHelper.BusinessCoreLayer.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,17 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 	{
 		operation.Summary = "Get the concrete message from a conversation.";
 		operation.Description = "Returns all available information about the requested message. The front end calls this to get the reply to an user's message.";
+		return operation;
+	});
+
+app.MapPost("/conversations/{conversationId}/messages",
+				([FromRoute] int conversationId,
+				[FromBody] PostConversationMessagesDTO payload,
+				IConversationController controller) => controller.ProcessUserMessage(conversationId, payload))
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Add a message to the conversation.";
+		operation.Description = "The message that should be added is always assumed to be an user message. Returns the created message that also contains the IRI of the reply message. The front end calls this endpoint to add the user's message to the conversation. It will then call the reply message's IRI to get the system's answer. This operation is currently synchronous. I might change it to an asynchronous operation later down the line.";
 		return operation;
 	});
 
