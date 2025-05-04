@@ -119,3 +119,28 @@ Data specification item:
 Otázky:
 - Jak bych měl ukládat ten OWL soubor? Jako text v databázi pod data specification?
 - Co použít jako ID itemu?
+
+*02/05/2025*
+Pořád řeším, jak rozdělit zpracování endpointů.
+- Mít jeden controller.
+- Nebo mít různé controllery pro každé endpointy.
+Do specifikace jsem napsal, že request handler deleguje práci do ostatních modulů.
+
+Myslím si, že dává smysl, že Program.cs mapuje endpoint. Nějaký controller bude volat metody na conversation service a případně jiných servisech. Pak ten výsledek přetransformuje do vhodné HTTP formy.
+- Např. na některé věci bude volat IConversationService. Ale pak vrátí jen 201_Created nebo něco takového.
+- To nedává smysl vracet z IConversationService.
+
+Co vše musím udělat, abych měl funkční back end?
+- Zpracovat Dataspecer package (DSL do OWL a pak uložit jako string).
+- Přidat Entity Framework.
+- Implementovat komunikaci s Ollama.
+- Přidat potřebné metody do interface servisů v core.
+
+Mapuju endpointy a podle těch endpointů definuju metody, které musejí servisy podporovat.
+
+Přemýšlím, co si uložit pod datovou specifikaci. Jestli všechny její třídy a property.
+- To může teoreticky být hodně.
+- Stejně vždycky dávám tu specifikaci jako RDF do LLM.
+- Takže si jen uložím ten OWL.
+Jako podstrukturu si uložím prostě seznam itemů.
+- K tomu ještě třeba suggested message.

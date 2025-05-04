@@ -1,6 +1,61 @@
+using DataspecNavigationHelper.BusinessCoreLayer;
+using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+	.AddSingleton<IConversationService, ConversationServiceMock>()
+	.AddSingleton<IConversationController, ConversationController>()
+	;
+
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+/* I'm registering all endpoints in this Program.cs file
+ * because I don't expect to have many more endpoints than the ones listed here.
+ * 
+ * An alternative would be to create extension methods for grouping endpoints
+ * and registering them.
+ */
+
+// Sanity check.
+app.MapGet("/", () => "Hello there!");
+
+app.MapGet("/conversations",
+			(IConversationController controller) => controller.GetOngoingConversations())
+	.WithOpenApi(endpoint =>
+	{
+		endpoint.Summary = "Get all ongoing conversations.";
+		endpoint.Description = "Front end calls this to display all conversations in the conversations management tab. The front end will show the title of each conversation and when the user expands the conversation, they will see more information about it.";
+		return endpoint;
+	});
+
+app.MapGet("/conversations/{conversationId}",
+			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversation(conversationId))
+	.WithOpenApi(endpoint =>
+	{
+		endpoint.Summary = "Get information about the conversation.";
+		endpoint.Description = "This endpoint is only for debugging. The front end does not need to call this for anything.";
+		return endpoint;
+	});
+
+app.MapGet("/conversations/{conversationId}/messages",
+			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationMessages(conversationId))
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Get all messages in the conversation.";
+		operation.Description = "Returns all messages ordered by their timestamps. The front end calls this when it loads a conversation and needs to display messages in the conversation.";
+		return operation;
+	});
+
+app.MapGet("/conversations/{conversationId}/messages/{messageId}",
+			([FromRoute] int conversationId, [FromRoute] int messageId,
+			IConversationController controller) => controller.GetMessage(conversationId, messageId))
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Get the concrete message from a conversation.";
+		operation.Description = "Returns all available information about the requested message. The front end calls this to get the reply to an user's message.";
+		return operation;
+	});
 
 app.Run();

@@ -5,6 +5,30 @@ namespace DataspecNavigationHelper.BusinessCoreLayer;
 
 public class ConversationServiceMock : IConversationService
 {
+	public IReadOnlyList<Conversation> GetOngoingConversations()
+	{
+		return new List<Conversation>
+		{
+			new Conversation { Id = 1, Title = "Mock conversation 1" },
+			new Conversation { Id = 2, Title = "Mock conversation 2" },
+		};
+	}
+
+	public Conversation? GetConversation(int conversationId)
+	{
+		if (conversationId < 0)
+		{
+			// Simulate the situation of ID not found in the database.
+			return null;
+		} else
+		{
+			Conversation conversation = new() { Id = conversationId, Title = "Mock conversation" };
+			conversation.Messages.Add(new Message(MessageType.WelcomeMessage, 0, "Mock welcome message", DateTime.Now));
+			conversation.Messages.Add(new Message(MessageType.UserMessage, 1, "Mock user message", DateTime.Now.AddSeconds(5)));
+			return conversation;
+		}
+	}
+
 	public string GetReply(Message userMessage)
 	{
 		if (userMessage.TextValue == "Your data specification has been loaded. What would you like to know?")
@@ -19,10 +43,5 @@ public class ConversationServiceMock : IConversationService
 		}
 
 		return "I could not find any suitable matches from the data specification.";
-	}
-
-	public string GetSuggestedMessge(IReadOnlyList<DataSpecificationItem> selectedItems)
-	{
-
 	}
 }
