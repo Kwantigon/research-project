@@ -1,0 +1,2544 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix dsv: <https://w3id.org/dsv#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix vann: <http://purl.org/vocab/vann/>.
+@prefix cardinality: <https://w3id.org/dsv/cardinality#>.
+@prefix requirement: <https://w3id.org/dsv/requirement-level#>.
+@prefix role: <https://w3id.org/dsv/class-role#>.
+@base <https://www.example-base-uri.org/>.
+
+<applicationProfileConceptualModel> a dsv:ConceptualModel.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<obsahuje-sbírku-listin> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <sbírka-listin>.
+
+<je-evidováno-v> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<je-zapsán-v-rejstříku> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <dobrovolný-svazek-obcí>.
+
+<sbírka-listin> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<dobrovolný-svazek-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>.
+
+<idds> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<ič-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<právní-důvod-zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<souřadnice> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<vznik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zánik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<stav-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<je-zapsán-v-rejstříku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <rejstřík-svazků-obcí>.
+
+<má-webovou-stránku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <webová-stránka>.
+
+<má-zdroj-výčtu-členů> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <zdroj-výčtu-členů>.
+
+<idds> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<ič-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<právní-důvod-zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<souřadnice> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<vznik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zánik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<stav-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<je-zapsán-v-rejstříku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <rejstřík-svazků-obcí>.
+
+<má-webovou-stránku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <webová-stránka>.
+
+<má-zdroj-výčtu-členů> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <zdroj-výčtu-členů>.
+
+<sídlí-na-adrese> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <adresa>.
+
+<vykonává> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <činnost>.
+
+<zahrnuje-jako-člena> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<je-orgánem-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <orgán>.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<obsahuje-sbírku-listin> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <sbírka-listin>.
+
+<je-evidováno-v> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<je-zapsán-v-rejstříku> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <dobrovolný-svazek-obcí>.
+
+<webová-stránka> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>.
+
+<url-odkaz> dsv:domain <webová-stránka>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-webovou-stránku> dsv:domain <webová-stránka>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <dobrovolný-svazek-obcí>.
+
+<zdroj-výčtu-členů> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>.
+
+<sbírka-listin> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<dobrovolný-svazek-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<webová-stránka> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>.
+
+<zdroj-výčtu-členů> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>.
+
+<adresa> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>.
+
+<činnost> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<orgán> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>.
+
+<dobrovolný-svazek-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>.
+
+<idds> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange <http://www.w3.org/2001/XMLSchema#nonNegativeInteger>.
+
+<ič-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<právní-důvod-zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<souřadnice> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<vznik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zánik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<stav-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<je-zapsán-v-rejstříku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <rejstřík-svazků-obcí>.
+
+<má-webovou-stránku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <webová-stránka>.
+
+<má-zdroj-výčtu-členů> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <zdroj-výčtu-členů>.
+
+<sídlí-na-adrese> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <adresa>.
+
+<vykonává> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <činnost>.
+
+<zahrnuje-jako-člena> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<je-orgánem-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-orgánem-svazku-obcí>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <orgán>.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<obsahuje-sbírku-listin> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obsahuje-sbírku-listin>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <sbírka-listin>.
+
+<je-evidováno-v> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<je-zapsán-v-rejstříku> dsv:domain <rejstřík-svazků-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <dobrovolný-svazek-obcí>.
+
+<webová-stránka> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>.
+
+<url-odkaz> dsv:domain <webová-stránka>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/url-odkaz>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zdroj-výčtu-členů> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>.
+
+<datum-poslední-aktualizace> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<míra-ověřenosti> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<typ-zdroje> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<poskytovatel-zdroje> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-zdroj-členství> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<datum-poslední-aktualizace> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/datum-poslední-aktualizace>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<typ-zdroje> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-zdroje>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<míra-ověřenosti> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/míra-ověřenosti>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<poskytovatel-zdroje> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/poskytovatel-zdroje>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-zdroj-členství> dsv:domain <zdroj-výčtu-členů>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<adresa> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>.
+
+<má-kód-adresního-místa> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/má-kód-adresního-místa>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/má-kód-adresního-místa>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/adresy/pojem/má-kód-adresního-místa>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<text-adresy> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/text-adresy>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/text-adresy>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/adresy/pojem/text-adresy>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-vyššího-územního-samosprávního-celku> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/název-vyššího-územního-samosprávního-celku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/název-vyššího-územního-samosprávního-celku>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/adresy/pojem/název-vyššího-územního-samosprávního-celku>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-městského-obvodu-městské-části> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/název-městského-obvodu-městské-části>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/název-městského-obvodu-městské-části>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/adresy/pojem/název-městského-obvodu-městské-části>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-název-ulice> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-ulice>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-ulice>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-ulice>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-název-okresu> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-okresu>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-okresu>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-název-okresu>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<má-číslo-orientační> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-číslo-orientační>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-číslo-orientační>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/má-číslo-orientační>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<poštovní-směrovací-číslo> dsv:domain <adresa>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/poštovní-směrovací-číslo>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/adresy/pojem/poštovní-směrovací-číslo>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/adresy/pojem/poštovní-směrovací-číslo>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<činnost> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>.
+
+<předmět-činnosti> dsv:domain <činnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/předmět-činnosti>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/předmět-činnosti>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/předmět-činnosti>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<den-vzniku-členství> dsv:domain <členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-členství>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-členství>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<den-zániku-členství> dsv:domain <členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-členství>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-členství>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<je-evidováno-v> dsv:domain <členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-evidováno-v>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <rejstřík-svazků-obcí>.
+
+<má-zdroj-členství> dsv:domain <členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-členství>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <zdroj-výčtu-členů>.
+
+<je-členem-svazku-obcí> dsv:domain <členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <obec>.
+
+<sbírka-listin> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sbírka-listin>.
+
+<smlouva-o-vytvoření-svazku-obcí> dsv:domain <sbírka-listin>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/smlouva-o-vytvoření-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/smlouva-o-vytvoření-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/smlouva-o-vytvoření-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<dobrovolný-svazek-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<zdroj-výčtu-členů> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>.
+
+<obec> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>.
+
+<ič-obce> dsv:domain <obec>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-obce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-obce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-obce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<kraj-obce> dsv:domain <obec>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kraj-obce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kraj-obce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kraj-obce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<kód-obce> dsv:domain <obec>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kód-obce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kód-obce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/kód-obce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-obce> dsv:domain <obec>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-obce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-obce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-obce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<orgán> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán>.
+
+<název-orgánu> dsv:domain <orgán>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-orgánu>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-orgánu>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-orgánu>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<typ-orgánu> dsv:domain <orgán>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-orgánu>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-orgánu>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/typ-orgánu>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<orgán-má-funkce--působnosti> dsv:domain <orgán>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán-má-funkce--působnosti>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán-má-funkce--působnosti>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/orgán-má-funkce--působnosti>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <působnost>.
+
+<působnost> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/působnost>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/působnost>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/působnost>.
+
+<den-vzniku-funkce> dsv:domain <působnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-funkce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-funkce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-vzniku-funkce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<den-zániku-funkce> dsv:domain <působnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-funkce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-funkce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/den-zániku-funkce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-funkce> dsv:domain <působnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-funkce>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-funkce>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-funkce>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<způsob-jednání> dsv:domain <působnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/způsob-jednání>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/způsob-jednání>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/způsob-jednání>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<vykonává-působnost-orgánu> dsv:domain <působnost>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává-působnost-orgánu>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává-působnost-orgánu>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává-působnost-orgánu>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <osoba-vykonávající-působnost-orgánu>.
+
+<osoba-vykonávající-působnost-orgánu> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/osoba-vykonávající-působnost-orgánu>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/osoba-vykonávající-působnost-orgánu>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/osoba-vykonávající-působnost-orgánu>.
+
+<bydliště> dsv:domain <osoba-vykonávající-působnost-orgánu>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/bydliště>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/bydliště>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/bydliště>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<příjmení> dsv:domain <osoba-vykonávající-působnost-orgánu>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/příjmení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/příjmení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/příjmení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<jméno> dsv:domain <osoba-vykonávající-působnost-orgánu>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/jméno>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/jméno>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/jméno>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<dobrovolný-svazek-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/dobrovolný-svazek-obcí>.
+
+<idds> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/idds>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<ič-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/ič-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<název-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/název-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<souřadnice> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/souřadnice>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<právní-důvod-zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/právní-důvod-zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<vznik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vznik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zrušení> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zrušení>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<zánik> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zánik>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<stav-svazku-obcí> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>
+];
+    dsv:cardinality cardinality:0n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/stav-svazku-obcí>;
+    a dsv:DatatypePropertyProfile;
+    dsv:datatypePropertyRange rdfs:Literal.
+
+<je-zapsán-v-rejstříku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-zapsán-v-rejstříku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <rejstřík-svazků-obcí>.
+
+<má-webovou-stránku> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-webovou-stránku>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <webová-stránka>.
+
+<má-zdroj-výčtu-členů> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/má-zdroj-výčtu-členů>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <zdroj-výčtu-členů>.
+
+<sídlí-na-adrese> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/sídlí-na-adrese>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <adresa>.
+
+<vykonává> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/vykonává>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <činnost>.
+
+<zahrnuje-jako-člena> dsv:domain <dobrovolný-svazek-obcí>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>
+];
+    dsv:cardinality cardinality:1n;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zahrnuje-jako-člena>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.
+
+<rejstřík-svazků-obcí> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/rejstřík-svazků-obcí>.
+
+<webová-stránka> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/webová-stránka>.
+
+<zdroj-výčtu-členů> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/zdroj-výčtu-členů>.
+
+<adresa> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/legislativní/sbírka/111/2009/pojem/adresa>.
+
+<činnost> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/činnost>.
+
+<členství> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/členství>.
+
+<obec> dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>
+];
+    a dsv:ClassProfile;
+    dsv:class <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/obec>.
+
+<je-členem-svazku-obcí> dsv:domain <obec>;
+    dct:isPartOf <applicationProfileConceptualModel>;
+    a dsv:Profile;
+    dsv:reusesPropertyValue [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:prefLabel;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>
+], [
+  a dsv:PropertyValueReuse;
+  dsv:reusedProperty skos:definition;
+  dsv:reusedFromResource <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>
+];
+    dsv:cardinality cardinality:11;
+    dsv:property <https://slovník.gov.cz/generický/rejstřík-svazků-obcí/pojem/je-členem-svazku-obcí>;
+    a dsv:ObjectPropertyProfile;
+    dsv:objectPropertyRange <členství>.

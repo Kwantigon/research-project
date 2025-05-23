@@ -1,0 +1,6 @@
+Otázky
+
+1. Zdá se mi, že DSV je rozšířený OWL. Myslím tím to, že všechna informace z OWLu je obsažená v DSV. Proto místo, abych zpracovával OWL i DSV, tak jen budu zpracovávat DSV. Převedu to do OWLu.
+2. Proč je někdo domain a range prohozený a jak to poznám? Většinou dsv:domain odpovídá rdfs:domain, ale někdy to odpovídá rdfs:range.
+3. Ještě jsem nedokázal vyřešit problém, že potřebuju získat skos:prefLabel a skos:definition z URI. To je v pohodě, pokud to URI mi vrátí normální RDF, který můžz naparsovat. Ale třeba slovnik.gov.cz/... nevrátí to, co potřebuju. Mohl bych teoreticky použít LLM, ale to nebude vždycky fungovat. ChatGPT to umí, ale ne všechny modely to musejí umět.
+4. Nápad: přeložit skos:prefLabel a skos:definition do angličtiny, pokud anglická varianta neexistuje.

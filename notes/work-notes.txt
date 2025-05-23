@@ -1,17 +1,3 @@
-Co když nechám uživatele psát jen na začátku. Další zprávy už pouze klikáním. Nemá možnost psát / upravovat navrhované zprávy.
-
-Jaké typy zpráv budu mít? Měl bych je více oddělit nebo stačí UserMessage a SystemMessage?
-
-Na prvotní query systém odpoví:
-- Negativní odpověď: uživatel se zeptal na něco úplně mimo.
-- Positivní odpověď:
-	1. FE zobrazí Sparql query.
-		Tady potřebuje od BE čistě jen textovou odpověď, která obsahuje Sparql query.
-	2. FE řekne uživateli, že může kliknout na nějaká slova, aby si zobrazil summary.
-		Potřebuje vědět jaká slova. Ideálně pozici v původní větě a kolik znaků (nebo slov).
-
-Nejsem si jistý, jestli v kódu musím rozlišovat typy systémových zpráv. Pro začátek to budu rozlišovat a pokud se ukáže, že není potřeba, tak to upravím.
-
 V property summary bude jednodušší, když vyjmenuju všechny properties, které by uživatele mohlo zajímat.
 Uživatel pak může vybírat v tom seznamu.
 Je to jednodušší než nechat uživatele klikat přímo do summary.
@@ -152,3 +138,23 @@ Napadlo mě, jestli reprezentace datové specifikace může mít vliv na výsled
 Kde jsem skončil:
 - Přidal jsem metodu AddUserMessage.
 - Musím přidat zpracování, které bere v úvahu RDF itemy.
+
+Teď musím pracovat na tom, jak vytvořit vstupní OWL pro LLM.
+- Nebo možná markdown bude lepší tvar.
+- Každopádně musím zpracovat OWL.TTL a DSV.TTL a ještě odkazy v nich. Pak si ty informace zpracuju do nějakého tvaru.
+Musím se podívat do dokumentace Dataspeceru, abych viděl popis RDF a aplikačních profilů atd.
+
+Sepíšu si, jak budu každý DSV "objekt" převádět na OWL.
+To co musím "překládat" jsou věci s prefixem vedoucí na w3id.org
+
+Já potřebuju udělat to, že si vezmu DSV a OWL a nějakým způsobem je spojit dohromady a vytvořit společný OWL.
+- Problém je, že potřebuju namatchovat subjects z jednoho souboru do druhého souboru.
+- Nejsou stejně seřazené.
+
+Rozumím tomu, jak RDFdotnet načítá a reprezentuje triples.
+Teoreticky bych ty triply dokázal modifikovat.
+Teď potřebuju sepsat, co budu mapovat na co.
+- A jak to mapovat.
+- Protože pokud chci DSV převádět na OWL, musím nejdřív vzít si ty definice z těch odkazů.
+
+V Class mi zatím chybí rdfs:label a rdfs:comment. To musím vyřešit tak, že to vytáhnu z reusesPropertyValue.

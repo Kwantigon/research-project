@@ -70,4 +70,15 @@ app.MapPost("/conversations/{conversationId}/messages",
 		return operation;
 	});
 
+app.MapPost("/data-specifications",
+				([FromBody] PostDataSpecificationsDTO payload,
+				IDataSpecificationController controller) => controller.ProcessDataspecerPackage(payload))
+	.WithOpenApi(operation =>
+	{
+		operation.Summary = "Add a new data specification.";
+		operation.Description = "Exports and processes the necessary data from the Dataspecer package given in the payload's IRI. If a name is given, the processed data specification will be stored under that name, otherwise a default name will be used.";
+		return operation;
+	});
+
+
 app.Run();
