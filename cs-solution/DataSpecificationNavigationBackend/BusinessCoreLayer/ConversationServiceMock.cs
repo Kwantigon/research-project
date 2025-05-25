@@ -44,4 +44,9 @@ public class ConversationServiceMock : IConversationService
 
 		return "I could not find any suitable matches from the data specification.";
 	}
+
+	public Message AddUserMessage(int conversationId, DateTime timeStamps, string message)
+	{
+		throw new NotImplementedException();
+	}
 }

@@ -15,6 +15,6 @@ public class DataSpecificationController(
 	public IResult ProcessDataspecerPackage(PostDataSpecificationsDTO payload)
 	{
 		DataSpecification dataSpecification = _dataSpecificationService.ExportDataSpecificationFromDataspecer(payload.DataspecerPackageIri, payload.Name);
-		return Results.Created($"/data-specifications/{dataSpecification.Id}", dataSpecification);
+		return Results.Created($"/data-specifications/{dataSpecification.Id}", (DataSpecificationDTO)dataSpecification);
 	}
 }

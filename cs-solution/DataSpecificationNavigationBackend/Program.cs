@@ -1,6 +1,8 @@
 using DataspecNavigationHelper.BusinessCoreLayer;
 using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+using DataspecNavigationHelper.ConnectorsLayer;
+using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
 	.AddSingleton<IConversationService, ConversationServiceMock>()
 	.AddSingleton<IConversationController, ConversationController>()
+	.AddSingleton<IDataSpecificationService, DataSpecificationService>()
+	.AddSingleton<IDataSpecificationController, DataSpecificationController>()
+	.AddSingleton<IDataspecerConnector, DataspecerConnectorMock>()
+	.AddSingleton<EntityFrameworkPlaceholder>()
 	;
 
 var app = builder.Build();
