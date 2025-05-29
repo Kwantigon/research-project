@@ -144,17 +144,19 @@ Teď musím pracovat na tom, jak vytvořit vstupní OWL pro LLM.
 - Každopádně musím zpracovat OWL.TTL a DSV.TTL a ještě odkazy v nich. Pak si ty informace zpracuju do nějakého tvaru.
 Musím se podívat do dokumentace Dataspeceru, abych viděl popis RDF a aplikačních profilů atd.
 
-Sepíšu si, jak budu každý DSV "objekt" převádět na OWL.
-To co musím "překládat" jsou věci s prefixem vedoucí na w3id.org
-
-Já potřebuju udělat to, že si vezmu DSV a OWL a nějakým způsobem je spojit dohromady a vytvořit společný OWL.
-- Problém je, že potřebuju namatchovat subjects z jednoho souboru do druhého souboru.
-- Nejsou stejně seřazené.
-
-Rozumím tomu, jak RDFdotnet načítá a reprezentuje triples.
-Teoreticky bych ty triply dokázal modifikovat.
-Teď potřebuju sepsat, co budu mapovat na co.
-- A jak to mapovat.
-- Protože pokud chci DSV převádět na OWL, musím nejdřív vzít si ty definice z těch odkazů.
-
 V Class mi zatím chybí rdfs:label a rdfs:comment. To musím vyřešit tak, že to vytáhnu z reusesPropertyValue.
+Pro získání věcí v reusesPropertyValue budu podporovat následující formáty dat:
+- Turtle
+- N-triples
+- JSON-LD
+- RDF/XML
+- RDF/JSON
+- Zeptám se na konzultaci, jaké další formáty bych měl podporovat.
+Musím nějak získat URI, které vede přímo na to RDF a to můžu předat přímo do dotnetRDF pro načtení grafu.
+slovník.gov.cz má ti URIčka úplně dole a ty odkazy vedou na dokumenty, které potřebuju. Ale je problém nějak vůbec získat to URI ... použít LLM?
+
+Myslím si, že prozatím tam implementuju jen primitivní zpracování - prostě se pokusím otevřít ten odkaz v dsv:ReusedFromProperty a získat hodnotu. Pokud to neloadne RDF graf, tak prostě pokračuju bez toho.
+Refaktoruju kód ve třídě DataSpecificationService, aby všechno nebylo v jedné metodě.
+
+Otázky:
+- Fasáda: dává smysl celou metodu pro konverzi dát do fasády nebo je lepší to zpracování mít v DataSpecificationService a detailní volání nějakých dotnetRdf metod dát do fasády?

@@ -4,8 +4,6 @@ using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
 using DataspecNavigationHelper.Model;
 using VDS.RDF;
-using VDS.RDF.Parsing;
-using VDS.RDF.Writing;
 
 namespace DataspecNavigationHelper.BusinessCoreLayer;
 
@@ -24,9 +22,8 @@ public class DataSpecificationService(
 	{
 		string dsv = _dataspecerConnector.ExportDsvFromDataspecer();
 		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
-		IGraph owlGraph = _rdfProcessor.ConvertDsvToOwl(dsvGraph);
+		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
 		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
-		_rdfProcessor.SaveGraphToFile(owlGraph, "data-specification.owl.ttl");
 		DataSpecification dataSpecification = new DataSpecification()
 		{
 			Name = (userGivenName != null ? userGivenName : "Todo: Give it the Dataspecer package name"),
@@ -36,6 +33,29 @@ public class DataSpecificationService(
 		_database.Save(dataSpecification);
 		return dataSpecification;
 	}
+
+	private IGraph ConvertDsvToOwl(IGraph dsvGraph)
+	{
+		// Conversion udělám v této třídě. Nějaké podrobnější volání metod v dotnetRDF přesunu do fasády.
+	}
+
+	/*private static class UriConstants
+	{
+		private static readonly string DSV_CLASS_PROFILE = "https://w3id.org/dsv#ClassProfile";
+		private static readonly string DSV_OBJECT_PROPERTY_PROFILE = "https://w3id.org/dsv#ObjectPropertyProfile";
+		private static readonly string DSV_OBJECT_PROPERTY_RANGE = "https://w3id.org/dsv#objectPropertyRange";
+		private static readonly string DSV_DATATYPE_PROPERTY_PROFILE = "https://w3id.org/dsv#DatatypePropertyProfile";
+		private static readonly string DSV_DATATYPE_PROPERTY_RANGE = "https://w3id.org/dsv#datatypePropertyRange";
+		private static readonly string DSV_DOMAIN = "https://w3id.org/dsv#domain";
+		private static readonly string DSV_REUSES_PROPERTY_VALUE = "https://w3id.org/dsv#reusesPropertyValue";
+		private static readonly string DSV_REUSED_PROPERTY = "https://w3id.org/dsv#reusedProperty";
+		private static readonly string DSV_REUSED_FROM_RESOURCE = "https://w3id.org/dsv#reusedFromResource";
+		private static readonly string DSV_CARDINALITY = "https://w3id.org/dsv#cardinality";
+		private static readonly string CARDINALITY_1N = "https://w3id.org/dsv/cardinality#1n";
+		private static readonly string CARDINALITY_11 = "https://w3id.org/dsv/cardinality#11";
+		private static readonly string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
+		private static readonly string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
+	}*/
 }
 
 internal class DsvToOwlConverter
@@ -50,6 +70,8 @@ internal class DsvToOwlConverter
 	private const string DSV_REUSED_PROPERTY = "https://w3id.org/dsv#reusedProperty";
 	private const string DSV_REUSED_FROM_RESOURCE = "https://w3id.org/dsv#reusedFromResource";
 	private const string DSV_CARDINALITY = "https://w3id.org/dsv#cardinality";
+	private const string SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
+	private const string SKOS_PREF_DEFINITION = "http://www.w3.org/2004/02/skos/core#definition";
 	private const string CARDINALITY_1N = "https://w3id.org/dsv/cardinality#1n";
 	private const string CARDINALITY_11 = "https://w3id.org/dsv/cardinality#11";
 	private const string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";

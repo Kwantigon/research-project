@@ -1,6 +1,8 @@
+using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataspecNavigationHelper.BusinessCoreLayer;
 using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+using DataspecNavigationHelper.BusinessCoreLayer.Facade;
 using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +15,7 @@ builder.Services
 	.AddSingleton<IDataSpecificationService, DataSpecificationService>()
 	.AddSingleton<IDataSpecificationController, DataSpecificationController>()
 	.AddSingleton<IDataspecerConnector, DataspecerConnectorMock>()
+	.AddSingleton<IRdfProcessor, RdfProcessor>()
 	.AddSingleton<EntityFrameworkPlaceholder>()
 	;
 
