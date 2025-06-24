@@ -2,11 +2,13 @@
 
 public interface IDataspecerConnector
 {
-	// Tady si musim zjistit, co presne vraci Dataspecer endpoint a v jakem tvaru.
-
 	/// <summary>
-	/// For now, let's just say that Dataspecer returns the DSV in a looooong string.
+	/// Retrieve the DSV documentation of the Dataspecer package.
 	/// </summary>
-	/// <returns></returns>
-	string ExportDsvFromDataspecer();
+	/// <param name="packageIri">UUID of the package.</param>
+	/// <returns>
+	/// The retrieved DSV in a string.</br>
+	/// <see langword="null"/> if the DSV retrieval failed.
+	/// </returns>
+	Task<string?> ExportPackageDocumentation(string packageIri);
 }

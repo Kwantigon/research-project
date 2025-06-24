@@ -18,9 +18,41 @@ public class DataSpecificationService(
 	private readonly IRdfProcessor _rdfProcessor = rdfProcessor;
 	private readonly EntityFrameworkPlaceholder _database = entityFrameworkPlaceholder;
 
-	public DataSpecification ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
+	public async Task<DataSpecification> ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
 	{
-		string dsv = _dataspecerConnector.ExportDsvFromDataspecer();
+		string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageIri);
+		if (string.IsNullOrEmpty(dsv))
+		{
+			_logger.LogError("The exported package DSV is either null or empty.");
+			throw new Exception("Exported DSV is null or empty.");
+		}
+		_logger.LogDebug("Exported DSV:\n{Content}", dsv);
+
+		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
+		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
+		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
+
+		_logger.LogDebug("Converted the DSV to OWL.");
+		_logger.LogDebug(owl);
+		DataSpecification dataSpecification = new DataSpecification()
+		{
+			Name = (userGivenName != null ? userGivenName : "Todo: Give it the Dataspecer package name"),
+			Iri = dataspecerPackageIri,
+			Owl = owl
+		};
+
+		_database.Save(dataSpecification);
+		return dataSpecification;
+	}
+
+	/*
+	 * Tuto metodu použiju, pokud z Dataspeceru exportuju DSVčko.
+	 * Momentálně ale exportuju json-ld a nijak to nezprácovávám, takže tuto metodu zakomentuju
+	 * a použiju možná někdy později.
+	 */
+	/*public DataSpecification ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
+	{
+		string dsv = _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageIri);
 		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
 		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
 		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
@@ -32,30 +64,18 @@ public class DataSpecificationService(
 		};
 		_database.Save(dataSpecification);
 		return dataSpecification;
+	}*/
+
+	public DataSpecification? GetDataSpecificationByIri(string dataSpecificationIri)
+	{
+		return _database.FindDataSpecificationByIri(dataSpecificationIri);
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)
 	{
-		// Conversion udělám v této třídě. Nějaké podrobnější volání metod v dotnetRDF přesunu do fasády.
+		DsvToOwlConverter converter = new DsvToOwlConverter();
+		return converter.ConvertDsvGraphToOwlGraph(dsvGraph);
 	}
-
-	/*private static class UriConstants
-	{
-		private static readonly string DSV_CLASS_PROFILE = "https://w3id.org/dsv#ClassProfile";
-		private static readonly string DSV_OBJECT_PROPERTY_PROFILE = "https://w3id.org/dsv#ObjectPropertyProfile";
-		private static readonly string DSV_OBJECT_PROPERTY_RANGE = "https://w3id.org/dsv#objectPropertyRange";
-		private static readonly string DSV_DATATYPE_PROPERTY_PROFILE = "https://w3id.org/dsv#DatatypePropertyProfile";
-		private static readonly string DSV_DATATYPE_PROPERTY_RANGE = "https://w3id.org/dsv#datatypePropertyRange";
-		private static readonly string DSV_DOMAIN = "https://w3id.org/dsv#domain";
-		private static readonly string DSV_REUSES_PROPERTY_VALUE = "https://w3id.org/dsv#reusesPropertyValue";
-		private static readonly string DSV_REUSED_PROPERTY = "https://w3id.org/dsv#reusedProperty";
-		private static readonly string DSV_REUSED_FROM_RESOURCE = "https://w3id.org/dsv#reusedFromResource";
-		private static readonly string DSV_CARDINALITY = "https://w3id.org/dsv#cardinality";
-		private static readonly string CARDINALITY_1N = "https://w3id.org/dsv/cardinality#1n";
-		private static readonly string CARDINALITY_11 = "https://w3id.org/dsv/cardinality#11";
-		private static readonly string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
-		private static readonly string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
-	}*/
 }
 
 internal class DsvToOwlConverter
@@ -77,19 +97,13 @@ internal class DsvToOwlConverter
 	private const string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
 	private const string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
 
-	private readonly ILogger<DsvToOwlConverter> _logger = LoggerFactory
-		.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug))
-		.CreateLogger<DsvToOwlConverter>();
-
 	internal IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph)
 	{
 		IGraph owlGraph = new Graph();
 		owlGraph.NamespaceMap.Import(dsvGraph.NamespaceMap);
-		_logger.LogDebug("Imported namespace map from the dsvGraph to owlGraph.");
 
 		foreach (Triple dsvTriple in dsvGraph.Triples)
 		{
-			_logger.LogDebug("===== Processing a new triple.");
 			INode subjectNode = dsvTriple.Subject;
 			INode predicateNode = dsvTriple.Predicate;
 			INode objectNode = dsvTriple.Object;
@@ -97,57 +111,43 @@ internal class DsvToOwlConverter
 			// Rules to transform nodes to OWL
 			if (objectNode.NodeType is NodeType.Uri)
 			{
-				_logger.LogDebug("Object node is an UriNode.");
 				string nodeUri = ((UriNode)objectNode).Uri.ToSafeString();
 
 				if (nodeUri == DSV_CLASS_PROFILE)
 				{
-					_logger.LogDebug("Object node is DSV_CLASS_PROFILE.");
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
-					_logger.LogDebug("Added rdfs:Class and owl:Class to the owlGraph.");
 				}
 
 				if (nodeUri == DSV_OBJECT_PROPERTY_PROFILE)
 				{
-					_logger.LogDebug("Object node is DSV_OBJECT_PROPERTY_PROFILE.");
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
-					_logger.LogDebug("Added rdf:Property and owl:ObjectProperty to the owlGraph.");
 				}
 
 				if (nodeUri == DSV_DATATYPE_PROPERTY_PROFILE)
 				{
-					_logger.LogDebug("Object node is DSV_DATATYPE_PROPERTY_PROFILE.");
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
-					_logger.LogDebug("Added rdf:Property and owl:DatatypeProperty to the owlGraph.");
 				}
 			}
 
 			if (predicateNode.NodeType is NodeType.Uri)
 			{
-				_logger.LogDebug("Predicate node is an UriNode.");
 				string predicateUri = ((UriNode)predicateNode).Uri.ToSafeString();
 
 				if (predicateUri == DSV_DOMAIN)
 				{
-					_logger.LogDebug("Predicate node is DSV_DOMAIN.");
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:domain"), objectNode));
-					_logger.LogDebug("Added rdfs:domain to the owlGraph.");
 				}
 
 				if (predicateUri == DSV_DATATYPE_PROPERTY_RANGE || predicateUri == DSV_OBJECT_PROPERTY_RANGE)
 				{
-					_logger.LogDebug("Predicate node is DSV_DATATYPE_PROPERTY_RANGE or DSV_OBJECT_PROPERTY_RANGE.");
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:range"), objectNode));
-					_logger.LogDebug("Added rdfs:range to the owlGraph.");
 				}
 
 				if (predicateUri == DSV_REUSES_PROPERTY_VALUE)
 				{
-					_logger.LogDebug("Predicate node is DSV_REUSES_PROPERTY_VALUE.");
-					_logger.LogDebug("Getting triples with the object node as the subject of the triple.");
 					IEnumerable<Triple> reuseInfoTriples = dsvGraph.GetTriplesWithSubject(objectNode);
 					INode? reusedPropertyNode = null;
 					INode? reusedFromResourceNode = null;
@@ -179,8 +179,6 @@ internal class DsvToOwlConverter
 					{
 						throw new Exception("reusedPropertyNode or reusedResourceNode is not of type URI.");
 					}
-					_logger.LogDebug("The predicate to look for: " + ((UriNode)reusedPropertyNode).Uri);
-					_logger.LogDebug("The URI where to look for the predicate: " + ((UriNode)reusedFromResourceNode).Uri);
 
 					IGraph reusedResourceGraph = new Graph();
 					reusedResourceGraph.LoadFromUri(((UriNode)reusedFromResourceNode).Uri);
@@ -198,7 +196,6 @@ internal class DsvToOwlConverter
 
 				if (predicateUri == DSV_CARDINALITY)
 				{
-					_logger.LogDebug("Predicate node is DSV_CARDINALITY.");
 					if (objectNode.NodeType is NodeType.Uri)
 					{
 						ILiteralNode literalNode;
@@ -221,11 +218,9 @@ internal class DsvToOwlConverter
 								break;
 						}
 						owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:comment"), literalNode));
-						_logger.LogDebug("Added rdfs:comment with the property cardinality to the owlGraph.");
 					}
 				}
 			}
-			_logger.LogDebug("==============================");
 		}
 
 		return owlGraph;

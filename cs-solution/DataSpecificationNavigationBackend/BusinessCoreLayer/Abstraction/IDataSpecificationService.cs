@@ -4,5 +4,6 @@ namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 
 public interface IDataSpecificationService
 {
-	DataSpecification ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName);
+	Task<DataSpecification> ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName);
+	DataSpecification? GetDataSpecificationByIri(string dataSpecificationIri);
 }

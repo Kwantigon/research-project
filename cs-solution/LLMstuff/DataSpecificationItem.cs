@@ -1,25 +1,17 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DataspecNavigationHelper.Model;
+namespace LLMstuff;
 
 public class DataSpecificationItem
 {
-	[JsonConstructor]
-	public DataSpecificationItem(string iri, string label, ItemType type)
-	{
-		Iri = iri;
-		Label = label;
-		Type = type;
-	}
-
 	[JsonPropertyName("iri")]
-	public string Iri { get; init; }
+	public required string Iri { get; init; }
 
 	[JsonPropertyName("label")]
-	public string Label { get; init; }
+	public required string Label { get; init; }
 
 	[JsonPropertyName("type")]
-	public ItemType Type { get; init; }
+	public required ItemType Type { get; init; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]

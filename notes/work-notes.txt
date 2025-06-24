@@ -31,31 +31,6 @@ Například chce: Tournaments that have taken place this year so far in which th
 - Já dokážu vyznačit to, že dotaz se bude týkat tournament a player a country.
 - Tak teď nějakým způsobem říct LLM, kam by měl uživatel doplnit specifické hodnoty, které chce ve svém dotazu mít - např. Vietnam.
 
-Když v RequestHandleru budu zpracovávat rovnou všechny operace, tak bude dělat moc různých věcí.
-Přidám další abstrakci: IDataSpecificationService, IConversationService atd.
-RequestHandler bude jen volat operace na těchto servisách.
-
-RequestHandler bude mít zodpovědnost:
-- Zkontrolovat příchozí payload.
-- Volat metody na dalších I...Service ve správném pořadí.
-- Sestavit výslednou HTTP odpověď a vrátit.
-- Bude vždy vracet IResults.
-- Objekt, který se má vracet bude v tom results body.
-Jen přemýšlím, jestli bych měl vytvořit třídu, která bude vracet ty objekty.
-Chtěl bych, aby na první pohled bylo vidět, co vrací která metoda.
-- Ale když všechno bude vracet IResults, tak to není vidět.
-
-Eventually budu chtít použít nějaký ExceptionHandler, aby transformoval vyjímky na HTTP odpovědi.
-- Zatím se soustředím na to, abych měl funkční back end.
-
-*29/03/2025*
-Nakreslil jsem si trochu pořádněji architekturu.
-Popsal jsem boxy architektury ve specifikaci.
-
-To do: Vytvořit jeden úplně kompletní příklad. Dovést to až do konce. Ne jenom říct, že se to bude opakovat.
-- Jeden příklad, kde rozšíření dotazu budou jen selecty.
-- Jeden příklad, kde rozšíření dotazu je i nějaké filtrování.
-
 *20/04/2025*
 Jak píšu tu mock konverzaci, tak se mi zdá, že pořád bude lepší mít jen seznam namapovaných slov. Potom ty související itemy zobrazit až když uživatel si rozklikne to slovo.
 - A nebo to nechat jako seznam, ale vhodně odrazit.
@@ -101,10 +76,6 @@ Data specification:
 Data specification item:
 - Uložím si typ (class, property, relationship).
 - Summary (některé si už můžu předem vygenerovat).
-
-Otázky:
-- Jak bych měl ukládat ten OWL soubor? Jako text v databázi pod data specification?
-- Co použít jako ID itemu?
 
 *02/05/2025*
 Pořád řeším, jak rozdělit zpracování endpointů.
@@ -160,3 +131,24 @@ Refaktoruju kód ve třídě DataSpecificationService, aby všechno nebylo v jed
 
 Otázky:
 - Fasáda: dává smysl celou metodu pro konverzi dát do fasády nebo je lepší to zpracování mít v DataSpecificationService a detailní volání nějakých dotnetRdf metod dát do fasády?
+
+## 22. 6. 2025
+
+Minule jsem začal přesouvat komplikované zpracování s dotnetRDF do fasády. Není to ještě hotové, ale prozatím toho nechám.
+
+Chtěl bych "zprovoznit" ten back end. Fasáda nemá úplně vliv na to, jestli back end bude něco vracet nebo zpracovávat, takže to nechám na později.
+
+Dívám se na to, co posílal Štěpán a zkusím vymyslet, jak z toho získat DSV.
+
+Dataspecer používá pro každý package nějaké UUID, kterému říká IRI a je to vidět v odkazech třeba na dokumentaci.
+
+V tuto chvíli je mi teoreticky jedno, v jakém formátu Dataspecer vrací data. Jestli json-ld nebo dsv nebo owl. Já potřebuju něco, co nacpu do LLM, abych měl první funkční implementaci.
+- Takže teď to nebudu podrobně zkoumat a implementuju prostě něco. Klidně třeba přímo to json-ld.
+- Pak se uvidí.
+
+Nejdřív to zkusím zprovoznit, protože musím se ještě napojit na ollama a vymyslet pár promptů. A pak zpracování těch promptů.
+
+Získání json-ld dokumentaci prozatím funguje.
+Teď musím implementovat ten workflow té konverzace.
+
+Napadlo mě, že bych mohl zkusit použít HttpClient a přímo stáhnout dokumentaci package z Dataspeceru.

@@ -1,6 +1,15 @@
 ﻿namespace DataspecNavigationHelper.Model;
 
-public record Message(MessageType Type, int Id, string TextValue, DateTime TimeStamp);
+public class Message
+{
+	public int Id; // Should be automatically assigned by the database.
+
+	public MessageType Type;
+
+	public required string TextValue;
+
+	public DateTime TimeStamp;
+}
 
 public enum MessageType
 {

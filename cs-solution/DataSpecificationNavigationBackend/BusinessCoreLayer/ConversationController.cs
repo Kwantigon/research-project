@@ -1,5 +1,7 @@
-﻿using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
+using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.Model;
 
 namespace DataspecNavigationHelper.BusinessCoreLayer;
@@ -8,9 +10,23 @@ namespace DataspecNavigationHelper.BusinessCoreLayer;
 /// Converts the results of <see cref="IConversationService""/> to HTTP responses.
 /// </summary>
 public class ConversationController(
-	IConversationService conversationService) : IConversationController
+	IConversationService conversationService,
+	IDataSpecificationService dataSpecificationService) : IConversationController
 {
 	private readonly IConversationService _conversationService = conversationService;
+	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
+
+	public IResult StartConversation(PostConversationsDTO payload)
+	{
+		DataSpecification? dataSpecification = _dataSpecificationService.GetDataSpecificationByIri(payload.DataSpecificationIri);
+		if (dataSpecification == null)
+		{
+			return Results.NotFound(new Error { Reason = $"Data specification with IRI {payload.DataSpecificationIri} not found." });
+		}
+
+		Conversation conversation = _conversationService.StartNewConversation(payload.ConversationTitle, dataSpecification);
+		return Results.Ok((ConversationDTO)conversation);
+	}
 
 	public IResult GetOngoingConversations()
 	{
@@ -61,10 +77,16 @@ public class ConversationController(
 
 	public IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload)
 	{
-		//Message userMessage = new(MessageType.UserMessage, 69, payload.TextValue, payload.TimeStamp);
-
-		// Some LLM shaenanigans needed here.
 		Message userMessage = _conversationService.AddUserMessage(conversationId, payload.TimeStamp, payload.TextValue);
+
+		// Map the user's question to items from the data specification.
+
+		// Get a list of data specification items that are relevant to the question.
+
+		// Translate to Sparql.
+
+		// Create a reply message and add that message to the conversation. The reply message also contains the list of relevant items.
+
 		return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", userMessage);
 	}
 }

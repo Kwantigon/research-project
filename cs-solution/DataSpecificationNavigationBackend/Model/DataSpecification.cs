@@ -21,4 +21,6 @@ public class DataSpecification
 	/// The content of the model.owl.ttl file that represents the model as RDF triples.
 	/// </summary>
 	public required string Owl { get; init; }
+
+	//public required string JsonLd { get; init; }
 }

@@ -1,9 +1,11 @@
-﻿using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
+using DataspecNavigationHelper.BusinessCoreLayer.DTO;
 
 namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 
 public interface IConversationController
 {
+	IResult StartConversation(PostConversationsDTO payload);
 	IResult GetOngoingConversations();
 	IResult GetConversation(int conversationId);
 	IResult GetConversationMessages(int conversationId);

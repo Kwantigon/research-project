@@ -8,7 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google_GenerativeAI" Version="2.7.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.28.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="dsv.ttl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

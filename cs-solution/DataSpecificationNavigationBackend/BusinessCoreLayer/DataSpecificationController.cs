@@ -12,9 +12,9 @@ public class DataSpecificationController(
 {
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
 
-	public IResult ProcessDataspecerPackage(PostDataSpecificationsDTO payload)
+	public async Task<IResult> ProcessDataspecerPackage(PostDataSpecificationsDTO payload)
 	{
-		DataSpecification dataSpecification = _dataSpecificationService.ExportDataSpecificationFromDataspecer(payload.DataspecerPackageIri, payload.Name);
+		DataSpecification dataSpecification = await _dataSpecificationService.ExportDataSpecificationFromDataspecer(payload.DataspecerPackageIri, payload.Name);
 		return Results.Created($"/data-specifications/{dataSpecification.Id}", (DataSpecificationDTO)dataSpecification);
 	}
 }

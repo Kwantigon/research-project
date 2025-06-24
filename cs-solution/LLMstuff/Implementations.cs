@@ -1,4 +1,5 @@
 ﻿using Abstractions;
+using GenerativeAI;
 using Microsoft.SemanticKernel;
 using System.Text;
 
