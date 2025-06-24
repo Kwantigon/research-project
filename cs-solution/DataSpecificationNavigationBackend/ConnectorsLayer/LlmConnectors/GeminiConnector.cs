@@ -60,7 +60,7 @@ public class GeminiConnector(
 	[MemberNotNull(nameof(_apiKey), nameof(_model))]
 	private void LoadLlmSettings()
 	{
-		_apiKey = "AIzaSyCxQytFZxal6t-T4hfuldFfwn9NFhY06Sw";
+		_apiKey = "";
 		_model = "models/gemini-2.5-flash";
 	}
 }
