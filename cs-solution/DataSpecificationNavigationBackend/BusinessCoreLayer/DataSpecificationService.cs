@@ -29,10 +29,10 @@ public class DataSpecificationService(
 		_logger.LogDebug("Exported DSV:\n{Content}", dsv);
 
 		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
+		_logger.LogDebug("Converting the DSV to OWL.");
 		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
 		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
 
-		_logger.LogDebug("Converted the DSV to OWL.");
 		_logger.LogDebug(owl);
 		DataSpecification dataSpecification = new DataSpecification()
 		{

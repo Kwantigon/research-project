@@ -152,3 +152,7 @@ Získání json-ld dokumentaci prozatím funguje.
 Teď musím implementovat ten workflow té konverzace.
 
 Napadlo mě, že bych mohl zkusit použít HttpClient a přímo stáhnout dokumentaci package z Dataspeceru.
+- Zkusil jsem to implementovat a vypadá to, že to funguje.
+
+Napadlo mě, že nemusím ukládat stažený ZIP, ale stačí otevřít přímo z toho byte array.
+Dále přidat interface PromptConstructor a ResponseProcessor do interface LlmConnector.

@@ -11,8 +11,8 @@ public class GeminiConnector(
 	ILogger<GeminiConnector> logger) : ILlmConnector
 {
 	private readonly ILogger<GeminiConnector> _logger = logger;
-	private readonly PromptConstructor _promptConstructor = new();
-	private readonly ResponseProcessor _responseProcessor = new();
+	private readonly PromptConstructor _promptConstructor = new(logger);
+	private readonly ResponseProcessor _responseProcessor = new(logger);
 	private const int _retryAttempts = 3; // If the response processor fails to extract the necessary classes, retry the prompt this many times.
 	private string? _apiKey;
 	private string? _model;
@@ -44,6 +44,7 @@ public class GeminiConnector(
 			_logger.LogError("The data specification items list is still null after " + _retryAttempts + " attempts.");
 			throw new Exception("There was an error that prevented mapping data specification items to the question.");
 		}
+		return items;
 	}
 
 	private string SendPrompt(string prompt)

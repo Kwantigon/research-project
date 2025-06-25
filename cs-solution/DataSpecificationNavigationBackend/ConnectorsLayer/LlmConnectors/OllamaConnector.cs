@@ -24,7 +24,7 @@ public class OllamaConnector(
 		_chat = new(_ollamaClient);
 	}
 
-	public List<DataSpecificationItem> MapQuestionToItems(string question)
+	public List<DataSpecificationItem> MapQuestionToItems(DataSpecification dataSpecification, string question)
 	{
 		string prompt = _promptConstructor.GetQuestionToItemsMappingPrompt(question);
 		Task<string> task = SendPrompt(prompt);

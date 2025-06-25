@@ -16,7 +16,7 @@ public class DataspecerConnector(
 	public async Task<string?> ExportPackageDocumentation(string packageIri)
 	{
 		string uri = DATASPECER_DOWNLOAD_DOCUMENTATION_ENDPOINT + packageIri;
-		_logger.LogDebug("Downloading the Dataspecer package documentation from the URI: {URI}.", uri);
+		//_logger.LogDebug("Downloading the Dataspecer package documentation from the URI: {URI}.", uri);
 		byte[] data = await _httpClient.GetByteArrayAsync(uri);
 
 		const string zipFilePath = "./documentation.zip";

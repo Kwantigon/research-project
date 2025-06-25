@@ -1,8 +1,8 @@
-## dotNetRDF facts:
+## dotNetRDF facts
 
 - Při načítání .ttl to vytvoří jen jeden node a ten se použije pro více triples.
 
-## Mapping:
+## Mapping
 
 dsv:class, dsv:property odkazují na originální URI těchto itemů.
 Objects
@@ -14,3 +14,8 @@ Predicates
 	dsv:domain = rdfs:domain
 	dsv:property?
 	dsv:datatypePropertyRange = rdfs:range
+
+## Pseudo-algorithm
+
+Input: model.owl.ttl, dsv.ttl
+
