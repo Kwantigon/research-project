@@ -3,10 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Define types for messages and items based on the specification
 class Message {
-	constructor(id: string, type: any, text: string) {
+	constructor(id:string, type: any, text: string) {
 		this.id = id;
 		this.type = type;
 		this.text = text;
@@ -17,15 +18,20 @@ class Message {
 	text: string;
 	relatedItems?: DataSpecificationItem[];
 
-	/*isSparqlQuery?: boolean;*/
 	/*timestamp: string;*/
 }
 
-interface DataSpecificationItem {
-	id: string;
-	name: string;
-	summary: string;
-	isAddedToQuestion: boolean; // To track if the item is selected for query expansion
+class DataSpecificationItem {
+	constructor(iri: string, label: string, type: any) {
+		this.iri = iri;
+		this.label = label;
+		this.type = type;
+	}
+
+	iri: string;
+	label: string;
+	type: "Class" | "ObjectProperty" | "DatatypeProperty";
+	summary?: string;
 }
 
 function ConversationPage() {
@@ -35,26 +41,38 @@ function ConversationPage() {
 	const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<DataSpecificationItem[]>([]);
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<DataSpecificationItem | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	// Ref for the chat messages container to enable auto-scrolling
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
     const fetchMessages = async () => {
-			const response = await fetch("https://localhost:7064/conversations/1/messages");
-			if (!response.ok) {
-				throw new Error("Failed to fetch conversation messages from the back end.");
-			}
-
-			const data = await response.json();
 			const fetched: Message[] = [];
-			for (let i = 0; i < data.length; i++) {
+			try {
+				setIsLoading(true);
+				const response = await fetch("https://localhost:7064/conversations/1/messages");
+				if (!response.ok) {
+					throw new Error("The response from the back end was not a success.");
+				} else {
+					const data = await response.json();
+					for (let i = 0; i < data.length; i++) {
+						fetched.push(new Message(
+							data[i].id,
+							data[i].type,
+							data[i].textValue
+						));
+					}
+				}
+			} catch(error) {
 				fetched.push(new Message(
-					data[i].id,
-					data[i].type,
-					data[i].textValue
-				));
+					`WelcomeMessage-${Date.now()}`,
+					"WelcomeMessage",
+					"There was an error retrieving the conversation messages."
+				))
+			} finally {
+				setMessages(fetched);
+				setIsLoading(false);
 			}
-			setMessages(fetched);
     };
 
     fetchMessages();
@@ -75,11 +93,10 @@ function ConversationPage() {
 		setMessages((prevMessages) => [
 			...prevMessages,
 			{
-				id: `user-${Date.now()}`,
+				id: `UserMessage-${Date.now()}`,
 				type: "UserMessage",
-				text: messageToSend,
-				timestamp: new Date().toISOString(),
-			},
+				text: messageToSend
+			}
 		]);
 
 		// Clear input and suggested message
@@ -154,7 +171,7 @@ function ConversationPage() {
 				body: JSON.stringify({
 					conversationId: "current-conversation-id",
 					currentQuestion: messages[messages.length - 1]?.text, // Get the last user question
-					itemsToAdd: updatedSelectedItems.map(item => item.id),
+					itemsToAdd: updatedSelectedItems.map(item => item.iri),
 				}),
 			})
 			.then(res => res.json())
@@ -175,7 +192,15 @@ function ConversationPage() {
 	return (
 		<div className="flex flex-col h-full p-4">
 			<div ref={messagesEndRef} className="flex-1 overflow-y-auto border rounded-md p-4 space-y-4">
-				{messages.map((msg) => (
+				{isLoading ? (
+          // Display skeleton loaders while loading
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-10 w-1/2 ml-auto" />
+            <Skeleton className="h-10 w-2/3" />
+          </div>
+        ) : 
+				(messages.map((msg) => (
 					<div
 						key={msg.id}
 						className={`flex ${msg.type === "UserMessage" ? "justify-end" : "justify-start"}`}
@@ -197,9 +222,9 @@ function ConversationPage() {
 										<p className="font-semibold text-sm">Some words in your question can be expanded upon. You can click on each item to see more information about it.</p>
 										<ul className="list-disc list-inside mt-1">
 											{msg.relatedItems.map((item) => (
-												<li key={item.id}>
+												<li key={item.iri}>
 													<Button variant="link" onClick={() => handleItemClick(item)} className="p-0 h-auto text-sm">
-														{item.name}
+														{item.label}
 													</Button>
 												</li>
 											))}
@@ -209,7 +234,7 @@ function ConversationPage() {
 							</CardContent>
 						</Card>
 					</div>
-				))}
+				)))}
 			</div>
 
 			{suggestedMessage && (
@@ -243,11 +268,11 @@ function ConversationPage() {
 			<Dialog open={isSummaryDialogOpen} onOpenChange={setIsSummaryDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Summary of "{selectedItemForSummary?.name}"</DialogTitle>
+						<DialogTitle>Summary of "{selectedItemForSummary?.label}"</DialogTitle>
 					</DialogHeader>
 					<div className="py-4">
 						<p>{selectedItemForSummary?.summary}</p>
-						{selectedItemForSummary && !selectedItemsForExpansion.some(item => item.id === selectedItemForSummary.id) && ( // Only show "Add item" if not already selected
+						{selectedItemForSummary && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.iri) && ( // Only show "Add item" if not already selected
 							<Button onClick={handleAddItemToQuestion} className="mt-4">
 								Add item to my question
 							</Button>
