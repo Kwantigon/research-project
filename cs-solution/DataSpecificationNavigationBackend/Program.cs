@@ -22,7 +22,19 @@ builder.Services
 	.AddSingleton<EntityFrameworkPlaceholder>()
 	;
 
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policy =>
+	{
+		policy.AllowAnyOrigin()
+			.AllowAnyMethod()
+			.AllowAnyHeader()
+			.SetIsOriginAllowed(origin => true);
+	});
+});
+
 var app = builder.Build();
+app.UseCors();
 
 /* I'm registering all endpoints in this Program.cs file
  * because I don't expect to have many more endpoints than the ones listed here.

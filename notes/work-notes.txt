@@ -156,3 +156,9 @@ Napadlo mě, že bych mohl zkusit použít HttpClient a přímo stáhnout dokume
 
 Napadlo mě, že nemusím ukládat stažený ZIP, ale stačí otevřít přímo z toho byte array.
 Dále přidat interface PromptConstructor a ResponseProcessor do interface LlmConnector.
+
+## 1. 7. 2025
+
+Front end skeleton funguje.
+Gemini ani ChatGPT nezobrazují timestamp. Pro moje účely to taky není důležité, takže to nejspíše zahodím.
+Nesmažu, ale jen zakomentuju timestampy. Kdybych v budoucnu náhodou potřeboval.

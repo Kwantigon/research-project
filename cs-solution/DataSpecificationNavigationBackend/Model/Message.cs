@@ -1,16 +1,23 @@
-﻿namespace DataspecNavigationHelper.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace DataspecNavigationHelper.Model;
 
 public class Message
 {
-	public int Id; // Should be automatically assigned by the database.
+	[JsonPropertyName("id")]
+	public int Id { get; init; } // Should be automatically assigned by the database.
 
-	public MessageType Type;
+	[JsonPropertyName("type")]
+	public MessageType Type { get; init; }
 
-	public required string TextValue;
+	[JsonPropertyName("textValue")]
+	public required string TextValue { get; init; }
 
-	public DateTime TimeStamp;
+	[JsonPropertyName("timestamp")]
+	public DateTime TimeStamp { get; init; }
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]
 public enum MessageType
 {
 	UserMessage,
