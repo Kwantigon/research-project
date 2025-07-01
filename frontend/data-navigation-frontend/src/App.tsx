@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ConversationPage from "@/pages/ConversationPage";
 import ConversationManagementPage from "@/pages/ConversationManagementPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
 	return (
@@ -13,12 +14,17 @@ function App() {
 						<ul className="flex space-x-4">
 							<li>
 								<Button asChild variant="ghost">
+									<Link to="/">Home</Link>
+								</Button>
+							</li>
+							<li>
+								<Button asChild variant="ghost">
 									<Link to="/manage-conversations">Manage Conversations</Link>
 								</Button>
 							</li>
 							<li>
 								<Button asChild variant="ghost">
-									<Link to="/">Chat</Link>
+									<Link to="/conversation">Chat</Link>
 								</Button>
 							</li>
 						</ul>
@@ -26,8 +32,9 @@ function App() {
 				</header>
 				<main className="flex-1 overflow-auto">
 					<Routes>
-						<Route path="/" element={<ConversationPage />} />
-						<Route path="/manage-conversations" element={<ConversationManagementPage />} />
+						<Route path="/" element={<HomePage/>}/>
+						<Route path="/conversation" element={<ConversationPage/>}/>
+						<Route path="/manage-conversations" element={<ConversationManagementPage/>}/>
 						{/* Potentially a route for selecting a Dataspecer package, if not handled purely by redirect */}
 					</Routes>
 				</main>
