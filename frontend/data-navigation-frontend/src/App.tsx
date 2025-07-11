@@ -24,7 +24,7 @@ function App() {
 							</li>
 							<li>
 								<Button asChild variant="ghost">
-									<Link to="/conversation">Chat</Link>
+									<Link to="/conversation/1">Chat</Link>
 								</Button>
 							</li>
 						</ul>
@@ -33,7 +33,7 @@ function App() {
 				<main className="flex-1 overflow-auto">
 					<Routes>
 						<Route path="/" element={<HomePage/>}/>
-						<Route path="/conversation" element={<ConversationPage/>}/>
+						<Route path="/conversation/:conversationId" element={<ConversationPage/>}/>
 						<Route path="/manage-conversations" element={<ConversationManagementPage/>}/>
 						{/* Potentially a route for selecting a Dataspecer package, if not handled purely by redirect */}
 					</Routes>

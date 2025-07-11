@@ -4,30 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
+import { useParams } from "react-router-dom";
+
+const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 // Define types for messages and items based on the specification
-class Message {
-	constructor(id:string, type: any, text: string) {
-		this.id = id;
-		this.type = type;
-		this.text = text;
-	}
+interface Message {
 
 	id: string;
 	type: "UserMessage" | "WelcomeMessage" | "ReplyMessage" | "SuggestedMessage";
 	text: string;
 	relatedItems?: DataSpecificationItem[];
-
-	/*timestamp: string;*/
+	timestamp: string;
 }
 
-class DataSpecificationItem {
-	constructor(iri: string, label: string, type: any) {
-		this.iri = iri;
-		this.label = label;
-		this.type = type;
-	}
-
+interface DataSpecificationItem {
 	iri: string;
 	label: string;
 	type: "Class" | "ObjectProperty" | "DatatypeProperty";
@@ -42,41 +33,32 @@ function ConversationPage() {
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<DataSpecificationItem | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
-	// Ref for the chat messages container to enable auto-scrolling
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const { conversationId } = useParams<{ conversationId: string }>();
+
+	const fetchMessages = async () => {
+		try {
+			setIsLoading(true);
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`);
+			if (!response.ok) {
+				console.error("Failed to fetch conversations.")
+				console.error("Response status: " + response.status);
+				console.error(response.body);
+				throw new Error("Error fetching conversations.");
+			}
+			const messages = await response.json();
+			console.log(messages);
+			setMessages(messages);
+		} catch (error) {
+			console.error(error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	useEffect(() => {
-    const fetchMessages = async () => {
-			const fetched: Message[] = [];
-			try {
-				setIsLoading(true);
-				const response = await fetch("https://localhost:7064/conversations/1/messages");
-				if (!response.ok) {
-					throw new Error("The response from the back end was not a success.");
-				} else {
-					const data = await response.json();
-					for (let i = 0; i < data.length; i++) {
-						fetched.push(new Message(
-							data[i].id,
-							data[i].type,
-							data[i].textValue
-						));
-					}
-				}
-			} catch(error) {
-				fetched.push(new Message(
-					`WelcomeMessage-${Date.now()}`,
-					"WelcomeMessage",
-					"There was an error retrieving the conversation messages."
-				))
-			} finally {
-				setMessages(fetched);
-				setIsLoading(false);
-			}
-    };
-
-    fetchMessages();
-  }, []);
+		fetchMessages();
+	}, []);
 
 	useEffect(() => {
 		if (messagesEndRef.current) {
@@ -95,7 +77,8 @@ function ConversationPage() {
 			{
 				id: `UserMessage-${Date.now()}`,
 				type: "UserMessage",
-				text: messageToSend
+				text: messageToSend,
+				timestamp: Date.now().toString()
 			}
 		]);
 
@@ -104,18 +87,15 @@ function ConversationPage() {
 		setSuggestedMessage(null);
 		setSelectedItemsForExpansion([]);
 
-		// Simulate API call to backend
 		try {
-			const response = await fetch("/api/conversation/send-message", {
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					conversationId: "current-conversation-id", // This would come from backend or context
-					userQuestion: messageToSend,
-					// You might send the selectedItemsForExpansion here if they are part of the *current* user message's intent
-					// based on the logic of how the backend processes the suggested message
+					conversationId: conversationId,
+					userQuestion: messageToSend
 				}),
 			});
 
@@ -193,13 +173,13 @@ function ConversationPage() {
 		<div className="flex flex-col h-full p-4">
 			<div ref={messagesEndRef} className="flex-1 overflow-y-auto border rounded-md p-4 space-y-4">
 				{isLoading ? (
-          // Display skeleton loaders while loading
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-10 w-1/2 ml-auto" />
-            <Skeleton className="h-10 w-2/3" />
-          </div>
-        ) : 
+					// Display skeleton loaders while loading
+					<div className="space-y-4">
+						<Skeleton className="h-10 w-3/4" />
+						<Skeleton className="h-10 w-1/2 ml-auto" />
+						<Skeleton className="h-10 w-2/3" />
+					</div>
+				) : 
 				(messages.map((msg) => (
 					<div
 						key={msg.id}
