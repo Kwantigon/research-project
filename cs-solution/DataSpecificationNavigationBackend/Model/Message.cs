@@ -5,16 +5,19 @@ namespace DataspecNavigationHelper.Model;
 public class Message
 {
 	[JsonPropertyName("id")]
-	public int Id { get; init; } // Should be automatically assigned by the database.
+	public int Id { get; set; } // Should be automatically assigned by the database.
 
 	[JsonPropertyName("type")]
-	public MessageType Type { get; init; }
+	public MessageType Type { get; set; }
 
-	[JsonPropertyName("textValue")]
-	public required string TextValue { get; init; }
+	[JsonPropertyName("text")]
+	public required string TextValue { get; set; }
 
 	[JsonPropertyName("timestamp")]
-	public DateTime TimeStamp { get; init; }
+	public DateTime TimeStamp { get; set; }
+
+	[JsonPropertyName("relatedItems")]
+	public List<DataSpecificationItem>? RelatedItems { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]

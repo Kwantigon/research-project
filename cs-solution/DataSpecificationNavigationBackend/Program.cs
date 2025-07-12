@@ -1,5 +1,6 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
+using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
 using DataspecNavigationHelper.BusinessCoreLayer;
 using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
@@ -8,18 +9,19 @@ using DataspecNavigationHelper.BusinessCoreLayer.Facade;
 using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-	.AddSingleton<IConversationService, ConversationService>()
-	.AddSingleton<IConversationController, ConversationController>()
-	.AddSingleton<IDataSpecificationService, DataSpecificationService>()
-	.AddSingleton<IDataSpecificationController, DataSpecificationController>()
-	.AddSingleton<IDataspecerConnector, DataspecerConnector>()
-	.AddSingleton<ILlmConnector, GeminiConnector>()
-	.AddSingleton<IRdfProcessor, RdfProcessor>()
-	.AddSingleton<EntityFrameworkPlaceholder>()
+	.AddScoped<IConversationService, ConversationService>()
+	.AddScoped<IConversationController, ConversationController>()
+	.AddScoped<IDataSpecificationService, DataSpecificationService>()
+	.AddScoped<IDataSpecificationController, DataSpecificationController>()
+	.AddScoped<IDataspecerConnector, DataspecerConnector>()
+	.AddScoped<ILlmConnector, GeminiConnector>()
+	.AddScoped<IRdfProcessor, RdfProcessor>()
+	.AddScoped<EntityFrameworkPlaceholder>()
 	;
 
 builder.Services.AddCors(options =>
@@ -32,9 +34,28 @@ builder.Services.AddCors(options =>
 			.SetIsOriginAllowed(origin => true);
 	});
 });
+/*builder.Services.AddSwaggerGen(c =>
+{
+	c.SwaggerDoc("v1", new OpenApiInfo {
+		Title = "Data specification helper API",
+		Description = "The back end for the data specification helper project.",
+		Version = "v1" }
+	);
+});*/
+
+var connectionString = builder.Configuration.GetConnectionString("Chatbot") ?? "Data Source=Chatbot.db";
+builder.Services.AddSqlite<AppDbContext>(connectionString);
 
 var app = builder.Build();
 app.UseCors();
+/*if (app.Environment.IsDevelopment())
+{
+	app.UseSwagger();
+	app.UseSwaggerUI(c =>
+	{
+		c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data specification helper API");
+	});
+}*/
 
 /* I'm registering all endpoints in this Program.cs file
  * because I don't expect to have many more endpoints than the ones listed here.
@@ -129,5 +150,18 @@ app.MapPost("/conversations",
 		operation.Description = "Starts a new conversation with the given title and using the given data specification in the payload. If the conversation title is not specified, a default name will be used instead.";
 		return operation;
 	});
+
+app.MapPost("/ef-test/conversations",
+				([FromBody] PostConversationsDTO payload,
+				IConversationController controller) => controller.StartEfTestConversation(payload));
+
+app.MapPost("/ef-test/data-specifications",
+				([FromBody] PostDataSpecificationsDTO payload,
+				IConversationController controller) => controller.AddEfTestDataSpecification(payload));
+
+app.MapGet("/ef-test/data-specifications", (AppDbContext database) =>
+{
+	return Results.Ok(database.DataSpecifications.ToList());
+});
 
 app.Run();

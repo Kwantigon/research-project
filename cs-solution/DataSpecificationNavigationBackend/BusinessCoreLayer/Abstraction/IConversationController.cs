@@ -11,4 +11,7 @@ public interface IConversationController
 	IResult GetConversationMessages(int conversationId);
 	IResult GetMessage(int conversationId, int messageId);
 	IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload);
+
+	IResult StartEfTestConversation(PostConversationsDTO payload);
+	IResult AddEfTestDataSpecification(PostDataSpecificationsDTO payload);
 }

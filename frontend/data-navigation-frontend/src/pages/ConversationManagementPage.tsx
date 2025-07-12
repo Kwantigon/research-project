@@ -35,7 +35,7 @@ function ConversationManagementPage() {
 			setConversations(data);
 		} catch (error) {
 			console.error(error);
-			setError("There was an error while retrieving conversations from the back end. See the console for more info.");
+			setError("Failed to retrieve conversations.");
 		} finally {
 			setIsLoading(false);
 		}
@@ -48,8 +48,8 @@ function ConversationManagementPage() {
 	const handleDeleteConversation = async (conversationId: string) => {
 		try {
 			// Optimistically remove the conversation from the UI.
-				setConversations(conversations.filter(conv => conv.id !== conversationId));
-				setError(null); // Clear previous error if there was one.
+			setError(null); // Clear previous error if there was one.
+			setConversations(conversations.filter(conv => conv.id !== conversationId));
 
 			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}`, { method: "DELETE" });
 			if (!response.ok) {
@@ -58,18 +58,16 @@ function ConversationManagementPage() {
 				console.error(response.body);
 				throw new Error("Error deleting conversation.");
 			}
-			setConversations(conversations.filter(conv => conv.id !== conversationId));
+			//setConversations(conversations.filter(conv => conv.id !== conversationId));
 		} catch (error) {
-			console.error("Error deleting conversation:", error);
-			setError("There was an error while deleting the conversation. See the console for more info.");
-			
+			console.error(error);
+			setError("Failed to delete the conversation.");
       // Re-fetch conversations to revert the optimistic update.
       fetchConversations();
 		}
 	};
 
 	const handleOpenConversation = (conversationId: string) => {
-		console.log(`Navigating to: /conversation/${conversationId}`);
 		navigate(`/conversation/${conversationId}`);
 	};
 
@@ -100,10 +98,10 @@ function ConversationManagementPage() {
 							</CardHeader>
 							<CardContent className="flex justify-end space-x-2">
 								<Button variant="outline" size="sm" onClick={() => handleOpenConversation(conv.id)}>
-									<FolderOpen className="mr-2 h-4 w-4" /> Open
+									<FolderOpen className="mr-2 h-4 w-4" />Open
 								</Button>
 								<Button variant="destructive" size="sm" onClick={() => handleDeleteConversation(conv.id)}>
-									<Trash2 className="mr-2 h-4 w-4" /> Delete
+									<Trash2 className="mr-2 h-4 w-4" />Delete
 								</Button>
 							</CardContent>
 						</Card>
