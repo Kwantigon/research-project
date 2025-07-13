@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
+const LAST_CHOSEN_CONVERSATION_ID_STRING = "lastChosenConversationId";
 
 interface Conversation {
 	id: string;
@@ -27,14 +28,29 @@ function ConversationManagementPage() {
   const [newConversationTitle, setNewConversationTitle] = useState<string>("");
 	const [newConversationError, setNewConversationError] = useState<string | null>(null);
 	const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
+	const [showNoConversationSelectedMessage, setShowNoConversationSelectedMessage] = useState<boolean>(false);
 	const navigate = useNavigate();
-	const [searchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	useEffect(() => {
-    const iriFromUrl = searchParams.get('iri');
+		const URL_PARAM_IRI = "iri";
+		const URL_PARAM_NO_CONVERSATION_SELECTED = "noConversationSelected";
+
+    const iriFromUrl = searchParams.get(URL_PARAM_IRI);
     if (iriFromUrl) {
       setNewConversationDataSpecIri(iriFromUrl);
       setIsNewConversationDialogOpen(true);
+			searchParams.delete(URL_PARAM_IRI);
+      setSearchParams(searchParams);
+			return;
+    }
+
+		const noConversationSelected = searchParams.get(URL_PARAM_NO_CONVERSATION_SELECTED)
+		if (noConversationSelected === "true") {
+      setShowNoConversationSelectedMessage(true);
+      searchParams.delete(URL_PARAM_NO_CONVERSATION_SELECTED);
+      setSearchParams(searchParams);
+			return;
     }
   }, [searchParams]);
 
@@ -64,6 +80,7 @@ function ConversationManagementPage() {
 	}, []);
 
 	const handleOpenConversation = (conversationId: string) => {
+		sessionStorage.setItem(LAST_CHOSEN_CONVERSATION_ID_STRING, conversationId);
 		navigate(`/conversation/${conversationId}`);
 	};
 
@@ -135,7 +152,9 @@ function ConversationManagementPage() {
 				console.error(response.body);
 				throw new Error("Error deleting conversation.");
 			}
-			//setConversations(conversations.filter(conv => conv.id !== conversationId));
+			if (sessionStorage.getItem(LAST_CHOSEN_CONVERSATION_ID_STRING) === conversationId) {
+				sessionStorage.removeItem(LAST_CHOSEN_CONVERSATION_ID_STRING);
+			}
 		} catch (error) {
 			console.error(error);
 			setError("Failed to delete the conversation.");
@@ -152,7 +171,23 @@ function ConversationManagementPage() {
           <PlusCircle className="mr-2 h-4 w-4" /> Create new conversation
         </Button>
       </div>
-			{/* <h2 className="text-2xl font-bold mb-4">Manage Conversations</h2> */}
+
+			{showNoConversationSelectedMessage && (
+        <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <strong className="font-bold">Warning!</strong>
+          <span className="block sm:inline"> No conversation was selected. Please open an existing conversation or create a new one to start chatting.</span>
+          <span className="absolute top-0 bottom-0 right-0 px-4 py-3 cursor-pointer" onClick={() => setShowNoConversationSelectedMessage(false)}>
+            <svg
+							className="fill-current h-6 w-6 text-blue-500"
+							role="button" xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20">
+								<title>Close</title>
+								<path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.15a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.15 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+						</svg>
+          </span>
+        </div>
+      )}
+
 			{isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Skeleton className="h-40 w-full rounded-lg" />

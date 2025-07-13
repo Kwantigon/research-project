@@ -5,6 +5,17 @@ import ConversationManagementPage from "@/pages/ConversationManagementPage";
 import HomePage from "./pages/HomePage";
 
 function App() {
+	console.log("function App() is running.");
+	const handleOpenMostRecentConversation = () => {
+		const LAST_CHOSEN_CONVERSATION_ID_STRING = "lastChosenConversationId";
+		const lastChosenConversationId = sessionStorage.getItem(LAST_CHOSEN_CONVERSATION_ID_STRING);
+		console.log(`${LAST_CHOSEN_CONVERSATION_ID_STRING}: ${lastChosenConversationId}`);
+		const mostRecentConversationPath = lastChosenConversationId // Path for the "Most recent conversation" link
+		? `/conversation/${lastChosenConversationId}`
+		: '/manage-conversations?noConversationSelected=true';
+		return mostRecentConversationPath;
+	}
+
 	return (
 		<Router>
 			<div className="flex flex-col h-screen">
@@ -24,7 +35,7 @@ function App() {
 							</li>
 							<li>
 								<Button asChild variant="ghost">
-									<Link to="/conversation/1">Chat</Link>
+									<Link to={handleOpenMostRecentConversation()}>Most recent conversation</Link>
 								</Button>
 							</li>
 						</ul>
