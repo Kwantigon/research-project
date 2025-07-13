@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, FolderOpen, PlusCircle } from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'; // Import Dialog components
 import { Input } from '@/components/ui/input'; 
 import { Label } from '@/components/ui/label';
@@ -21,12 +21,22 @@ function ConversationManagementPage() {
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
-	const navigate = useNavigate();
   const [isNewConversationDialogOpen, setIsNewConversationDialogOpen] = useState<boolean>(false);
   const [newConversationDataSpecIri, setNewConversationDataSpecIri] = useState<string>("");
   const [newConversationDataSpecName, setNewConversationDataSpecName] = useState<string>("");
   const [newConversationTitle, setNewConversationTitle] = useState<string>("");
 	const [newConversationError, setNewConversationError] = useState<string | null>(null);
+	const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
+	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+
+	useEffect(() => {
+    const iriFromUrl = searchParams.get('iri');
+    if (iriFromUrl) {
+      setNewConversationDataSpecIri(iriFromUrl);
+      setIsNewConversationDialogOpen(true);
+    }
+  }, [searchParams]);
 
 	const fetchConversations = async () => {
 		try {
@@ -58,6 +68,7 @@ function ConversationManagementPage() {
 	};
 
 	const handleCreateNewConversation = async () => {
+		setIsCreatingConversation(true);
     setNewConversationError(null);
     if (!newConversationDataSpecIri || !newConversationDataSpecName || !newConversationTitle) {
       setNewConversationError('All fields are required.');
@@ -106,7 +117,9 @@ function ConversationManagementPage() {
     } catch (err) {
       console.error('Error creating new conversation:', err);
       setNewConversationError('Failed to create conversation. Please check your inputs and try again.');
-    }
+    } finally {
+			setIsCreatingConversation(false);
+		}
 	}
 
 	const handleDeleteConversation = async (conversationId: string) => {
@@ -134,9 +147,9 @@ function ConversationManagementPage() {
 	return (
 		<div className="p-4">
 			<div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Manage Conversations</h2>
+        <h2 className="text-2xl font-bold">Manage conversations</h2>
         <Button onClick={() => setIsNewConversationDialogOpen(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Create New Conversation
+          <PlusCircle className="mr-2 h-4 w-4" /> Create new conversation
         </Button>
       </div>
 			{/* <h2 className="text-2xl font-bold mb-4">Manage Conversations</h2> */}
@@ -159,7 +172,7 @@ function ConversationManagementPage() {
 						<Card key={conv.id}>
 							<CardHeader>
 								<CardTitle>{conv.title}</CardTitle>
-								<p className="text-sm text-gray-500">Data Spec: {conv.dataSpecificationName}</p>
+								<p className="text-sm text-gray-500">Data specification: {conv.dataSpecificationName}</p>
 								<p className="text-xs text-gray-400">Last updated: {new Date(conv.lastUpdated).toLocaleString()}</p>
 							</CardHeader>
 							<CardContent className="flex justify-end space-x-2">
@@ -178,7 +191,7 @@ function ConversationManagementPage() {
 			<Dialog open={isNewConversationDialogOpen} onOpenChange={setIsNewConversationDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create New Conversation</DialogTitle>
+            <DialogTitle>Create new conversation</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {newConversationError && (
@@ -188,19 +201,20 @@ function ConversationManagementPage() {
             )}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataspecerIRI" className="text-right">
-                Dataspecer Package IRI
+                Dataspecer package IRI
               </Label>
               <Input
                 id="dataspecerIRI"
                 value={newConversationDataSpecIri}
                 onChange={(e) => setNewConversationDataSpecIri(e.target.value)}
                 className="col-span-3"
-                placeholder="e.g., https://tool.dataspecer.com/data-specification-editor/specification?dataSpecificationIri=061e24ee-2cba-4c19-9510-7fe5278ae02c"
+                placeholder="e.g., 061e24ee-2cba-4c19-9510-7fe5278ae02c"
+								disabled={isCreatingConversation}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataSpecName" className="text-right">
-                Data Specification Name
+                Data specification name
               </Label>
               <Input
                 id="dataSpecName"
@@ -208,11 +222,12 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationDataSpecName(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., Badminton specification"
+								disabled={isCreatingConversation}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="conversationTitle" className="text-right">
-                Conversation Title
+                Conversation title
               </Label>
               <Input
                 id="conversationTitle"
@@ -220,12 +235,25 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationTitle(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., Query about tournaments"
+								disabled={isCreatingConversation}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsNewConversationDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateNewConversation}>Create Conversation</Button>
+            <Button onClick={handleCreateNewConversation} disabled={isCreatingConversation}>
+							{isCreatingConversation ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating conversation...
+                </span>
+              ) : (
+                'Create conversation'
+              )}
+						</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

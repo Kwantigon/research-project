@@ -19,7 +19,7 @@ function App() {
 							</li>
 							<li>
 								<Button asChild variant="ghost">
-									<Link to="/manage-conversations">Manage Conversations</Link>
+									<Link to="/manage-conversations">Manage conversations</Link>
 								</Button>
 							</li>
 							<li>
@@ -35,7 +35,7 @@ function App() {
 						<Route path="/" element={<HomePage/>}/>
 						<Route path="/conversation/:conversationId" element={<ConversationPage/>}/>
 						<Route path="/manage-conversations" element={<ConversationManagementPage/>}/>
-						{/* Potentially a route for selecting a Dataspecer package, if not handled purely by redirect */}
+						<Route path="/manage-conversations/new" element={<ConversationManagementPage/>}/>
 					</Routes>
 				</main>
 			</div>
