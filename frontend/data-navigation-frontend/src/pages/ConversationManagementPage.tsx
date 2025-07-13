@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, FolderOpen } from "lucide-react";
+import { Trash2, FolderOpen, PlusCircle } from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'; // Import Dialog components
+import { Input } from '@/components/ui/input'; 
+import { Label } from '@/components/ui/label';
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -19,6 +22,11 @@ function ConversationManagementPage() {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const navigate = useNavigate();
+  const [isNewConversationDialogOpen, setIsNewConversationDialogOpen] = useState<boolean>(false);
+  const [newConversationDataSpecIri, setNewConversationDataSpecIri] = useState<string>("");
+  const [newConversationDataSpecName, setNewConversationDataSpecName] = useState<string>("");
+  const [newConversationTitle, setNewConversationTitle] = useState<string>("");
+	const [newConversationError, setNewConversationError] = useState<string | null>(null);
 
 	const fetchConversations = async () => {
 		try {
@@ -45,6 +53,62 @@ function ConversationManagementPage() {
 		fetchConversations();
 	}, []);
 
+	const handleOpenConversation = (conversationId: string) => {
+		navigate(`/conversation/${conversationId}`);
+	};
+
+	const handleCreateNewConversation = async () => {
+    setNewConversationError(null);
+    if (!newConversationDataSpecIri || !newConversationDataSpecName || !newConversationTitle) {
+      setNewConversationError('All fields are required.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/conversations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          conversationTitle: newConversationTitle,
+          dataSpecificationIri: newConversationDataSpecIri,
+          dataSpecificationName: newConversationDataSpecName
+        })
+      });
+			console.log(JSON.stringify({
+          conversationTitle: newConversationTitle,
+          dataSpecificationIri: newConversationDataSpecIri,
+          dataSpecificationName: newConversationDataSpecName
+        }));
+      if (!response.ok) {
+        throw new Error(`Failed to create new conversation: ${response.statusText}`);
+      }
+
+      const newConv = await response.json();
+			console.log(newConv);
+      setConversations(prev => [...prev, {
+        id: newConv.id,
+        title: newConv.title,
+        dataSpecificationName: newConv.dataSpecificationName,
+        lastUpdated: newConv.lastUpdated
+      }].sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()));
+
+      // Clear form fields and close dialog
+      setNewConversationDataSpecIri("");
+      setNewConversationDataSpecName("");
+      setNewConversationTitle("");
+      setIsNewConversationDialogOpen(false);
+
+      // Navigate to the newly created conversation
+      //handleOpenConversation(newConv.id);
+
+    } catch (err) {
+      console.error('Error creating new conversation:', err);
+      setNewConversationError('Failed to create conversation. Please check your inputs and try again.');
+    }
+	}
+
 	const handleDeleteConversation = async (conversationId: string) => {
 		try {
 			// Optimistically remove the conversation from the UI.
@@ -67,13 +131,15 @@ function ConversationManagementPage() {
 		}
 	};
 
-	const handleOpenConversation = (conversationId: string) => {
-		navigate(`/conversation/${conversationId}`);
-	};
-
 	return (
 		<div className="p-4">
-			<h2 className="text-2xl font-bold mb-4">Manage Conversations</h2>
+			<div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Manage Conversations</h2>
+        <Button onClick={() => setIsNewConversationDialogOpen(true)}>
+          <PlusCircle className="mr-2 h-4 w-4" /> Create New Conversation
+        </Button>
+      </div>
+			{/* <h2 className="text-2xl font-bold mb-4">Manage Conversations</h2> */}
 			{isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Skeleton className="h-40 w-full rounded-lg" />
@@ -108,6 +174,61 @@ function ConversationManagementPage() {
 					))}
 				</div>
 			)}
+
+			<Dialog open={isNewConversationDialogOpen} onOpenChange={setIsNewConversationDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Conversation</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {newConversationError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative text-sm" role="alert">
+                {newConversationError}
+              </div>
+            )}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dataspecerIRI" className="text-right">
+                Dataspecer Package IRI
+              </Label>
+              <Input
+                id="dataspecerIRI"
+                value={newConversationDataSpecIri}
+                onChange={(e) => setNewConversationDataSpecIri(e.target.value)}
+                className="col-span-3"
+                placeholder="e.g., https://tool.dataspecer.com/data-specification-editor/specification?dataSpecificationIri=061e24ee-2cba-4c19-9510-7fe5278ae02c"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dataSpecName" className="text-right">
+                Data Specification Name
+              </Label>
+              <Input
+                id="dataSpecName"
+                value={newConversationDataSpecName}
+                onChange={(e) => setNewConversationDataSpecName(e.target.value)}
+                className="col-span-3"
+                placeholder="e.g., Badminton specification"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="conversationTitle" className="text-right">
+                Conversation Title
+              </Label>
+              <Input
+                id="conversationTitle"
+                value={newConversationTitle}
+                onChange={(e) => setNewConversationTitle(e.target.value)}
+                className="col-span-3"
+                placeholder="e.g., Query about tournaments"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNewConversationDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateNewConversation}>Create Conversation</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 		</div>
 	);
 }
