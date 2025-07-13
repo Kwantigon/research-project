@@ -1,4 +1,5 @@
-﻿using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
+using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 using DataspecNavigationHelper.BusinessCoreLayer.Facade;
 using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
@@ -11,12 +12,12 @@ public class DataSpecificationService(
 	ILogger<DataSpecificationService> logger,
 	IDataspecerConnector dataspecerConnector,
 	IRdfProcessor rdfProcessor,
-	EntityFrameworkPlaceholder entityFrameworkPlaceholder) : IDataSpecificationService
+	AppDbContext appDbContext) : IDataSpecificationService
 {
 	private readonly ILogger<DataSpecificationService> _logger = logger;
 	private readonly IDataspecerConnector _dataspecerConnector = dataspecerConnector;
 	private readonly IRdfProcessor _rdfProcessor = rdfProcessor;
-	private readonly EntityFrameworkPlaceholder _database = entityFrameworkPlaceholder;
+	private readonly AppDbContext _database = appDbContext;
 
 	public async Task<DataSpecification> ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
 	{
@@ -36,12 +37,13 @@ public class DataSpecificationService(
 		_logger.LogDebug(owl);
 		DataSpecification dataSpecification = new DataSpecification()
 		{
-			Name = (userGivenName != null ? userGivenName : "Todo: Give it the Dataspecer package name"),
+			Name = (userGivenName != null ? userGivenName : "Unnamed specification"),
 			Iri = dataspecerPackageIri,
 			Owl = owl
 		};
 
-		_database.Save(dataSpecification);
+		_database.DataSpecifications.Add(dataSpecification);
+		_database.SaveChanges();
 		return dataSpecification;
 	}
 
@@ -68,7 +70,7 @@ public class DataSpecificationService(
 
 	public DataSpecification? GetDataSpecificationByIri(string dataSpecificationIri)
 	{
-		return _database.FindDataSpecificationByIri(dataSpecificationIri);
+		return _database.DataSpecifications.Single(dataSpec => dataSpec.Iri == dataSpecificationIri);
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)

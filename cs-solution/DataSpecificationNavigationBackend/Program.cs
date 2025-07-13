@@ -9,6 +9,7 @@ using DataspecNavigationHelper.BusinessCoreLayer.Facade;
 using DataspecNavigationHelper.ConnectorsLayer;
 using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -151,17 +152,27 @@ app.MapPost("/conversations",
 		return operation;
 	});
 
+app.MapDelete("/conversations/{conversationId}",
+				([FromRoute] int conversationId,
+				IConversationController controller) => controller.DeleteConversation(conversationId));
+
 app.MapPost("/ef-test/conversations",
 				([FromBody] PostConversationsDTO payload,
 				IConversationController controller) => controller.StartEfTestConversation(payload));
 
 app.MapPost("/ef-test/data-specifications",
 				([FromBody] PostDataSpecificationsDTO payload,
-				IConversationController controller) => controller.AddEfTestDataSpecification(payload));
+				IDataSpecificationController controller) => controller.AddEfTestDataSpecification(payload));
 
 app.MapGet("/ef-test/data-specifications", (AppDbContext database) =>
 {
 	return Results.Ok(database.DataSpecifications.ToList());
+});
+
+app.MapDelete("ef-test/data-specifications", async (AppDbContext database) =>
+{
+	int rows = await database.DataSpecifications.ExecuteDeleteAsync();
+	return Results.Ok($"Deleted {rows} data specifications.");
 });
 
 app.Run();

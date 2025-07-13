@@ -5,13 +5,13 @@ namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
 
 public interface IConversationController
 {
-	IResult StartConversation(PostConversationsDTO payload);
-	IResult GetOngoingConversations();
+	Task<IResult> StartConversation(PostConversationsDTO payload);
+	Task<IResult> GetOngoingConversations();
 	IResult GetConversation(int conversationId);
 	IResult GetConversationMessages(int conversationId);
 	IResult GetMessage(int conversationId, int messageId);
 	IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload);
+	Task<IResult> DeleteConversation(int conversationId);
 
 	IResult StartEfTestConversation(PostConversationsDTO payload);
-	IResult AddEfTestDataSpecification(PostDataSpecificationsDTO payload);
 }

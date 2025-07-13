@@ -162,3 +162,17 @@ Dále přidat interface PromptConstructor a ResponseProcessor do interface LlmCo
 Front end skeleton funguje.
 Gemini ani ChatGPT nezobrazují timestamp. Pro moje účely to taky není důležité, takže to nejspíše zahodím.
 Nesmažu, ale jen zakomentuju timestampy. Kdybych v budoucnu náhodou potřeboval.
+
+## 13. 7. 2025
+
+Proces vytvoření nové konverzace je rozdělený do dvou kroků:
+1. POST data-specifications
+2. POST conversations, kam předám IRI (nebo possibly ID) nově vytvořené specifikace v kroku 1.
+Ale mohl bych to sjednotit.
+- Když POST conversations dostane IRI, tak si vyhledá v databázi.
+- Pokud tam není data specification, tak založí novou.
+- Jinak použije stávající specifikaci pro novou konverzaci.
+
+Uživatel zadá potřebné věci a klikne na vytvořit.
+Front end zobrazí nějaký loading, třeba točící se kolečko.
+Back end bude logovat každý krok pro případný debugging.

@@ -6,7 +6,7 @@ public class Conversation
 
 	public string Title { get; set; } = "Unnamed conversation";
 
-	public required DataSpecification DataSpecification { get; set; }
+	public DataSpecification DataSpecification { get; set; }
 
 	public List<Message> Messages { get; set; } = [];
 

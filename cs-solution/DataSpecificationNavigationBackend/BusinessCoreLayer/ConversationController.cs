@@ -17,21 +17,58 @@ public class ConversationController(
 {
 	private readonly IConversationService _conversationService = conversationService;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
-	private readonly AppDbContext _database = appDbContext;
+	private readonly AppDbContext _database = appDbContext; // Only for mocks.
 
-	public IResult StartConversation(PostConversationsDTO payload)
+	public async Task<IResult> StartConversation(PostConversationsDTO payload)
 	{
-		DataSpecification? dataSpecification = _dataSpecificationService.GetDataSpecificationByIri(payload.DataSpecificationIri);
+		/*DataSpecification? dataSpecification = _dataSpecificationService.GetDataSpecificationByIri(payload.DataSpecificationIri);
 		if (dataSpecification == null)
 		{
 			return Results.NotFound(new Error { Reason = $"Data specification with IRI {payload.DataSpecificationIri} not found." });
 		}
 
 		Conversation conversation = _conversationService.StartNewConversation(payload.ConversationTitle, dataSpecification);
-		return Results.Ok((ConversationDTO)conversation);
+		return Results.Ok((ConversationDTO)conversation);*/
+
+		// Check if there is a data specification with the given IRI.
+		// If not, call a method on _dataSpecificationService, which will get it from Dataspecer.
+		// now create a new conversation.
+
+		// Mock.
+		try
+		{
+			DataSpecification? dataSpecification = await _database.DataSpecifications.SingleOrDefaultAsync(ds => ds.Iri == payload.DataSpecificationIri);
+			if (dataSpecification == null)
+			{
+				dataSpecification = new()
+				{
+					Iri = payload.DataSpecificationIri,
+					Name = payload.DataSpecificationName,
+					Owl = "Some mock OWL value."
+				};
+				_database.DataSpecifications.Add(dataSpecification);
+			}
+
+			Conversation conversation = new()
+			{
+				DataSpecification = dataSpecification,
+				LastUpdated = DateTime.Now,
+				Title = payload.ConversationTitle,
+				Messages = []
+			};
+			_database.Conversations.Add(conversation);
+			_database.SaveChanges();
+
+			return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+			return Results.InternalServerError(ex.Message);
+		}
 	}
 
-	public IResult GetOngoingConversations()
+	public async Task<IResult> GetOngoingConversations()
 	{
 		/*IReadOnlyList<Conversation> conversations = _conversationService.GetOngoingConversations();
 		return Results.Ok(
@@ -39,12 +76,9 @@ public class ConversationController(
 		);*/
 
 		// Mock conversations
-		List<ConversationDTO> conversations = [
-			new ConversationDTO(1, "Conversation one", "specification one", DateTime.Now.AddDays(-2)),
-			new ConversationDTO(2, "Mock convo 2", "Some data spec 2", DateTime.Now.AddDays(-1)),
-			new ConversationDTO(3, "Convo three", "Data specification three", DateTime.Now)
-		];
-		return Results.Ok(conversations);
+		List<Conversation> conversations = await _database.Conversations.Include(c => c.DataSpecification).ToListAsync();
+		List<ConversationDTO> result = conversations.Select(c => (ConversationDTO)c).ToList();
+		return Results.Ok(result);
 	}
 
 	public IResult GetConversation(int conversationId)
@@ -172,16 +206,16 @@ public class ConversationController(
 		return Results.Created($"/ef-test/conversations/{conversation.Id}", conversation);
 	}
 
-	public IResult AddEfTestDataSpecification(PostDataSpecificationsDTO payload)
+	public async Task<IResult> DeleteConversation(int conversationId)
 	{
-		DataSpecification ds = new DataSpecification()
+		Conversation? conversation = await _database.Conversations.SingleOrDefaultAsync(c => c.Id == conversationId);
+		if (conversation is null)
 		{
-			Iri = payload.DataspecerPackageIri,
-			Name = payload.Name != null ? payload.Name : "Unnamed data specification",
-			Owl = "owl placeholder"
-		};
-		_database.DataSpecifications.Add(ds);
+			return Results.NotFound($"Conversation with ID {conversationId} not found.");
+		}
+
+		_database.Conversations.Remove(conversation);
 		_database.SaveChanges();
-		return Results.Created($"/ef-test/data-specifications/{ds.Id}", ds);
+		return Results.NoContent();
 	}
 }
