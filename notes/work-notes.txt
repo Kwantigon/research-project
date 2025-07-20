@@ -169,10 +169,25 @@ Proces vytvoření nové konverzace je rozdělený do dvou kroků:
 1. POST data-specifications
 2. POST conversations, kam předám IRI (nebo possibly ID) nově vytvořené specifikace v kroku 1.
 Ale mohl bych to sjednotit.
-- Když POST conversations dostane IRI, tak si vyhledá v databázi.
+- Když POST conversations dostane IRI, tak ConversationService se zeptá DataSpecificationService, jestli zná to IRI.
 - Pokud tam není data specification, tak založí novou.
 - Jinak použije stávající specifikaci pro novou konverzaci.
 
 Uživatel zadá potřebné věci a klikne na vytvořit.
 Front end zobrazí nějaký loading, třeba točící se kolečko.
 Back end bude logovat každý krok pro případný debugging.
+
+## 20. 7.
+
+Třídy ve složce Model už mám asi v pohodě pro entity framework. Teď začnu nahrazovat mocky.
+Dataspecer connector hází chyby.
+- Jeden package nelze vůbec stáhnout.
+- Jiný package asi zase má divný formát Turtlu.
+- Budu to muset probrat se Štěpánem.
+
+Když namockuju konektor, tak konverzaci už vytvořím v pohodě.
+Zprávy taky dokážu vytáhnout z databáze a vrátit.
+
+Teď musím implementovat samotné zpracování nových zpráv.
+
+Musím taky přidat podporu pro suggested message do front endu.

@@ -1,12 +1,13 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
-using DataspecNavigationHelper.BusinessCoreLayer.Facade;
-using DataspecNavigationHelper.ConnectorsLayer;
-using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
-using DataspecNavigationHelper.Model;
+using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataspecNavigationBackend.BusinessCoreLayer.Facade;
+using DataspecNavigationBackend.ConnectorsLayer;
+using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
+using DataspecNavigationBackend.Model;
+using Microsoft.EntityFrameworkCore;
 using VDS.RDF;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer;
+namespace DataspecNavigationBackend.BusinessCoreLayer;
 
 public class DataSpecificationService(
 	ILogger<DataSpecificationService> logger,
@@ -19,13 +20,13 @@ public class DataSpecificationService(
 	private readonly IRdfProcessor _rdfProcessor = rdfProcessor;
 	private readonly AppDbContext _database = appDbContext;
 
-	public async Task<DataSpecification> ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
+	public async Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName)
 	{
-		string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageIri);
+		/*string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageUuid);
 		if (string.IsNullOrEmpty(dsv))
 		{
 			_logger.LogError("The exported package DSV is either null or empty.");
-			throw new Exception("Exported DSV is null or empty.");
+			return null;
 		}
 		_logger.LogDebug("Exported DSV:\n{Content}", dsv);
 
@@ -37,40 +38,30 @@ public class DataSpecificationService(
 		_logger.LogDebug(owl);
 		DataSpecification dataSpecification = new DataSpecification()
 		{
-			Name = (userGivenName != null ? userGivenName : "Unnamed specification"),
-			Iri = dataspecerPackageIri,
-			Owl = owl
+			DataspecerPackageUuid = dataspecerPackageUuid,
+			Name = dataspecerPackageName,
+			Owl = owl,
 		};
 
-		_database.DataSpecifications.Add(dataSpecification);
-		_database.SaveChanges();
+		await _database.DataSpecifications.AddAsync(dataSpecification);
+		await _database.SaveChangesAsync();
+		return dataSpecification;*/
+
+		DataSpecification dataSpecification = new DataSpecification()
+		{
+			DataspecerPackageUuid = dataspecerPackageUuid,
+			Name = dataspecerPackageName,
+			Owl = "Mock OWL value",
+		};
+
+		await _database.DataSpecifications.AddAsync(dataSpecification);
+		await _database.SaveChangesAsync();
 		return dataSpecification;
 	}
 
-	/*
-	 * Tuto metodu použiju, pokud z Dataspeceru exportuju DSVčko.
-	 * Momentálně ale exportuju json-ld a nijak to nezprácovávám, takže tuto metodu zakomentuju
-	 * a použiju možná někdy později.
-	 */
-	/*public DataSpecification ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName)
+	public async Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId)
 	{
-		string dsv = _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageIri);
-		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
-		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
-		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
-		DataSpecification dataSpecification = new DataSpecification()
-		{
-			Name = (userGivenName != null ? userGivenName : "Todo: Give it the Dataspecer package name"),
-			Iri = dataspecerPackageIri,
-			Owl = owl
-		};
-		_database.Save(dataSpecification);
-		return dataSpecification;
-	}*/
-
-	public DataSpecification? GetDataSpecificationByIri(string dataSpecificationIri)
-	{
-		return _database.DataSpecifications.Single(dataSpec => dataSpec.Iri == dataSpecificationIri);
+		return await _database.DataSpecifications.SingleOrDefaultAsync(dataSpec => dataSpec.Id == dataSpecificationId);
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)

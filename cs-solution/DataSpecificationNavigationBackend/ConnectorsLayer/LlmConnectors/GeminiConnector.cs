@@ -1,5 +1,5 @@
-﻿using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
-using DataspecNavigationHelper.Model;
+﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
+using DataspecNavigationBackend.Model;
 using GenerativeAI;
 using GenerativeAI.Types;
 using System.Diagnostics.CodeAnalysis;

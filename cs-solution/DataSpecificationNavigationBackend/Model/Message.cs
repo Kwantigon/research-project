@@ -1,23 +1,26 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DataspecNavigationHelper.Model;
+namespace DataspecNavigationBackend.Model;
 
 public class Message
 {
-	[JsonPropertyName("id")]
-	public int Id { get; set; } // Should be automatically assigned by the database.
+	public Guid Id { get; set; }
 
-	[JsonPropertyName("type")]
 	public MessageType Type { get; set; }
 
-	[JsonPropertyName("text")]
-	public required string TextValue { get; set; }
+	public string TextValue { get; set; } = string.Empty;
 
-	[JsonPropertyName("timestamp")]
 	public DateTime TimeStamp { get; set; }
 
-	[JsonPropertyName("relatedItems")]
 	public List<DataSpecificationItem>? RelatedItems { get; set; }
+
+	public int ConversationId { get; set; }
+
+	public required virtual Conversation Conversation { get; set; }
+
+	public Guid? ReplyMessageId { get; set; }
+
+	public Message? ReplyMessage { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]

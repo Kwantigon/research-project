@@ -1,9 +1,9 @@
-﻿using DataspecNavigationHelper.Model;
+﻿using DataspecNavigationBackend.Model;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IDataSpecificationService
 {
-	Task<DataSpecification> ExportDataSpecificationFromDataspecer(string dataspecerPackageIri, string? userGivenName);
-	DataSpecification? GetDataSpecificationByIri(string dataSpecificationIri);
+	Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName);
+	Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId);
 }

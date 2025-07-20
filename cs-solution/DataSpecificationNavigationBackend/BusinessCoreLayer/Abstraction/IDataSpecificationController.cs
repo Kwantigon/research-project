@@ -1,11 +1,11 @@
-﻿using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+﻿using DataspecNavigationBackend.BusinessCoreLayer.DTO;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IDataSpecificationController
 {
 	Task<IResult> ProcessDataspecerPackage(PostDataSpecificationsDTO payload);
 
 
-	Task<IResult> AddEfTestDataSpecification(PostDataSpecificationsDTO payload);
+	//Task<IResult> AddEfTestDataSpecification(PostDataSpecificationsDTO payload);
 }

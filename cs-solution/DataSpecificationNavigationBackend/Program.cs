@@ -2,12 +2,12 @@
 using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
-using DataspecNavigationHelper.BusinessCoreLayer;
-using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
-using DataspecNavigationHelper.BusinessCoreLayer.DTO;
-using DataspecNavigationHelper.BusinessCoreLayer.Facade;
-using DataspecNavigationHelper.ConnectorsLayer;
-using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
+using DataspecNavigationBackend.BusinessCoreLayer;
+using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataspecNavigationBackend.BusinessCoreLayer.DTO;
+using DataspecNavigationBackend.BusinessCoreLayer.Facade;
+using DataspecNavigationBackend.ConnectorsLayer;
+using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -73,7 +73,7 @@ app.MapGet("/conversations",
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get all ongoing conversations.";
-		endpoint.Description = "Front end calls this to display all conversations in the conversations management tab. The front end will show the title of each conversation and when the user expands the conversation, they will see more information about it.";
+		endpoint.Description = "Front end calls this to display all conversations in the conversations management tab.";
 		return endpoint;
 	});
 
@@ -87,7 +87,7 @@ app.MapGet("/conversations/{conversationId}",
 	});
 
 app.MapGet("/conversations/{conversationId}/messages",
-			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationMessages(conversationId))
+			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationMessagesAsync(conversationId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get all messages in the conversation.";
@@ -96,8 +96,8 @@ app.MapGet("/conversations/{conversationId}/messages",
 	});
 
 app.MapGet("/conversations/{conversationId}/messages/{messageId}",
-			([FromRoute] int conversationId, [FromRoute] int messageId,
-			IConversationController controller) => controller.GetMessage(conversationId, messageId))
+			([FromRoute] int conversationId, [FromRoute] Guid messageId,
+			IConversationController controller) => controller.GetMessageAsync(conversationId, messageId))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Get the concrete message from a conversation.";
@@ -108,7 +108,7 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 app.MapPost("/conversations/{conversationId}/messages",
 				([FromRoute] int conversationId,
 				[FromBody] PostConversationMessagesDTO payload,
-				IConversationController controller) => controller.ProcessUserMessage(conversationId, payload))
+				IConversationController controller) => controller.ProcessUserMessageAsync(conversationId, payload))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Add a message to the conversation.";
@@ -116,22 +116,6 @@ app.MapPost("/conversations/{conversationId}/messages",
 		return operation;
 	});
 
-/*
- * Po získání Dataspecer package budu potřebovat vrátit nějaký redirect nebo něco.
- * V Dataspecer manager kliknu na tlačítko, které pošle IRI package sem a zároveň mě to musí
- * vzít do front end mé aplikace, kde po načtení Dataspecer package můžu rovnou chatovat.
- * 
- * Dejme tomu, že Štěpán implementuje do Dataspeceru to tlačítko, že pošle POST /data-specifications a přesměruje uživatele.
- * Ale kam má uživatele přesměrovat?
- * Tzn. musím přidat další endpoint, který počká na načtení package a pak začne konverzaci.
- * Nebo to nějak vhodně implementovat do endpointu POST /conversations (ten tu ještě nemám).
- * 
- * Udělám to asi tak, že Štěpán implementuje to tlačítko. To tlačítko pošle IRI package na front end a přesměruje.
- * Front end vezme to package IRI a pošle POST /data-specifications na back end.
- * Až back end vrátí odpověď OK, tak front end pokračuje voláním POST /conversations.
- * 
- * Mezitím co to probíhá front end zobrazí točící kolečko, aby uživatel věděl, že něco načítá.
- */
 app.MapPost("/data-specifications",
 				([FromBody] PostDataSpecificationsDTO payload,
 				IDataSpecificationController controller) => controller.ProcessDataspecerPackage(payload))
@@ -154,9 +138,9 @@ app.MapPost("/conversations",
 
 app.MapDelete("/conversations/{conversationId}",
 				([FromRoute] int conversationId,
-				IConversationController controller) => controller.DeleteConversation(conversationId));
+				IConversationController controller) => controller.DeleteConversationAsync(conversationId));
 
-app.MapPost("/ef-test/conversations",
+/*app.MapPost("/ef-test/conversations",
 				([FromBody] PostConversationsDTO payload,
 				IConversationController controller) => controller.StartEfTestConversation(payload));
 
@@ -173,6 +157,6 @@ app.MapDelete("ef-test/data-specifications", async (AppDbContext database) =>
 {
 	int rows = await database.DataSpecifications.ExecuteDeleteAsync();
 	return Results.Ok($"Deleted {rows} data specifications.");
-});
+});*/
 
 app.Run();

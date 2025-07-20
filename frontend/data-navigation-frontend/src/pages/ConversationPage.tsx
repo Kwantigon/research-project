@@ -84,7 +84,7 @@ function ConversationPage() {
 
 		const messageToSend = suggestedMessage || currentMessage;
 		const userMessage: Message = {
-				id: `UserMessage-${new Date().toLocaleString()}`, // ID is generated on the back end. Will be set later.
+				id: "TBD", // ID is generated on the back end. Will be set later.
 				type: "UserMessage",
 				text: messageToSend,
 				timestamp: new Date().toLocaleString()

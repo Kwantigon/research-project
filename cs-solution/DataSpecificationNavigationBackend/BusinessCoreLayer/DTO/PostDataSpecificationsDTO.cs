@@ -1,3 +1,3 @@
-﻿namespace DataspecNavigationHelper.BusinessCoreLayer.DTO;
+﻿namespace DataspecNavigationBackend.BusinessCoreLayer.DTO;
 
-public record PostDataSpecificationsDTO(string DataspecerPackageIri, string? Name);
+public record PostDataSpecificationsDTO(string DataspecerPackageUuid, string Name);

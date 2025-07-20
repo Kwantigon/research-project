@@ -1,4 +1,4 @@
-﻿namespace DataspecNavigationHelper.BusinessCoreLayer;
+﻿namespace DataspecNavigationBackend.BusinessCoreLayer;
 
 public class Error
 {

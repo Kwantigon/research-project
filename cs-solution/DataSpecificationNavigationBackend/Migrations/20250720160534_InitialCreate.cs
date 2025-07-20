@@ -17,8 +17,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    DataspecerPackageUuid = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Iri = table.Column<string>(type: "TEXT", nullable: false),
                     Owl = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -51,12 +51,11 @@ namespace DataSpecificationNavigationBackend.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     TextValue = table.Column<string>(type: "TEXT", nullable: false),
                     TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ConversationId = table.Column<int>(type: "INTEGER", nullable: true)
+                    ConversationId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,7 +64,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                         name: "FK_Messages_Conversations_ConversationId",
                         column: x => x.ConversationId,
                         principalTable: "Conversations",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,14 +73,21 @@ namespace DataSpecificationNavigationBackend.Migrations
                 columns: table => new
                 {
                     Iri = table.Column<string>(type: "TEXT", nullable: false),
+                    DataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
                     Label = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Summary = table.Column<string>(type: "TEXT", nullable: true),
-                    MessageId = table.Column<int>(type: "INTEGER", nullable: true)
+                    MessageId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSpecificationItems", x => x.Iri);
+                    table.PrimaryKey("PK_DataSpecificationItems", x => new { x.Iri, x.DataSpecificationId });
+                    table.ForeignKey(
+                        name: "FK_DataSpecificationItems_DataSpecifications_DataSpecificationId",
+                        column: x => x.DataSpecificationId,
+                        principalTable: "DataSpecifications",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DataSpecificationItems_Messages_MessageId",
                         column: x => x.MessageId,
@@ -91,6 +98,11 @@ namespace DataSpecificationNavigationBackend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Conversations_DataSpecificationId",
                 table: "Conversations",
+                column: "DataSpecificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSpecificationItems_DataSpecificationId",
+                table: "DataSpecificationItems",
                 column: "DataSpecificationId");
 
             migrationBuilder.CreateIndex(

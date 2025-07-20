@@ -46,7 +46,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Iri")
+                    b.Property<string>("DataspecerPackageUuid")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -66,55 +66,51 @@ namespace DataSpecificationNavigationBackend.Migrations
             modelBuilder.Entity("DataspecNavigationHelper.Model.DataSpecificationItem", b =>
                 {
                     b.Property<string>("Iri")
-                        .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "iri");
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DataSpecificationId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "label");
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("MessageId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid?>("MessageId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Summary")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER")
-                        .HasAnnotation("Relational:JsonPropertyName", "type");
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Iri");
+                    b.HasKey("Iri", "DataSpecificationId");
+
+                    b.HasIndex("DataSpecificationId");
 
                     b.HasIndex("MessageId");
 
                     b.ToTable("DataSpecificationItems");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "relatedItems");
                 });
 
             modelBuilder.Entity("DataspecNavigationHelper.Model.Message", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasAnnotation("Relational:JsonPropertyName", "id");
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("ConversationId")
+                    b.Property<int>("ConversationId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TextValue")
                         .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "timestamp");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER")
-                        .HasAnnotation("Relational:JsonPropertyName", "type");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -136,16 +132,28 @@ namespace DataSpecificationNavigationBackend.Migrations
 
             modelBuilder.Entity("DataspecNavigationHelper.Model.DataSpecificationItem", b =>
                 {
+                    b.HasOne("DataspecNavigationHelper.Model.DataSpecification", "DataSpecification")
+                        .WithMany()
+                        .HasForeignKey("DataSpecificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DataspecNavigationHelper.Model.Message", null)
                         .WithMany("RelatedItems")
                         .HasForeignKey("MessageId");
+
+                    b.Navigation("DataSpecification");
                 });
 
             modelBuilder.Entity("DataspecNavigationHelper.Model.Message", b =>
                 {
-                    b.HasOne("DataspecNavigationHelper.Model.Conversation", null)
+                    b.HasOne("DataspecNavigationHelper.Model.Conversation", "Conversation")
                         .WithMany("Messages")
-                        .HasForeignKey("ConversationId");
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
                 });
 
             modelBuilder.Entity("DataspecNavigationHelper.Model.Conversation", b =>

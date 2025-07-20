@@ -1,8 +1,8 @@
-﻿using DataspecNavigationHelper.ConnectorsLayer.Abstraction;
+﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using System.IO.Compression;
 using System.Net.Http;
 
-namespace DataspecNavigationHelper.ConnectorsLayer;
+namespace DataspecNavigationBackend.ConnectorsLayer;
 
 public class DataspecerConnector(
 	ILogger<DataspecerConnector> logger) : IDataspecerConnector
@@ -16,8 +16,16 @@ public class DataspecerConnector(
 	public async Task<string?> ExportPackageDocumentation(string packageIri)
 	{
 		string uri = DATASPECER_DOWNLOAD_DOCUMENTATION_ENDPOINT + packageIri;
-		//_logger.LogDebug("Downloading the Dataspecer package documentation from the URI: {URI}.", uri);
-		byte[] data = await _httpClient.GetByteArrayAsync(uri);
+		_logger.LogDebug("Downloading the Dataspecer package documentation from the URI: {URI}.", uri);
+		HttpResponseMessage response = await _httpClient.GetAsync(uri);
+		if (!response.IsSuccessStatusCode)
+		{
+			_logger.LogError("Failed to download Dataspecer package documentation. Response code = {ResponseCode}", response.StatusCode);
+			string body = await response.Content.ReadAsStringAsync();
+			_logger.LogError("Response body:\n{Body}", body);
+			return null;
+		}
+		byte[] data = await response.Content.ReadAsByteArrayAsync();
 
 		const string zipFilePath = "./documentation.zip";
 		File.WriteAllBytes(zipFilePath, data);

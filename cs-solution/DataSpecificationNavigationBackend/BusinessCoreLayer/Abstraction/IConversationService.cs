@@ -1,11 +1,14 @@
-﻿using DataspecNavigationHelper.Model;
+﻿using DataspecNavigationBackend.Model;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IConversationService
 {
-	Conversation StartNewConversation(string? conversationTitle, DataSpecification dataSpecification);
-	IReadOnlyList<Conversation> GetOngoingConversations();
-	Conversation? GetConversation(int conversationId);
-	Message AddUserMessage(int conversationId, DateTime timeStamps, string message);
+	Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification);
+
+	Task<IReadOnlyList<Conversation>> GetAllConversationsAsync();
+
+	Task<Conversation?> GetConversationAsync(int conversationId, bool includeMessages = false);
+
+	Task<Message> AddNewUserMessage(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage);
 }

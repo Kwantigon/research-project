@@ -1,30 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace DataspecNavigationHelper.Model;
+namespace DataspecNavigationBackend.Model;
 
+[PrimaryKey(nameof(Iri), nameof(DataSpecificationId))]
 public class DataSpecificationItem
 {
-	[JsonConstructor]
-	public DataSpecificationItem(string iri, string label, ItemType type, string? summary = null)
-	{
-		Iri = iri;
-		Label = label;
-		Type = type;
-		Summary = summary;
-	}
+	public required string Iri { get; set; }
 
-	[Key]
-	[JsonPropertyName("iri")]
-	public string Iri { get; set; }
+	public required string Label { get; set; }
 
-	[JsonPropertyName("label")]
-	public string Label { get; set; }
-
-	[JsonPropertyName("type")]
 	public ItemType Type { get; set; }
 
 	public string? Summary { get; set; }
+
+	public int DataSpecificationId { get; set; }
+
+	public required virtual DataSpecification DataSpecification { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]

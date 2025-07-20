@@ -1,12 +1,14 @@
-﻿namespace DataspecNavigationHelper.Model;
+﻿namespace DataspecNavigationBackend.Model;
 
 public class Conversation
 {
 	public int Id { get; set; }
 
-	public string Title { get; set; } = "Unnamed conversation";
+	public required string Title { get; set; }
 
-	public DataSpecification DataSpecification { get; set; }
+	public int DataSpecificationId { get; set; }
+
+	public required virtual DataSpecification DataSpecification { get; set; }
 
 	public List<Message> Messages { get; set; } = [];
 

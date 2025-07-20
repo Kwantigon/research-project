@@ -1,11 +1,11 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
-using DataspecNavigationHelper.BusinessCoreLayer.DTO;
-using DataspecNavigationHelper.Model;
+using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataspecNavigationBackend.BusinessCoreLayer.DTO;
+using DataspecNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer;
+namespace DataspecNavigationBackend.BusinessCoreLayer;
 
 /// <summary>
 /// Converts the results of <see cref="IConversationService""/> to HTTP responses.
@@ -21,70 +21,27 @@ public class ConversationController(
 
 	public async Task<IResult> StartConversation(PostConversationsDTO payload)
 	{
-		/*DataSpecification? dataSpecification = _dataSpecificationService.GetDataSpecificationByIri(payload.DataSpecificationIri);
-		if (dataSpecification == null)
+		DataSpecification? dataSpecification = await _dataSpecificationService.ExportDataSpecificationFromDataspecerAsync(payload.DataspecerPackageUuid, payload.DataspecerPackageName);
+		if (dataSpecification is null)
 		{
-			return Results.NotFound(new Error { Reason = $"Data specification with IRI {payload.DataSpecificationIri} not found." });
+			return Results.InternalServerError(new Error() { Reason = "There was an error while retrieving and processing the Dataspecer package." });
 		}
-
-		Conversation conversation = _conversationService.StartNewConversation(payload.ConversationTitle, dataSpecification);
-		return Results.Ok((ConversationDTO)conversation);*/
-
-		// Check if there is a data specification with the given IRI.
-		// If not, call a method on _dataSpecificationService, which will get it from Dataspecer.
-		// now create a new conversation.
-
-		// Mock.
-		try
-		{
-			DataSpecification? dataSpecification = await _database.DataSpecifications.SingleOrDefaultAsync(ds => ds.Iri == payload.DataSpecificationIri);
-			if (dataSpecification == null)
-			{
-				dataSpecification = new()
-				{
-					Iri = payload.DataSpecificationIri,
-					Name = payload.DataSpecificationName,
-					Owl = "Some mock OWL value."
-				};
-				_database.DataSpecifications.Add(dataSpecification);
-			}
-
-			Conversation conversation = new()
-			{
-				DataSpecification = dataSpecification,
-				LastUpdated = DateTime.Now,
-				Title = payload.ConversationTitle,
-				Messages = []
-			};
-			_database.Conversations.Add(conversation);
-			_database.SaveChanges();
-
-			return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-			return Results.InternalServerError(ex.Message);
-		}
+		Conversation conversation = await _conversationService.StartNewConversationAsync(payload.ConversationTitle, dataSpecification);
+		return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
 	}
 
 	public async Task<IResult> GetOngoingConversations()
 	{
-		/*IReadOnlyList<Conversation> conversations = _conversationService.GetOngoingConversations();
+		IReadOnlyList<Conversation> conversations = await _conversationService.GetAllConversationsAsync();
 		return Results.Ok(
-			conversations.Select(conversation => (ConversationDTO)conversation)
-		);*/
-
-		// Mock conversations
-		List<Conversation> conversations = await _database.Conversations.Include(c => c.DataSpecification).ToListAsync();
-		List<ConversationDTO> result = conversations.Select(c => (ConversationDTO)c).ToList();
-		return Results.Ok(result);
+			conversations.Select(conv => (ConversationDTO)conv)
+		);
 	}
 
-	public IResult GetConversation(int conversationId)
+	public async Task<IResult> GetConversation(int conversationId)
 	{
-		Conversation? conversation = _conversationService.GetConversation(conversationId);
-		if (conversation == null)
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
+		if (conversation is null)
 		{
 			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
 		}
@@ -92,64 +49,22 @@ public class ConversationController(
 		return Results.Ok((ConversationDTO)conversation);
 	}
 
-	public IResult GetConversationMessages(int conversationId)
+	public async Task<IResult> GetConversationMessagesAsync(int conversationId)
 	{
-		/*Conversation? conversation = _conversationService.GetConversation(conversationId);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
 		if (conversation == null)
 		{
 			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
-		return Results.Ok(conversation.Messages);*/
-
-		// Mock messages
-		List<Message> messages = [
-			new Message()
-			{
-				Id = 0,
-				Type = MessageType.WelcomeMessage,
-				TextValue = "Mock welcome message",
-				TimeStamp = DateTime.Now
-			},
-			new Message()
-			{
-				Id = 1,
-				Type = MessageType.UserMessage,
-				TextValue = "Hello there (from user)",
-				TimeStamp = DateTime.Now
-			},
-			new Message()
-			{
-				Id = 2,
-				Type = MessageType.ReplyMessage,
-				TextValue = "Hi (reply from system)",
-				TimeStamp = DateTime.Now,
-				RelatedItems = [
-					new DataSpecificationItem("http://example.com/class-item", "item of type class", ItemType.Class, "Mock summary for class item"),
-					new DataSpecificationItem("http://example.com/objectProperty-item", "item of type objectProperty", ItemType.ObjectProperty),
-					new DataSpecificationItem("http://example.com/datatypeProperty-item", "item of type datatypeProperty", ItemType.DatatypeProperty)
-				]
-			},
-			new Message()
-			{
-				Id = 3,
-				Type = MessageType.ReplyMessage,
-				TextValue = "Hi (reply from system)",
-				TimeStamp = DateTime.Now,
-				RelatedItems = [
-					new DataSpecificationItem("http://example.com/ab", "item of type class", ItemType.Class, "Mock summary for class item"),
-					new DataSpecificationItem("http://example.com/cc", "item of type objectProperty", ItemType.ObjectProperty),
-					new DataSpecificationItem("http://example.com/de", "item of type datatypeProperty", ItemType.DatatypeProperty)
-				]
-			}
-		];
-		Console.WriteLine("Returning messages.");
-		return Results.Ok(messages);
+		return Results.Ok(
+			conversation.Messages.Select(msg => (ConversationMessageDTO)msg)
+		);
 	}
 
-	public IResult GetMessage(int conversationId, int messageId)
+	public async Task<IResult> GetMessageAsync(int conversationId, Guid messageId)
 	{
-		Conversation? conversation = _conversationService.GetConversation(conversationId);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
 		if (conversation == null)
 		{
 			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
@@ -161,12 +76,26 @@ public class ConversationController(
 			return Results.NotFound(new Error { Reason = $"Message with ID {messageId} not found." });
 		}
 
-		return Results.Ok(message);
+		// Verify that the messageId matches the last element in the messages list.
+		// That should be the reply message that has to be processed.
+		if (conversation.Messages.Last() == message && message.TextValue == string.Empty)
+		{
+			// In this case, the reply message has not yet been generated.
+			// Todo: Generate the reply.
+		}
+
+		return Results.Ok((ConversationMessageDTO)message);
 	}
 
-	public IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload)
+	public async Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload)
 	{
-		Message userMessage = _conversationService.AddUserMessage(conversationId, payload.TimeStamp, payload.TextValue);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
+		if (conversation == null)
+		{
+			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
+		}
+
+		//Message userMessage = _conversationService.AddUserMessage(conversationId, payload.TimeStamp, payload.TextValue);
 
 		// Map the user's question to items from the data specification.
 
@@ -176,37 +105,27 @@ public class ConversationController(
 
 		// Create a reply message and add that message to the conversation. The reply message also contains the list of relevant items.
 
-		return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", userMessage);
+		//return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", userMessage);
+		return Results.Ok();
 		// Todo: Return "replyUri" as part of the answer so that the front end knows, what URI to query for the reply.
 	}
 
-	public IResult StartEfTestConversation(PostConversationsDTO payload)
+	/*public IResult StartEfTestConversation(PostConversationsDTO payload)
 	{
-		DataSpecification ds = _database.DataSpecifications.Single(spec => spec.Iri.Equals(payload.DataSpecificationIri));
+		DataSpecification ds = _database.DataSpecifications.Single(spec => spec.DataspecerPackageUuid.Equals(payload.DataspecerPackageUuid));
 		if (ds is null)
 		{
-			ds = new DataSpecification()
-			{
-				Iri = $"some-iri-{DateTime.Now.ToString()}",
-				Name = "mock",
-				Owl = "owl placeholder"
-			};
+			ds = new DataSpecification(0, $"some-iri-{DateTime.Now.ToString()}", "mock", "owl placeholder");
 			_database.DataSpecifications.Add(ds);
 		}
 
-		Conversation conversation = new()
-		{
-			DataSpecification = ds,
-			Messages = [],
-			Title = "mock convo",
-			LastUpdated = DateTime.Now
-		};
+		Conversation conversation = new(0, payload.ConversationTitle, ds.Id, ds, [], DateTime.Now);
 		_database.Conversations.Add(conversation);
 		_database.SaveChanges();
 		return Results.Created($"/ef-test/conversations/{conversation.Id}", conversation);
-	}
+	}*/
 
-	public async Task<IResult> DeleteConversation(int conversationId)
+	public async Task<IResult> DeleteConversationAsync(int conversationId)
 	{
 		Conversation? conversation = await _database.Conversations.SingleOrDefaultAsync(c => c.Id == conversationId);
 		if (conversation is null)

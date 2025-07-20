@@ -1,6 +1,6 @@
-﻿using DataspecNavigationHelper.Model;
+﻿using DataspecNavigationBackend.Model;
 
-namespace DataspecNavigationHelper.ConnectorsLayer;
+namespace DataspecNavigationBackend.ConnectorsLayer;
 
 public class EntityFrameworkPlaceholder
 {

@@ -1,10 +1,10 @@
-﻿using DataspecNavigationHelper.Model;
+﻿using DataspecNavigationBackend.Model;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer.DTO;
+namespace DataspecNavigationBackend.BusinessCoreLayer.DTO;
 
 public record ConversationDTO(int Id, string Title, string DataSpecificationName, DateTime LastUpdated)
 {
-	public static implicit operator ConversationDTO(Conversation conversation)
+	public static explicit operator ConversationDTO(Conversation conversation)
 	{
 		return new ConversationDTO(
 			conversation.Id,

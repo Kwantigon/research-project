@@ -1,4 +1,4 @@
-﻿namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+﻿namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface ISparqlTranslationService
 {

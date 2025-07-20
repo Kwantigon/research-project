@@ -33,25 +33,29 @@ function ConversationManagementPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	useEffect(() => {
-		const URL_PARAM_IRI = "iri";
-		const URL_PARAM_NO_CONVERSATION_SELECTED = "noConversationSelected";
+    const urlParamName_uuid = "uuid";
+    const urlParamName_packageName = "packageName";
+    const urlParamName_newConversation = "newConversation";
 
-    const iriFromUrl = searchParams.get(URL_PARAM_IRI);
+    const iriFromUrl = searchParams.get(urlParamName_uuid);
     if (iriFromUrl) {
       setNewConversationDataSpecIri(iriFromUrl);
-      setIsNewConversationDialogOpen(true);
-			searchParams.delete(URL_PARAM_IRI);
-      setSearchParams(searchParams);
-			return;
+			searchParams.delete(urlParamName_uuid);
+    }
+    
+    const dataSpecificationNameFromUrl = searchParams.get(urlParamName_packageName);
+    if (dataSpecificationNameFromUrl) {
+      setNewConversationDataSpecName(dataSpecificationNameFromUrl);
+      searchParams.delete(urlParamName_packageName);
     }
 
-		const noConversationSelected = searchParams.get(URL_PARAM_NO_CONVERSATION_SELECTED)
-		if (noConversationSelected === "true") {
-      setShowNoConversationSelectedMessage(true);
-      searchParams.delete(URL_PARAM_NO_CONVERSATION_SELECTED);
-      setSearchParams(searchParams);
-			return;
+    const newFromUrl = searchParams.get(urlParamName_newConversation);
+    if (newFromUrl && newFromUrl === "true") {
+      setIsNewConversationDialogOpen(true);
+      searchParams.delete(urlParamName_newConversation);
     }
+
+    setSearchParams(searchParams);
   }, [searchParams]);
 
 	const fetchConversations = async () => {
@@ -87,12 +91,11 @@ function ConversationManagementPage() {
 	const handleCreateNewConversation = async () => {
 		setIsCreatingConversation(true);
     setNewConversationError(null);
-    if (!newConversationDataSpecIri || !newConversationDataSpecName || !newConversationTitle) {
-      setNewConversationError('All fields are required.');
-      return;
-    }
-
     try {
+      if (!newConversationDataSpecIri || !newConversationDataSpecName || !newConversationTitle) {
+        throw new Error("Some fields are missing for conversation creation.");
+      }
+
       const response = await fetch(`${BACKEND_API_URL}/conversations`, {
         method: 'POST',
         headers: {
@@ -100,8 +103,8 @@ function ConversationManagementPage() {
         },
         body: JSON.stringify({
           conversationTitle: newConversationTitle,
-          dataSpecificationIri: newConversationDataSpecIri,
-          dataSpecificationName: newConversationDataSpecName
+          dataspecerPackageUuid: newConversationDataSpecIri,
+          dataspecerPackageName: newConversationDataSpecName
         })
       });
 			console.log(JSON.stringify({
@@ -236,7 +239,7 @@ function ConversationManagementPage() {
             )}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataspecerIRI" className="text-right">
-                Dataspecer package IRI
+                Dataspecer package UUID
               </Label>
               <Input
                 id="dataspecerIRI"
@@ -244,12 +247,12 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationDataSpecIri(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., 061e24ee-2cba-4c19-9510-7fe5278ae02c"
-								disabled={isCreatingConversation}
+								disabled={/* For debugging purposes I will enable this field */false}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataSpecName" className="text-right">
-                Data specification name
+                Dataspecer package name
               </Label>
               <Input
                 id="dataSpecName"
@@ -257,7 +260,7 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationDataSpecName(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., Badminton specification"
-								disabled={isCreatingConversation}
+								disabled={/* For debugging purposes I will enable this field */false}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

@@ -1,4 +1,4 @@
-﻿using DataspecNavigationHelper.BusinessCoreLayer.Facade;
+﻿using DataspecNavigationBackend.BusinessCoreLayer.Facade;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Writing;

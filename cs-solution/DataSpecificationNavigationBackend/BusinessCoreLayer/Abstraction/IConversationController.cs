@@ -1,17 +1,27 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
-using DataspecNavigationHelper.BusinessCoreLayer.DTO;
+using DataspecNavigationBackend.BusinessCoreLayer.DTO;
 
-namespace DataspecNavigationHelper.BusinessCoreLayer.Abstraction;
+namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IConversationController
 {
 	Task<IResult> StartConversation(PostConversationsDTO payload);
 	Task<IResult> GetOngoingConversations();
-	IResult GetConversation(int conversationId);
-	IResult GetConversationMessages(int conversationId);
-	IResult GetMessage(int conversationId, int messageId);
-	IResult ProcessUserMessage(int conversationId, PostConversationMessagesDTO payload);
-	Task<IResult> DeleteConversation(int conversationId);
 
-	IResult StartEfTestConversation(PostConversationsDTO payload);
+	Task<IResult> GetConversation(int conversationId);
+
+	/// <summary>
+	/// Get messages in a conversation.
+	/// </summary>
+	/// <param name="conversationId">The ID of the conversation.</param>
+	/// <returns>All messages in the conversation ordered by their timestamps.</returns>
+	Task<IResult> GetConversationMessagesAsync(int conversationId);
+
+	Task<IResult> GetMessageAsync(int conversationId, Guid messageId);
+
+	Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload);
+
+	Task<IResult> DeleteConversationAsync(int conversationId);
+
+	//IResult StartEfTestConversation(PostConversationsDTO payload);
 }
