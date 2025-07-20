@@ -88,4 +88,14 @@ public class ConversationService(
 		// Todo: Possibly start doing stuff for the reply message here.
 		// Or wait until a GET request for the reply message is received.
 	}
+
+	public async Task<Message?> GenerateReplyMessage(Message userMessage)
+	{
+		if (userMessage.ReplyMessageId is null)
+		{
+			_logger.LogError("The ID of the reply message is null. User message ID is {ID}", userMessage.Id);
+			return null;
+		}
+
+	}
 }

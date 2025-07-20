@@ -80,11 +80,18 @@ public class ConversationController(
 		// That should be the reply message that has to be processed.
 		if (conversation.Messages.Last() == message && message.TextValue == string.Empty)
 		{
-			// In this case, the reply message has not yet been generated.
-			// Todo: Generate the reply.
-		}
+			// Todo: There is a bug here. The variable message contains the reply message, not the user message!.
+			Message? replyMessage = await _conversationService.GenerateReplyMessage(message);
+			if (replyMessage is null)
+			{
+				return Results.InternalServerError(new Error() { Reason = "An error occured while generating a reply." });
+			}
 
-		return Results.Ok((ConversationMessageDTO)message);
+			return Results.Ok((ConversationMessageDTO)replyMessage);
+		} else
+		{
+			return Results.Ok((ConversationMessageDTO)message);
+		}
 	}
 
 	public async Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload)
