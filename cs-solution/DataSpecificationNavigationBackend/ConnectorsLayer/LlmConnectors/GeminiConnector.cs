@@ -1,68 +1,148 @@
 ﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using DataspecNavigationBackend.Model;
 using GenerativeAI;
-using GenerativeAI.Types;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
 
-public class GeminiConnector(
-	ILogger<GeminiConnector> logger) : ILlmConnector
+public class GeminiConnector : ILlmConnector
 {
-	private readonly ILogger<GeminiConnector> _logger = logger;
-	private readonly PromptConstructor _promptConstructor = new(logger);
-	private readonly ResponseProcessor _responseProcessor = new(logger);
+	private readonly ILogger<GeminiConnector> _logger;
+	private readonly PromptConstructor _promptConstructor;
+	private readonly ResponseProcessor _responseProcessor;
 	private const int _retryAttempts = 3; // If the response processor fails to extract the necessary classes, retry the prompt this many times.
 	private string? _apiKey;
 	private string? _model;
 	private GenerativeModel? _gemini;
 
-	[MemberNotNull(nameof(_gemini))]
-	public void Initialize()
+	public GeminiConnector()
 	{
-		LoadLlmSettings();
+		_logger = LoggerFactory
+											.Create(config => config.SetMinimumLevel(LogLevel.Trace).AddConsole())
+											.CreateLogger<GeminiConnector>();
+		_promptConstructor = new(_logger);
+		_responseProcessor = new(_logger);
+		_apiKey = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/cs-solution/DataSpecificationNavigationBackend/local/gemini_api-key.txt");
+		_model = "models/gemini-2.5-flash";
 		GoogleAi googleAi = new(_apiKey);
 		_gemini = googleAi.CreateGenerativeModel(_model);
 	}
 
-	public List<DataSpecificationItem> MapQuestionToItems(DataSpecification dataSpecification, string question)
+	public async Task<List<DataSpecificationItem>> MapQuestionToItemsAsync(DataSpecification dataSpecification, string question)
 	{
-		int attempts = 0;
+		/*int attempts = 0;
 		List<DataSpecificationItem>? items = null;
 
 		while (attempts < _retryAttempts && items is null)
 		{
 			string prompt = _promptConstructor.CreateQuestionToItemsMappingPrompt(question, dataSpecification);
-			string response = SendPrompt(prompt);
-			items = _responseProcessor.ExtractDataSpecificationItems(response);
+			string response = await SendPromptAsync(prompt);
+			items = _responseProcessor.ExtractDataSpecificationItems(response, dataSpecification);
 			attempts++;
 		}
 		
 		if (items is null)
 		{
 			_logger.LogError("The data specification items list is still null after " + _retryAttempts + " attempts.");
-			throw new Exception("There was an error that prevented mapping data specification items to the question.");
+			throw new Exception("An error occurred while mapping the question to data specification items.");
 		}
-		return items;
+		return items;*/
+
+		// Mock
+		await Task.CompletedTask;
+		return [
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item one",
+				Summary = "AAAAAaaaaa",
+				Type = ItemType.Class
+			},
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item two",
+				Summary = "bbbbb",
+				Type = ItemType.DatatypeProperty
+			},
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item three",
+				Summary = "CCccCC",
+				Type = ItemType.ObjectProperty
+			}
+		];
 	}
 
-	private string SendPrompt(string prompt)
+	public async Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems)
+	{
+		/*int attempts = 0;
+		List<DataSpecificationItem>? relatedItems = null;
+
+		while (attempts < _retryAttempts && relatedItems is null)
+		{
+			string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, mappedItems);
+			string response = await SendPromptAsync(prompt);
+			relatedItems = _responseProcessor.ExtractRelatedItems(response, dataSpecification);
+			attempts++;
+		}
+
+		if (relatedItems is null)
+		{
+			_logger.LogError("The data relatedItems list is still null after " + _retryAttempts + " attempts.");
+			throw new Exception("An error occured while getting the items related to the question.");
+		}
+		return relatedItems;*/
+
+		// Mock
+		await Task.CompletedTask;
+		return [
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item one",
+				Summary = "AAAAAaaaaa",
+				Type = ItemType.Class
+			},
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item two",
+				Summary = "bbbbb",
+				Type = ItemType.DatatypeProperty
+			},
+			new DataSpecificationItem()
+			{
+				DataSpecification = dataSpecification,
+				DataSpecificationId = dataSpecification.Id,
+				Iri = $"mock-item.{Guid.NewGuid()}",
+				Label = "Mock item three",
+				Summary = "CCccCC",
+				Type = ItemType.ObjectProperty
+			}
+		];
+	}
+
+	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_gemini is null)
 		{
 			throw new Exception("The Gemini model has not been initialized. Call the Initialize() method first.");
 		}
-		Task<GenerateContentResponse> task = _gemini.GenerateContentAsync(prompt);
-		task.Wait();
-		return task.Result.Text;
-	}
-
-	[MemberNotNull(nameof(_apiKey), nameof(_model))]
-	private void LoadLlmSettings()
-	{
-		_apiKey = "";
-		_model = "models/gemini-2.5-flash";
+		var response = await _gemini.GenerateContentAsync(prompt);
+		return response.Text;
 	}
 }
 
@@ -110,6 +190,8 @@ internal class PromptConstructor
 		```
 		""";
 
+	const string GET_RELATED_ITEMS_PROMPT = "I don't know yet.";
+
 	private readonly ILogger _logger;
 
 	internal PromptConstructor(ILogger logger)
@@ -120,6 +202,11 @@ internal class PromptConstructor
 	public string CreateQuestionToItemsMappingPrompt(string question, DataSpecification dataSpecification)
 	{
 		return string.Format(MAP_QUESTION_TO_ITEMS_PROMPT, dataSpecification.Owl, question);
+	}
+
+	public string CreateGetRelatedItemsPrompt(string question, DataSpecification dataSpecification, List<DataSpecificationItem> relatedItems)
+	{
+		return "MOCK RELATED ITEMS PROMPT";
 	}
 }
 
@@ -132,16 +219,32 @@ internal class ResponseProcessor
 		_logger = logger;
 	}
 
-	public List<DataSpecificationItem>? ExtractDataSpecificationItems(string llmResponse)
+	public List<DataSpecificationItem>? ExtractDataSpecificationItems(string llmResponse, DataSpecification dataSpecification)
 	{
+		_logger.LogDebug("Extracting items from the following response string:\n{LlmResponse}", llmResponse);
 		try
 		{
-			return JsonSerializer.Deserialize<List<DataSpecificationItem>>(llmResponse);
+			List<DataSpecificationItem>? mappedItems = JsonSerializer.Deserialize<List<DataSpecificationItem>>(llmResponse);
+			if (mappedItems != null)
+			{
+				foreach (DataSpecificationItem item in mappedItems)
+				{
+					item.DataSpecificationId = dataSpecification.Id;
+					item.DataSpecification = dataSpecification;
+				}
+			}
+			return mappedItems;
 		}
 		catch (JsonException e)
 		{
-			_logger.LogError("A JsonException occured while extracting the data specification items from the LLM's response: {}", e);
+			_logger.LogError("A JsonException occured while extracting the data specification items from the LLM's response. {Exception}", e);
 			return null;
 		}
+	}
+
+	public List<DataSpecificationItem>? ExtractRelatedItems(string llmResponse, DataSpecification dataSpecification)
+	{
+		// Mock items.
+		throw new NotImplementedException();
 	}
 }

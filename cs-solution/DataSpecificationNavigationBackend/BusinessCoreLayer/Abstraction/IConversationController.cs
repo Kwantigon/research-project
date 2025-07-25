@@ -5,10 +5,10 @@ namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IConversationController
 {
-	Task<IResult> StartConversation(PostConversationsDTO payload);
-	Task<IResult> GetOngoingConversations();
+	Task<IResult> StartConversationAsync(PostConversationsDTO payload);
+	Task<IResult> GetAllConversationsAsync();
 
-	Task<IResult> GetConversation(int conversationId);
+	Task<IResult> GetConversationAsync(int conversationId);
 
 	/// <summary>
 	/// Get messages in a conversation.

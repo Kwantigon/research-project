@@ -11,16 +11,20 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataSpecificationNavigationBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250720160534_InitialCreate")]
+    [Migration("20250725190646_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true);
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Conversation", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Conversation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -43,7 +47,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.ToTable("Conversations");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.DataSpecification", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.DataSpecification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +70,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.ToTable("DataSpecifications");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.DataSpecificationItem", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.DataSpecificationItem", b =>
                 {
                     b.Property<string>("Iri")
                         .HasColumnType("TEXT");
@@ -96,7 +100,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.ToTable("DataSpecificationItems");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Message", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Message", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -104,6 +108,9 @@ namespace DataSpecificationNavigationBackend.Migrations
 
                     b.Property<int>("ConversationId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("ReplyMessageId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TextValue")
                         .IsRequired()
@@ -119,12 +126,14 @@ namespace DataSpecificationNavigationBackend.Migrations
 
                     b.HasIndex("ConversationId");
 
+                    b.HasIndex("ReplyMessageId");
+
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Conversation", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Conversation", b =>
                 {
-                    b.HasOne("DataspecNavigationHelper.Model.DataSpecification", "DataSpecification")
+                    b.HasOne("DataspecNavigationBackend.Model.DataSpecification", "DataSpecification")
                         .WithMany()
                         .HasForeignKey("DataSpecificationId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -133,38 +142,44 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Navigation("DataSpecification");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.DataSpecificationItem", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.DataSpecificationItem", b =>
                 {
-                    b.HasOne("DataspecNavigationHelper.Model.DataSpecification", "DataSpecification")
+                    b.HasOne("DataspecNavigationBackend.Model.DataSpecification", "DataSpecification")
                         .WithMany()
                         .HasForeignKey("DataSpecificationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataspecNavigationHelper.Model.Message", null)
+                    b.HasOne("DataspecNavigationBackend.Model.Message", null)
                         .WithMany("RelatedItems")
                         .HasForeignKey("MessageId");
 
                     b.Navigation("DataSpecification");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Message", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Message", b =>
                 {
-                    b.HasOne("DataspecNavigationHelper.Model.Conversation", "Conversation")
+                    b.HasOne("DataspecNavigationBackend.Model.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataspecNavigationBackend.Model.Message", "ReplyMessage")
+                        .WithMany()
+                        .HasForeignKey("ReplyMessageId");
+
                     b.Navigation("Conversation");
+
+                    b.Navigation("ReplyMessage");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Conversation", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Conversation", b =>
                 {
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("DataspecNavigationHelper.Model.Message", b =>
+            modelBuilder.Entity("DataspecNavigationBackend.Model.Message", b =>
                 {
                     b.Navigation("RelatedItems");
                 });

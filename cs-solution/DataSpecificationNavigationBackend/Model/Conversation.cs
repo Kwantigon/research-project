@@ -10,7 +10,7 @@ public class Conversation
 
 	public required virtual DataSpecification DataSpecification { get; set; }
 
-	public List<Message> Messages { get; set; } = [];
+	public virtual List<Message> Messages { get; set; } = [];
 
 	public DateTime LastUpdated { get; set; }
 }

@@ -55,7 +55,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     TextValue = table.Column<string>(type: "TEXT", nullable: false),
                     TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ConversationId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ConversationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReplyMessageId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -66,6 +67,11 @@ namespace DataSpecificationNavigationBackend.Migrations
                         principalTable: "Conversations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Messages_Messages_ReplyMessageId",
+                        column: x => x.ReplyMessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -114,6 +120,11 @@ namespace DataSpecificationNavigationBackend.Migrations
                 name: "IX_Messages_ConversationId",
                 table: "Messages",
                 column: "ConversationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_ReplyMessageId",
+                table: "Messages",
+                column: "ReplyMessageId");
         }
 
         /// <inheritdoc />

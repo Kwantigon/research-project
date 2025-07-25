@@ -16,6 +16,11 @@ public class OllamaConnector(
 	private OllamaApiClient? _ollamaClient;
 	private Chat? _chat;
 
+	public Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems)
+	{
+		throw new NotImplementedException();
+	}
+
 	public void InitializeModel()
 	{
 		_ollamaSettings = new OllamaSettings();
@@ -24,17 +29,15 @@ public class OllamaConnector(
 		_chat = new(_ollamaClient);
 	}
 
-	public List<DataSpecificationItem> MapQuestionToItems(DataSpecification dataSpecification, string question)
+	public async Task<List<DataSpecificationItem>> MapQuestionToItemsAsync(DataSpecification dataSpecification, string question)
 	{
 		string prompt = _promptConstructor.GetQuestionToItemsMappingPrompt(question);
-		Task<string> task = SendPrompt(prompt);
-		task.Wait();
-		string response = task.Result;
+		string response = await SendPromptAsync(prompt);
 		List<DataSpecificationItem> dataSpecificationItems = _responseProcessor.GetDataSpecificationItemsFromResponse(response);
 		return dataSpecificationItems;
 	}
 
-	private async Task<string> SendPrompt(string prompt)
+	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_chat is null)
 		{

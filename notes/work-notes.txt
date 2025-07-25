@@ -191,3 +191,25 @@ Zprávy taky dokážu vytáhnout z databáze a vrátit.
 Teď musím implementovat samotné zpracování nových zpráv.
 
 Musím taky přidat podporu pro suggested message do front endu.
+
+## 25. 7.
+
+Generování odpovědi jsem dal do volání GET /.../{messageId}, což není úplně nejlepší.
+GET by neměl spouštět nějaké zdlouhavé procesy na back endu.
+Měl bych to pustit už při POST user message.
+Pak front end bude prostě čekat na odpověď opakovaným voláním GET?
+- Na druhou stranu, když zajistím, že ta operace je idempotentní (nebo jak se tomu říká), tak by to mohlo být v pohodě.
+- Jen první GET request spustí generování odpovědi.
+- Další requesty už jen čekají a pokud uvidí, že odpověď je vygenerovaný, tak vrátí.
+- Ale problém je, že když není zavolán GET, tak se mi to nezačne generovat.
+- Ale to je asi v pořádku. Když nikdo nevolá GET, tak asi nikdo nechce tu odpověď.
+
+Musím vyřešit synchronizaci, aby se nestalo, že více vláken generuje jednu odpověď.
+- Tady asi použít semaphore a každé vlákno když projde semaforem, tak si ověří, že replyMessage.TextValue už něco obsahuje.
+
+Zpracování user message na back endu už doběhne do konce.
+Zbývá:
+- Zprovoznit LLM connector, tzn. přidat prompt templates.
+- Implementovat Sparql translation.
+- Na front endu přidat podporu pro suggested message.
+- Na back endu přidat endpoint pro suggested messages.

@@ -12,7 +12,7 @@ public class Message
 
 	public DateTime TimeStamp { get; set; }
 
-	public List<DataSpecificationItem>? RelatedItems { get; set; }
+	public virtual List<DataSpecificationItem>? RelatedItems { get; set; }
 
 	public int ConversationId { get; set; }
 
@@ -20,7 +20,7 @@ public class Message
 
 	public Guid? ReplyMessageId { get; set; }
 
-	public Message? ReplyMessage { get; set; }
+	public virtual Message? ReplyMessage { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]

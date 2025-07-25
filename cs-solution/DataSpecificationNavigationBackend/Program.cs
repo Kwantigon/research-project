@@ -10,7 +10,6 @@ using DataspecNavigationBackend.ConnectorsLayer;
 using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +22,7 @@ builder.Services
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
 	.AddScoped<EntityFrameworkPlaceholder>()
+	.AddSingleton<ILlmConnector, GeminiConnector>()
 	;
 
 builder.Services.AddCors(options =>
@@ -45,7 +45,8 @@ builder.Services.AddCors(options =>
 });*/
 
 var connectionString = builder.Configuration.GetConnectionString("Chatbot") ?? "Data Source=Chatbot.db";
-builder.Services.AddSqlite<AppDbContext>(connectionString);
+//builder.Services.AddSqlite<AppDbContext>(connectionString);
+builder.Services.AddDbContext<AppDbContext>(b => b.UseSqlite(connectionString).UseLazyLoadingProxies());
 
 var app = builder.Build();
 app.UseCors();
@@ -58,18 +59,11 @@ app.UseCors();
 	});
 }*/
 
-/* I'm registering all endpoints in this Program.cs file
- * because I don't expect to have many more endpoints than the ones listed here.
- * 
- * An alternative would be to create extension methods for grouping endpoints
- * and registering them.
- */
-
 // Sanity check.
 app.MapGet("/", () => "Hello there!");
 
 app.MapGet("/conversations",
-			(IConversationController controller) => controller.GetOngoingConversations())
+			(IConversationController controller) => controller.GetAllConversationsAsync())
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get all ongoing conversations.";
@@ -78,7 +72,7 @@ app.MapGet("/conversations",
 	});
 
 app.MapGet("/conversations/{conversationId}",
-			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversation(conversationId))
+			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationAsync(conversationId))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get information about the conversation.";
@@ -128,7 +122,7 @@ app.MapPost("/data-specifications",
 
 app.MapPost("/conversations",
 				([FromBody] PostConversationsDTO payload,
-				IConversationController controller) => controller.StartConversation(payload))
+				IConversationController controller) => controller.StartConversationAsync(payload))
 	.WithOpenApi(operation =>
 	{
 		operation.Summary = "Start a new conversation.";

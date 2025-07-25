@@ -84,13 +84,11 @@ function ConversationPage() {
 
 		const messageToSend = suggestedMessage || currentMessage;
 		const userMessage: Message = {
-				id: "TBD", // ID is generated on the back end. Will be set later.
+				id: `UserMessage-${new Date().toString()}`, // ID is generated on the back end. Will be set later.
 				type: "UserMessage",
 				text: messageToSend,
 				timestamp: new Date().toLocaleString()
 			};
-
-		console.log(userMessage);
 
 		// Add user's message to conversation
 		setMessages((prevMessages) => [
@@ -103,30 +101,39 @@ function ConversationPage() {
 		setSelectedItemsForExpansion([]);
 
 		try {
+			const requestBody = JSON.stringify(
+					{
+						textValue: userMessage.text,
+						userModifiedPreviewMessage: !(userMessage.text === suggestedMessage)
+					});
+			console.log("Sending a POST request with body " + requestBody);
 			const postUserMsgResponse = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					timestamp: new Date().toLocaleString(),
-					textValue: messageToSend,
-					userModifiedPreviewMessage: true // Todo: This needs to be checked when user modifies the suggested question.
-				})
+				body: requestBody
 			});
 
 			if (!postUserMsgResponse.ok) {
 				throw new Error("Failed to send user's message to the back end.");
+			} else {
+				console.log("User message POSTed successfully.");
 			}
 			const postUserMsgData = await postUserMsgResponse.json();
+			console.log(`postUserMsgData: ${JSON.stringify(postUserMsgData)}`);
 			userMessage.id = postUserMsgData.id; // Set the message ID that the back end generated.
 
 			// Do another fetch to get the reply to user's message.
-			const getReplyMsgResponse = await fetch(`${BACKEND_API_URL}/${postUserMsgData.replyUri}`);
+			console.log(`Fetching a reply from ${BACKEND_API_URL}${postUserMsgData.replyUri}`);
+			const getReplyMsgResponse = await fetch(`${BACKEND_API_URL}${postUserMsgData.replyUri}`);
 			if (!getReplyMsgResponse.ok) {
 				throw new Error("Failed to get the reply message from the back end.")
+			} else {
+				console.log("Reply message fetched successfully.");
 			}
 			const getReplyMsgData = await getReplyMsgResponse.json();
+			console.log(`getReplyMsgData: ${JSON.stringify(getReplyMsgData)}`);
 
 			setMessages((prevMessages) => [
 				...prevMessages,
@@ -139,11 +146,11 @@ function ConversationPage() {
 				}
 			]);
 
-			if (postUserMsgData.relatedItems && postUserMsgData.relatedItems.length > 0) {
-        setMostRecentReplyMessageId(postUserMsgData.id);
-      } else {
-        setMostRecentReplyMessageId(null);
-      }
+			if (getReplyMsgData.relatedItems && getReplyMsgData.relatedItems.length > 0) {
+				setMostRecentReplyMessageId(getReplyMsgData.id);
+			} else {
+				setMostRecentReplyMessageId(null);
+			}
 		} catch (error) {
 			console.error("Error sending message:", error);
 			setMessages((prevMessages) => [
@@ -159,9 +166,9 @@ function ConversationPage() {
 	};
 
 	const handleItemClick = (item: DataSpecificationItem, parentMessageId: string) => {
-    setSelectedItemForSummary({ item, parentMessageId });
-    setIsSummaryDialogOpen(true);
-  };
+		setSelectedItemForSummary({ item, parentMessageId });
+		setIsSummaryDialogOpen(true);
+	};
 
 	const handleAddItemToQuestion = () => {
 		if (selectedItemForSummary && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
@@ -187,15 +194,7 @@ function ConversationPage() {
 		}
 	};
 
-	/*
-	To display message timestamps, add this to CardContent:
-		<p className={`text-xs mt-1 ${msg.sender === "user" ? "text-right text-gray-600" : "text-left text-gray-500"}`}>
-				{new Date(msg.timestamp).toLocaleString()}
-		</p>
-	*/
-
 	const isSelectedItemFromMostRecentAnswer = selectedItemForSummary?.parentMessageId === mostRecentReplyMessageId;
-	console.log("mostRecentApplicationMessageId: " + mostRecentReplyMessageId);
 
 	return (
 		<div className="flex flex-col h-full p-4">
@@ -238,31 +237,31 @@ function ConversationPage() {
 										<p className="font-semibold text-sm">Some parts in your question can be expanded upon. You can click on each item to see more information about it.</p>
 										<ul className="list-disc list-inside mt-1">
 											{msg.relatedItems.map((item) => {
-                          const isSelected = selectedItemsForExpansion.some(
-                            (selectedItem) => selectedItem.iri === item.iri
-                          );
-                          return (
-                            <li key={item.iri} className="flex items-center space-x-1">
-                              <Button
-                                variant="link"
-                                onClick={() => handleItemClick(item, msg.id)}
-                                className="p-0 h-auto text-sm text-blue-600 cursor-pointer">
-                                {item.label}
-                              </Button>
-                              {isSelected && (
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-green-500"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor">
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              )}
-                            </li>
+													const isSelected = selectedItemsForExpansion.some(
+														(selectedItem) => selectedItem.iri === item.iri
+													);
+													return (
+														<li key={item.iri} className="flex items-center space-x-1">
+															<Button
+																variant="link"
+																onClick={() => handleItemClick(item, msg.id)}
+																className="p-0 h-auto text-sm text-blue-600 cursor-pointer">
+																{item.label}
+															</Button>
+															{isSelected && (
+																<svg
+																	xmlns="http://www.w3.org/2000/svg"
+																	className="h-4 w-4 text-green-500"
+																	viewBox="0 0 20 20"
+																	fill="currentColor">
+																	<path
+																		fillRule="evenodd"
+																		d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+																		clipRule="evenodd"
+																	/>
+																</svg>
+															)}
+														</li>
 														);
 													})}
 										</ul>
@@ -310,22 +309,22 @@ function ConversationPage() {
 					<div className="py-4">
 						<p>{selectedItemForSummary?.item.summary}</p>
 						{selectedItemForSummary && isSelectedItemFromMostRecentAnswer ? (
-              // Show button if from most recent answer and not already added
-              !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                <Button onClick={() => handleAddItemToQuestion()} className="mt-4">
-                  Add item to my question
-                </Button>
-              ) : (
-                <p className="mt-4 text-sm text-green-600 font-semibold">
-                  This item has been added to your question.
-                </p>
-              )
-            ) : (
-              // Show reminder text if not from most recent answer
-              <p className="mt-4 text-sm text-gray-500 italic">
-                This item cannot be used because it is not from the most recent answer.
-              </p>
-            )}
+							// Show button if from most recent answer and not already added
+							!selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
+								<Button onClick={() => handleAddItemToQuestion()} className="mt-4">
+									Add item to my question
+								</Button>
+							) : (
+								<p className="mt-4 text-sm text-green-600 font-semibold">
+									This item has been added to your question.
+								</p>
+							)
+						) : (
+							// Show reminder text if not from most recent answer
+							<p className="mt-4 text-sm text-gray-500 italic">
+								This item cannot be used because it is not from the most recent answer.
+							</p>
+						)}
 					</div>
 				</DialogContent>
 			</Dialog>
