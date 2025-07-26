@@ -210,6 +210,12 @@ Musím vyřešit synchronizaci, aby se nestalo, že více vláken generuje jednu
 Zpracování user message na back endu už doběhne do konce.
 Zbývá:
 - Zprovoznit LLM connector, tzn. přidat prompt templates.
+- DataspecerConnector je kinda nespolehlivý, takže si musím najít nějaký package, který zaručeně funguje, abych mohl testovat.
 - Implementovat Sparql translation.
 - Na front endu přidat podporu pro suggested message.
 - Na back endu přidat endpoint pro suggested messages.
+
+# 26. 7.
+
+Pokud dataspecer connector dodá OWL, tak už to funguje.
+- V related items mi pořád chybí summary pro každý item. To můžu udělat tak, že když uživatel si rozklikne na ten item, tak tam bude třeba kolečko a POST pro summary. Když je dostupný, tak se zobrazí.

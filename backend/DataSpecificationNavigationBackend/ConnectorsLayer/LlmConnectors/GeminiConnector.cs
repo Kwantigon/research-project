@@ -1,7 +1,6 @@
 ﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using DataspecNavigationBackend.Model;
 using GenerativeAI;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 
@@ -13,85 +12,73 @@ public class GeminiConnector : ILlmConnector
 	private readonly PromptConstructor _promptConstructor;
 	private readonly ResponseProcessor _responseProcessor;
 	private const int _retryAttempts = 3; // If the response processor fails to extract the necessary classes, retry the prompt this many times.
-	private string? _apiKey;
-	private string? _model;
 	private GenerativeModel? _gemini;
 
-	public GeminiConnector()
+	public GeminiConnector(ILogger<GeminiConnector> logger)
 	{
-		_logger = LoggerFactory
+		/*_logger = LoggerFactory
 											.Create(config => config.SetMinimumLevel(LogLevel.Trace).AddConsole())
-											.CreateLogger<GeminiConnector>();
+											.CreateLogger<GeminiConnector>();*/
+		_logger = logger;
 		_promptConstructor = new(_logger);
 		_responseProcessor = new(_logger);
-		_apiKey = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/backend/DataSpecificationNavigationBackend/local/gemini_api-key.txt");
-		_model = "models/gemini-2.5-flash";
-		GoogleAi googleAi = new(_apiKey);
-		_gemini = googleAi.CreateGenerativeModel(_model);
+		string apiKey = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/backend/DataSpecificationNavigationBackend/local/gemini_api-key.txt");
+		const string model = "models/gemini-2.5-flash";
+		GoogleAi googleAi = new(apiKey);
+		_gemini = googleAi.CreateGenerativeModel(model);
 	}
 
 	public async Task<List<DataSpecificationItem>> MapQuestionToItemsAsync(DataSpecification dataSpecification, string question)
 	{
-		/*int attempts = 0;
-		List<DataSpecificationItem>? items = null;
+		int attempts = 0;
+		List<DataSpecificationItem>? mapped = null;
 
-		while (attempts < _retryAttempts && items is null)
+		_logger.LogTrace("Building a prompt for mapping the question to items.");
+		string prompt = _promptConstructor.CreateQuestionToItemsMappingPrompt(question, dataSpecification);
+		_logger.LogDebug("Map question to items prompt: \"{Prompt}\"", prompt);
+
+		while (attempts < _retryAttempts && mapped is null)
 		{
-			string prompt = _promptConstructor.CreateQuestionToItemsMappingPrompt(question, dataSpecification);
+			_logger.LogTrace("Attempt number {AttemptCount}", attempts + 1);
+
+			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
-			items = _responseProcessor.ExtractDataSpecificationItems(response, dataSpecification);
+			_logger.LogDebug("LLM response: {Response}", response);
+
+			_logger.LogTrace("Extracting the mapped items from the LLM response.");
+			mapped = _responseProcessor.ExtractMappedItems(response, dataSpecification);
 			attempts++;
 		}
-		
-		if (items is null)
+
+		if (mapped is null)
 		{
 			_logger.LogError("The data specification items list is still null after " + _retryAttempts + " attempts.");
 			throw new Exception("An error occurred while mapping the question to data specification items.");
+			// Todo: Gracefully handle the result instead of throwing an exception.
 		}
-		return items;*/
 
-		// Mock
-		await Task.CompletedTask;
-		return [
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item one",
-				Summary = "AAAAAaaaaa",
-				Type = ItemType.Class
-			},
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item two",
-				Summary = "bbbbb",
-				Type = ItemType.DatatypeProperty
-			},
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item three",
-				Summary = "CCccCC",
-				Type = ItemType.ObjectProperty
-			}
-		];
+		_logger.LogTrace("Returning the mapped items.");
+		return mapped;
 	}
 
 	public async Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems)
 	{
-		/*int attempts = 0;
+		int attempts = 0;
 		List<DataSpecificationItem>? relatedItems = null;
+
+		_logger.LogTrace("Building a prompt for getting the related items.");
+		string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, mappedItems);
+		_logger.LogDebug("Get related items prompt: \"{Prompt}\"", prompt);
 
 		while (attempts < _retryAttempts && relatedItems is null)
 		{
-			string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, mappedItems);
+			_logger.LogTrace("Attempt number {AttemptCount}", attempts + 1);
+
+			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
+			_logger.LogDebug("LLM response: {Response}", response);
+
+			_logger.LogTrace("Extracting the related items from the LLM response.");
 			relatedItems = _responseProcessor.ExtractRelatedItems(response, dataSpecification);
 			attempts++;
 		}
@@ -100,47 +87,18 @@ public class GeminiConnector : ILlmConnector
 		{
 			_logger.LogError("The data relatedItems list is still null after " + _retryAttempts + " attempts.");
 			throw new Exception("An error occured while getting the items related to the question.");
+			// Todo: Gracefully handle the result instead of throwing an exception.
 		}
-		return relatedItems;*/
 
-		// Mock
-		await Task.CompletedTask;
-		return [
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item one",
-				Summary = "AAAAAaaaaa",
-				Type = ItemType.Class
-			},
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item two",
-				Summary = "bbbbb",
-				Type = ItemType.DatatypeProperty
-			},
-			new DataSpecificationItem()
-			{
-				DataSpecification = dataSpecification,
-				DataSpecificationId = dataSpecification.Id,
-				Iri = $"mock-item.{Guid.NewGuid()}",
-				Label = "Mock item three",
-				Summary = "CCccCC",
-				Type = ItemType.ObjectProperty
-			}
-		];
+		_logger.LogTrace("Returning the related items.");
+		return relatedItems;
 	}
 
 	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_gemini is null)
 		{
-			throw new Exception("The Gemini model has not been initialized. Call the Initialize() method first.");
+			throw new Exception("The Gemini model has not been initialized.");
 		}
 		var response = await _gemini.GenerateContentAsync(prompt);
 		return response.Text;
@@ -152,33 +110,35 @@ internal class PromptConstructor
 	const string MAP_QUESTION_TO_ITEMS_PROMPT = """
 		Given an OWL file describing a data specification and a question in natural language, map the question to relevant OWL entities and return them in a JSON according to the following schema:
 		[{{
-			"iri": "",
-			"type": "",
-			"label": "",
-			"comment": ""
+			"Iri": "",
+			"Type": "",
+			"Label": "",
+			"Comment": ""
 		}}]
 
 		Example output:
 		[
 			{{
-				"iri": "https://www.example.com/item-one",
-				"type": "Class",
-				"label": "item one",
-				"comment": ""
+				"Iri": "https://www.example.com/item-one",
+				"Type": "Class",
+				"Label": "item one",
+				"Comment": ""
 			}},
 			{{
-				"iri": "https://www.example.com/item-two",
-				"type": "ObjectProperty",
-				"label": "item two",
-				"comment": ""
+				"Iri": "https://www.example.com/item-two",
+				"Type": "ObjectProperty",
+				"Label": "item two",
+				"Comment": ""
 			}},
 			{{
-				"iri": "https://www.example.com/item-three",
-				"type": "DatatypeProperty",
-				"label": "item three",
-				"comment": ""
+				"Iri": "https://www.example.com/item-three",
+				"Type": "DatatypeProperty",
+				"Label": "item three",
+				"Comment": ""
 			}}
 		]
+
+		Return only the JSON array. Do not surround it with backticks.
 
 		The OWL file is
 		```
@@ -194,33 +154,35 @@ internal class PromptConstructor
 	const string GET_RELATED_ITEMS_PROMPT = """
 		Given an OWL file describing a data specification, question in natural language and the OWL entities mapped from the question to the data specification, give me 5 entities from the data specification that are not the mapped entities and are relevant to the original question. Return them in a JSON according to the following schema:
 		[{{
-			"iri": "",
-			"type": "",
-			"label": "",
-			"comment": ""
+			"Iri": "",
+			"Type": "",
+			"Label": "",
+			"Comment": ""
 		}}]
 
 		Example output:
 		[
 			{{
-				"iri": "https://www.example.com/item-one",
-				"type": "Class",
-				"label": "item one",
-				"comment": ""
+				"Iri": "https://www.example.com/item-one",
+				"Type": "Class",
+				"Label": "item one",
+				"Comment": ""
 			}},
 			{{
-				"iri": "https://www.example.com/item-two",
-				"type": "ObjectProperty",
-				"label": "item two",
-				"comment": ""
+				"Iri": "https://www.example.com/item-two",
+				"Type": "ObjectProperty",
+				"Label": "item two",
+				"Comment": ""
 			}},
 			{{
-				"iri": "https://www.example.com/item-three",
-				"type": "DatatypeProperty",
-				"label": "item three",
-				"comment": ""
+				"Iri": "https://www.example.com/item-three",
+				"Type": "DatatypeProperty",
+				"Label": "item three",
+				"Comment": ""
 			}}
 		]
+
+		Return only the JSON array. Do not surround it with backticks.
 
 		The OWL file is
 		```
@@ -273,32 +235,41 @@ internal class ResponseProcessor
 		_logger = logger;
 	}
 
-	public List<DataSpecificationItem>? ExtractDataSpecificationItems(string llmResponse, DataSpecification dataSpecification)
+	public List<DataSpecificationItem>? ExtractMappedItems(string llmResponse, DataSpecification dataSpecification)
+	{
+		return DeserializeDataSpecItems(llmResponse, dataSpecification);
+	}
+
+	public List<DataSpecificationItem>? ExtractRelatedItems(string llmResponse, DataSpecification dataSpecification)
+	{
+		return DeserializeDataSpecItems(llmResponse, dataSpecification);
+	}
+
+	private List<DataSpecificationItem>? DeserializeDataSpecItems(string llmResponse, DataSpecification dataSpecification)
 	{
 		_logger.LogDebug("Extracting items from the following response string:\n{LlmResponse}", llmResponse);
 		try
 		{
-			List<DataSpecificationItem>? mappedItems = JsonSerializer.Deserialize<List<DataSpecificationItem>>(llmResponse);
-			if (mappedItems != null)
+			List<DataSpecificationItem>? items = JsonSerializer.Deserialize<List<DataSpecificationItem>>(llmResponse);
+			if (items is null)
 			{
-				foreach (DataSpecificationItem item in mappedItems)
+				_logger.LogError("Failed to deserialize the LLM response into a list of items.");
+			}
+			else
+			{
+				foreach (DataSpecificationItem item in items)
 				{
 					item.DataSpecificationId = dataSpecification.Id;
 					item.DataSpecification = dataSpecification;
 				}
 			}
-			return mappedItems;
+
+			return items;
 		}
 		catch (JsonException e)
 		{
-			_logger.LogError("A JsonException occured while extracting the data specification items from the LLM's response. {Exception}", e);
+			_logger.LogError("A JsonException occured while extracting the data specification items from the LLM response. {Exception}", e);
 			return null;
 		}
-	}
-
-	public List<DataSpecificationItem>? ExtractRelatedItems(string llmResponse, DataSpecification dataSpecification)
-	{
-		// Mock items.
-		throw new NotImplementedException();
 	}
 }

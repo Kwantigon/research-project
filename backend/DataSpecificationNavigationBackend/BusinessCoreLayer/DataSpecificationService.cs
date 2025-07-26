@@ -51,7 +51,7 @@ public class DataSpecificationService(
 		{
 			DataspecerPackageUuid = dataspecerPackageUuid,
 			Name = dataspecerPackageName,
-			Owl = "Mock OWL value",
+			Owl = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/backend/DataSpecificationNavigationBackend/local/insurance.owl.ttl"),
 		};
 
 		await _database.DataSpecifications.AddAsync(dataSpecification);

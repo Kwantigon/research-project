@@ -1,6 +1,5 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
-using DataspecNavigationBackend.ConnectorsLayer;
 using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using DataspecNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +58,8 @@ public class ConversationService(
 			return await _database.Conversations
 				.Include(conversation => conversation.Messages.OrderBy(message => message.TimeStamp))
 				.SingleOrDefaultAsync(conv => conv.Id == conversationId);
-		} else
+		}
+		else
 		{
 			return await _database.Conversations.SingleOrDefaultAsync(conv => conv.Id == conversationId);
 		}
@@ -110,7 +110,7 @@ public class ConversationService(
 			_logger.LogError("User message with ID {UserMsgId} does not have an associated reply message.", userMessage.Id);
 			return null;
 		}
-		
+
 		if (replyMessage.TextValue != string.Empty)
 		{
 			_logger.LogInformation("The reply message was previously generated already - returning it.");

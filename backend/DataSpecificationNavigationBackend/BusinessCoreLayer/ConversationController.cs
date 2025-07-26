@@ -47,7 +47,7 @@ public class ConversationController(
 		{
 			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
 		}
-		
+
 		return Results.Ok((ConversationDTO)conversation);
 	}
 
@@ -79,10 +79,10 @@ public class ConversationController(
 		if (requestedMessage is null)
 		{
 			_logger.LogError("Conversation [Title={ConvTitle}, Id={ConvId}] does not contain the message with ID {MsgId}.",
-																		conversation.Title, conversationId,																		messageId);
+																		conversation.Title, conversationId, messageId);
 			return Results.NotFound(new Error { Reason = $"Message with ID {messageId} not found." });
 		}
-		
+
 		_logger.LogTrace("Found the requested message in conversation [Title={ConvTitle}, Id={ConvId}]", conversation.Title, conversation.Id);
 		if (requestedMessage.Type is MessageType.ReplyMessage && requestedMessage.TextValue == string.Empty)
 		{
@@ -107,7 +107,8 @@ public class ConversationController(
 			}
 
 			return Results.Ok((ConversationMessageDTO)reply);
-		} else
+		}
+		else
 		{
 			return Results.Ok((ConversationMessageDTO)requestedMessage);
 		}

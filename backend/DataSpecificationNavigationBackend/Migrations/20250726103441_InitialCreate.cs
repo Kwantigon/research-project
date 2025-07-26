@@ -83,6 +83,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     Label = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Summary = table.Column<string>(type: "TEXT", nullable: true),
+                    Comment = table.Column<string>(type: "TEXT", nullable: true),
                     MessageId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
