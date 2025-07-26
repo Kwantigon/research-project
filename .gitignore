@@ -9,5 +9,3 @@ cs-solution/ConversationsModel/bin
 cs-solution/ConversationsModel/obj
 links.txt
 milestones.txt
-*.db*
-/cs-solution/DataSpecificationNavigationBackend/local
