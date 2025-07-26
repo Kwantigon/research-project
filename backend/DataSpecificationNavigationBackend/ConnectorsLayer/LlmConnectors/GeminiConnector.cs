@@ -24,7 +24,7 @@ public class GeminiConnector : ILlmConnector
 											.CreateLogger<GeminiConnector>();
 		_promptConstructor = new(_logger);
 		_responseProcessor = new(_logger);
-		_apiKey = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/cs-solution/DataSpecificationNavigationBackend/local/gemini_api-key.txt");
+		_apiKey = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/backend/DataSpecificationNavigationBackend/local/gemini_api-key.txt");
 		_model = "models/gemini-2.5-flash";
 		GoogleAi googleAi = new(_apiKey);
 		_gemini = googleAi.CreateGenerativeModel(_model);
