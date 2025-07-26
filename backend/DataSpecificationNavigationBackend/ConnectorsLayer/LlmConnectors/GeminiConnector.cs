@@ -2,6 +2,7 @@
 using DataspecNavigationBackend.Model;
 using GenerativeAI;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
@@ -149,7 +150,7 @@ public class GeminiConnector : ILlmConnector
 internal class PromptConstructor
 {
 	const string MAP_QUESTION_TO_ITEMS_PROMPT = """
-		Given an OWL file describing a data specification and a question in natural language, map the question to relevant OWL entities and return then in a JSON according to the following schema:
+		Given an OWL file describing a data specification and a question in natural language, map the question to relevant OWL entities and return them in a JSON according to the following schema:
 		[{{
 			"iri": "",
 			"type": "",
@@ -190,7 +191,52 @@ internal class PromptConstructor
 		```
 		""";
 
-	const string GET_RELATED_ITEMS_PROMPT = "I don't know yet.";
+	const string GET_RELATED_ITEMS_PROMPT = """
+		Given an OWL file describing a data specification, question in natural language and the OWL entities mapped from the question to the data specification, give me 5 entities from the data specification that are not the mapped entities and are relevant to the original question. Return them in a JSON according to the following schema:
+		[{{
+			"iri": "",
+			"type": "",
+			"label": "",
+			"comment": ""
+		}}]
+
+		Example output:
+		[
+			{{
+				"iri": "https://www.example.com/item-one",
+				"type": "Class",
+				"label": "item one",
+				"comment": ""
+			}},
+			{{
+				"iri": "https://www.example.com/item-two",
+				"type": "ObjectProperty",
+				"label": "item two",
+				"comment": ""
+			}},
+			{{
+				"iri": "https://www.example.com/item-three",
+				"type": "DatatypeProperty",
+				"label": "item three",
+				"comment": ""
+			}}
+		]
+
+		The OWL file is
+		```
+		{0}
+		```
+
+		The mapped entities are
+		```
+		{1}
+		```
+
+		The question is
+		```
+		{2}
+		```
+		""";
 
 	private readonly ILogger _logger;
 
@@ -206,7 +252,15 @@ internal class PromptConstructor
 
 	public string CreateGetRelatedItemsPrompt(string question, DataSpecification dataSpecification, List<DataSpecificationItem> relatedItems)
 	{
-		return "MOCK RELATED ITEMS PROMPT";
+		StringBuilder stringBuilder = new StringBuilder();
+		string prefix = string.Empty;
+		foreach (DataSpecificationItem item in relatedItems)
+		{
+			stringBuilder.Append(prefix);
+			prefix = ", ";
+			stringBuilder.Append(item.Iri);
+		}
+		return string.Format(GET_RELATED_ITEMS_PROMPT, dataSpecification.Owl, stringBuilder.ToString(), question);
 	}
 }
 
