@@ -1,6 +1,6 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.DTO;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 
 public record ConversationDTO(int Id, string Title, string DataSpecificationName, DateTime LastUpdated)
 {

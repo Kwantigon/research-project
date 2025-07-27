@@ -1,4 +1,4 @@
-﻿namespace DataspecNavigationBackend.ConnectorsLayer.Abstraction;
+﻿namespace DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 
 public interface IDataspecerConnector
 {

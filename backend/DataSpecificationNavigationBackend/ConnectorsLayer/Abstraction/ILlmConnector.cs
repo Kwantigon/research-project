@@ -1,6 +1,6 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 
-namespace DataspecNavigationBackend.ConnectorsLayer.Abstraction;
+namespace DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 
 public interface ILlmConnector
 {

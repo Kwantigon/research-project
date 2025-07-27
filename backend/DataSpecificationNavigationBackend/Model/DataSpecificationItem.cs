@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
-namespace DataspecNavigationBackend.Model;
+namespace DataSpecificationNavigationBackend.Model;
 
 [PrimaryKey(nameof(Iri), nameof(DataSpecificationId))]
 public class DataSpecificationItem

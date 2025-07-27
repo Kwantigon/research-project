@@ -1,7 +1,7 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 using VDS.RDF;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.Facade;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 
 /// <summary>
 /// A facade for the dotnetRdf library used to process the DSVs from Dataspecer.

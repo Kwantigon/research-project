@@ -1,4 +1,4 @@
-﻿namespace DataspecNavigationBackend.Model;
+﻿namespace DataSpecificationNavigationBackend.Model;
 
 /// <summary>
 /// A Dataspecer package is used as the data specification.

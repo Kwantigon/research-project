@@ -1,4 +1,4 @@
-﻿namespace DataspecNavigationBackend.Model;
+﻿namespace DataSpecificationNavigationBackend.Model;
 
 public class Conversation
 {

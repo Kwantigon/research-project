@@ -1,11 +1,10 @@
-﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
-using DataspecNavigationBackend.BusinessCoreLayer.DTO;
-using DataspecNavigationBackend.Model;
+using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
 /// <summary>
 /// Converts the results of <see cref="IConversationService""/> to HTTP responses.
@@ -26,7 +25,7 @@ public class ConversationController(
 		DataSpecification? dataSpecification = await _dataSpecificationService.ExportDataSpecificationFromDataspecerAsync(payload.DataspecerPackageUuid, payload.DataspecerPackageName);
 		if (dataSpecification is null)
 		{
-			return Results.InternalServerError(new Error() { Reason = "There was an error while retrieving and processing the Dataspecer package." });
+			return Results.InternalServerError(new ErrorDTO() { Reason = "There was an error while retrieving and processing the Dataspecer package." });
 		}
 		Conversation conversation = await _conversationService.StartNewConversationAsync(payload.ConversationTitle, dataSpecification);
 		return Results.Created($"/conversations/{conversation.Id}", (ConversationDTO)conversation);
@@ -45,7 +44,7 @@ public class ConversationController(
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation is null)
 		{
-			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
+			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
 		return Results.Ok((ConversationDTO)conversation);
@@ -56,7 +55,7 @@ public class ConversationController(
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
 		if (conversation == null)
 		{
-			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
+			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
 		return Results.Ok(
@@ -71,7 +70,7 @@ public class ConversationController(
 		if (conversation is null)
 		{
 			_logger.LogError("Conversation with Id {Id} not found.", conversationId);
-			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
+			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
 		_logger.LogTrace("Searching for the message with ID {Id} in the conversation.", messageId);
@@ -80,7 +79,7 @@ public class ConversationController(
 		{
 			_logger.LogError("Conversation [Title={ConvTitle}, Id={ConvId}] does not contain the message with ID {MsgId}.",
 																		conversation.Title, conversationId, messageId);
-			return Results.NotFound(new Error { Reason = $"Message with ID {messageId} not found." });
+			return Results.NotFound(new ErrorDTO { Reason = $"Message with ID {messageId} not found." });
 		}
 
 		_logger.LogTrace("Found the requested message in conversation [Title={ConvTitle}, Id={ConvId}]", conversation.Title, conversation.Id);
@@ -93,7 +92,7 @@ public class ConversationController(
 			if (userMessage is null)
 			{
 				_logger.LogError("The user message preceding reply message with ID={ReplyId} was not found in the conversation.", requestedMessage.Id);
-				return Results.NotFound(new Error { Reason = $"User message preceding the message with ID {messageId} not found." });
+				return Results.NotFound(new ErrorDTO { Reason = $"User message preceding the message with ID {messageId} not found." });
 			}
 
 			// Todo: Guard this critical section with a semaphore.
@@ -103,7 +102,7 @@ public class ConversationController(
 			// End of critical section.
 			if (reply is null)
 			{
-				return Results.InternalServerError(new Error() { Reason = "An error occured while generating a reply." });
+				return Results.InternalServerError(new ErrorDTO() { Reason = "An error occured while generating a reply." });
 			}
 
 			return Results.Ok((ConversationMessageDTO)reply);
@@ -119,7 +118,7 @@ public class ConversationController(
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation == null)
 		{
-			return Results.NotFound(new Error { Reason = $"Conversation with ID {conversationId} not found." });
+			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
 		Message userMessage = await _conversationService.AddNewUserMessage(conversation, payload.TextValue, DateTime.Now, payload.UserModifiedPreviewMessage);

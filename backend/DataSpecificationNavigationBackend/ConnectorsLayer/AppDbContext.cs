@@ -1,4 +1,4 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer;

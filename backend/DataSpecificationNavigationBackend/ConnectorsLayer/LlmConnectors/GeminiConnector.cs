@@ -1,5 +1,5 @@
-﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
-using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
+using DataSpecificationNavigationBackend.Model;
 using GenerativeAI;
 using System.Text;
 using System.Text.Json;
@@ -217,7 +217,10 @@ internal class PromptConstructor
 		""";
 
 	const string GET_ITEM_SUMMARY_PROMPT = """
-		Summarize the {0} with label \"{1}\" and iri \"{2}\" in a few sentences so that a non-technical person can understand it. This entity is in the following OWL file
+		Explain the {0} with label \"{1}\" and iri \"{2}\" in the context of specification given the the OWL file. Provide a brief summary suitable for non-technical end-users.
+		Return only the summary and nothing else. Do not include any explanations or apologies.
+
+		The OWL file is
 		```
 		{3}
 		```

@@ -1,6 +1,6 @@
-﻿using DataspecNavigationBackend.BusinessCoreLayer.DTO;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IDataSpecificationController
 {

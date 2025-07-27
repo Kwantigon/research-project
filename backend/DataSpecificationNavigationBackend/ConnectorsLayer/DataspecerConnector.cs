@@ -1,7 +1,7 @@
-﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
+﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using System.IO.Compression;
 
-namespace DataspecNavigationBackend.ConnectorsLayer;
+namespace DataSpecificationNavigationBackend.ConnectorsLayer;
 
 public class DataspecerConnector(
 	ILogger<DataspecerConnector> logger) : IDataspecerConnector

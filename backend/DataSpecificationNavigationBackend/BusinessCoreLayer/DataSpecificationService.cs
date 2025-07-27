@@ -1,13 +1,12 @@
-﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
-using DataspecNavigationBackend.BusinessCoreLayer.Facade;
-using DataspecNavigationBackend.ConnectorsLayer;
-using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
-using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
+using DataSpecificationNavigationBackend.ConnectorsLayer;
+using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
+using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
 using VDS.RDF;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
 public class DataSpecificationService(
 	ILogger<DataSpecificationService> logger,
@@ -67,9 +66,26 @@ public class DataSpecificationService(
 		return await _database.DataSpecifications.SingleOrDefaultAsync(dataSpec => dataSpec.Id == dataSpecificationId);
 	}
 
-	public async Task<IResult> GetItemSummaryAsync(int dataSpecificationId, string itemIri)
+	public async Task<DataSpecificationItem?> GetDataSpecificationItem(int dataSpecificationId, string itemIri)
 	{
-		throw new NotImplementedException();
+		return await _database.DataSpecificationItems.SingleOrDefaultAsync(item => item.DataSpecificationId == dataSpecificationId && item.Iri == itemIri);
+	}
+
+	public async Task GenerateItemSummaryAsync(DataSpecificationItem item)
+	{
+		if (item.Summary != null)
+		{
+			_logger.LogInformation("Item summary already exists. It will not be generated again.");
+			return;
+		}
+
+		_logger.LogTrace("Generating a summary for item [IRI={Iri}, Label={Label}].", item.Iri, item.Label);
+		string summary = await _llmConnector.GetItemSummaryAsync(item);
+		_logger.LogTrace("Summary generated successfully: {Summary}", summary);
+
+		_logger.LogTrace("Setting the item.Summary property and saving to database.");
+		item.Summary = summary;
+		await _database.SaveChangesAsync();
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)

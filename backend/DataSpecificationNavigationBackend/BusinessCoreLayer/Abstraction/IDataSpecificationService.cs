@@ -1,9 +1,12 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
+using System.Diagnostics.CodeAnalysis;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IDataSpecificationService
 {
 	Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName);
 	Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId);
+	Task<DataSpecificationItem?> GetDataSpecificationItem(int dataSpecificationId, string itemIri);
+	Task GenerateItemSummaryAsync(DataSpecificationItem item);
 }

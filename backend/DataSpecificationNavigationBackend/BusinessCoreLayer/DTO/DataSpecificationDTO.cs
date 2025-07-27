@@ -1,6 +1,6 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.DTO;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 
 public record DataSpecificationDTO(string BackendIri, string Name, string DataspecerIri)
 {

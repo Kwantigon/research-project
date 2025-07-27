@@ -1,5 +1,5 @@
-﻿using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
-using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
+using DataSpecificationNavigationBackend.Model;
 using OllamaSharp;
 using System.Text;
 
@@ -15,6 +15,11 @@ public class OllamaConnector(
 	private OllamaSettings? _ollamaSettings;
 	private OllamaApiClient? _ollamaClient;
 	private Chat? _chat;
+
+	public Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	{
+		throw new NotImplementedException();
+	}
 
 	public Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems)
 	{

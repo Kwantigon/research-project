@@ -1,6 +1,6 @@
-﻿using DataspecNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.Model;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IConversationService
 {

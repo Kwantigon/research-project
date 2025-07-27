@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DataspecNavigationBackend.Model;
+namespace DataSpecificationNavigationBackend.Model;
 
 public class Message
 {

@@ -1,13 +1,10 @@
-﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
+using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
-using DataspecNavigationBackend.BusinessCoreLayer;
-using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
-using DataspecNavigationBackend.BusinessCoreLayer.DTO;
-using DataspecNavigationBackend.BusinessCoreLayer.Facade;
-using DataspecNavigationBackend.ConnectorsLayer;
-using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -101,8 +98,8 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 		return endpoint;
 	});
 
-app.MapGet("/data-specifications/{dataSpecificationId}/items/{itemIri}/summary", // Todo: Might have to change itemIri to something else
-			([FromRoute] int dataSpecificationId, [FromRoute] string itemIri,
+app.MapGet("/data-specifications/{dataSpecificationId}/items/summary",
+			([FromRoute] int dataSpecificationId, [FromQuery] string itemIri,
 			IDataSpecificationController controller) => controller.GetItemSummaryAsync(dataSpecificationId, itemIri))
 	.WithOpenApi(endpoint =>
 	{

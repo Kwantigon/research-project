@@ -1,10 +1,10 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
-using DataspecNavigationBackend.ConnectorsLayer.Abstraction;
-using DataspecNavigationBackend.Model;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
+using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
 public class ConversationService(
 	ILogger<ConversationService> logger,
@@ -148,7 +148,7 @@ public class ConversationService(
 		}
 
 		_logger.LogTrace("Saving changes to the database and returning.");
-		await _database.SaveChangesAsync();
+		//await _database.SaveChangesAsync();
 		return replyMessage;
 	}
 }

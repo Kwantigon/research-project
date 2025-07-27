@@ -1,7 +1,6 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
-using DataspecNavigationBackend.BusinessCoreLayer.DTO;
 
-namespace DataspecNavigationBackend.BusinessCoreLayer.Abstraction;
+namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 
 public interface IConversationController
 {
