@@ -6,6 +6,5 @@ public interface IDataSpecificationController
 {
 	Task<IResult> ProcessDataspecerPackage(PostDataSpecificationsDTO payload);
 
-
-	//Task<IResult> AddEfTestDataSpecification(PostDataSpecificationsDTO payload);
+	Task<IResult> GetItemSummaryAsync(int dataSpecificationId, string itemIri);
 }

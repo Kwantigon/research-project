@@ -20,4 +20,6 @@ public interface ILlmConnector
 	/// <param name="mappedItems">Data specification items that the question mapped to.</param>
 	/// <returns>Data specification items that somehow relate to the question and can be used to expand the question.</returns>
 	Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems);
+
+	Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
 }

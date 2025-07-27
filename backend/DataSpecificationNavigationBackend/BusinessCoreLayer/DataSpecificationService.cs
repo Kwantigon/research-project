@@ -13,16 +13,18 @@ public class DataSpecificationService(
 	ILogger<DataSpecificationService> logger,
 	IDataspecerConnector dataspecerConnector,
 	IRdfProcessor rdfProcessor,
-	AppDbContext appDbContext) : IDataSpecificationService
+	AppDbContext appDbContext,
+	ILlmConnector llmConnector) : IDataSpecificationService
 {
 	private readonly ILogger<DataSpecificationService> _logger = logger;
 	private readonly IDataspecerConnector _dataspecerConnector = dataspecerConnector;
 	private readonly IRdfProcessor _rdfProcessor = rdfProcessor;
 	private readonly AppDbContext _database = appDbContext;
+	private readonly ILlmConnector _llmConnector = llmConnector;
 
 	public async Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName)
 	{
-		/*string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageUuid);
+		string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageUuid);
 		if (string.IsNullOrEmpty(dsv))
 		{
 			_logger.LogError("The exported package DSV is either null or empty.");
@@ -45,9 +47,10 @@ public class DataSpecificationService(
 
 		await _database.DataSpecifications.AddAsync(dataSpecification);
 		await _database.SaveChangesAsync();
-		return dataSpecification;*/
+		return dataSpecification;
 
-		DataSpecification dataSpecification = new DataSpecification()
+		// Mock
+		/*DataSpecification dataSpecification = new DataSpecification()
 		{
 			DataspecerPackageUuid = dataspecerPackageUuid,
 			Name = dataspecerPackageName,
@@ -56,12 +59,17 @@ public class DataSpecificationService(
 
 		await _database.DataSpecifications.AddAsync(dataSpecification);
 		await _database.SaveChangesAsync();
-		return dataSpecification;
+		return dataSpecification;*/
 	}
 
 	public async Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId)
 	{
 		return await _database.DataSpecifications.SingleOrDefaultAsync(dataSpec => dataSpec.Id == dataSpecificationId);
+	}
+
+	public async Task<IResult> GetItemSummaryAsync(int dataSpecificationId, string itemIri)
+	{
+		throw new NotImplementedException();
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)

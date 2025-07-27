@@ -147,8 +147,8 @@ public class ConversationController(
 			return Results.NotFound($"Conversation with ID {conversationId} not found.");
 		}
 		DataSpecification dataSpecification = conversation.DataSpecification;
-		_database.Conversations.Remove(conversation);
 		_database.DataSpecifications.Remove(dataSpecification);
+		_database.Conversations.Remove(conversation);
 		_database.SaveChanges();
 		return Results.NoContent();
 	}

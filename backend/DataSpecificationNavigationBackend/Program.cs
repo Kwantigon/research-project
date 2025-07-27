@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
+	// Scoped services (created per request).
 	.AddScoped<IConversationService, ConversationService>()
 	.AddScoped<IConversationController, ConversationController>()
 	.AddScoped<IDataSpecificationService, DataSpecificationService>()
@@ -21,7 +22,8 @@ builder.Services
 	.AddScoped<IDataspecerConnector, DataspecerConnector>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
-	.AddScoped<EntityFrameworkPlaceholder>()
+
+	// Singleton services (created once when the server starts).
 	.AddSingleton<ILlmConnector, GeminiConnector>()
 	;
 
@@ -82,52 +84,62 @@ app.MapGet("/conversations/{conversationId}",
 
 app.MapGet("/conversations/{conversationId}/messages",
 			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationMessagesAsync(conversationId))
-	.WithOpenApi(operation =>
+	.WithOpenApi(endpoint =>
 	{
-		operation.Summary = "Get all messages in the conversation.";
-		operation.Description = "Returns all messages ordered by their timestamps. The front end calls this when it loads a conversation and needs to display messages in the conversation.";
-		return operation;
+		endpoint.Summary = "Get all messages in the conversation.";
+		endpoint.Description = "Returns all messages ordered by their timestamps. The front end calls this when it loads a conversation and needs to display messages in the conversation.";
+		return endpoint;
 	});
 
 app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 			([FromRoute] int conversationId, [FromRoute] Guid messageId,
 			IConversationController controller) => controller.GetMessageAsync(conversationId, messageId))
-	.WithOpenApi(operation =>
+	.WithOpenApi(endpoint =>
 	{
-		operation.Summary = "Get the concrete message from a conversation.";
-		operation.Description = "Returns all available information about the requested message. The front end calls this to get the reply to an user's message.";
-		return operation;
+		endpoint.Summary = "Get the concrete message from a conversation.";
+		endpoint.Description = "Returns all available information about the requested message. The front end calls this to get the reply to an user's message.";
+		return endpoint;
+	});
+
+app.MapGet("/data-specifications/{dataSpecificationId}/items/{itemIri}/summary", // Todo: Might have to change itemIri to something else
+			([FromRoute] int dataSpecificationId, [FromRoute] string itemIri,
+			IDataSpecificationController controller) => controller.GetItemSummaryAsync(dataSpecificationId, itemIri))
+	.WithOpenApi(endpoint =>
+	{
+		endpoint.Summary = "";
+		endpoint.Description = "";
+		return endpoint;
 	});
 
 app.MapPost("/conversations/{conversationId}/messages",
 				([FromRoute] int conversationId,
 				[FromBody] PostConversationMessagesDTO payload,
 				IConversationController controller) => controller.ProcessUserMessageAsync(conversationId, payload))
-	.WithOpenApi(operation =>
+	.WithOpenApi(endpoint =>
 	{
-		operation.Summary = "Add a message to the conversation.";
-		operation.Description = "The message that should be added is always assumed to be an user message. Returns the created message that also contains the IRI of the reply message. The front end calls this endpoint to add the user's message to the conversation. It will then call the reply message's IRI to get the system's answer. This operation is currently synchronous. I might change it to an asynchronous operation later down the line.";
-		return operation;
+		endpoint.Summary = "Add a message to the conversation.";
+		endpoint.Description = "The message that should be added is always assumed to be an user message. Returns the created message that also contains the IRI of the reply message. The front end calls this endpoint to add the user's message to the conversation. It will then call the reply message's IRI to get the system's answer. This endpoint is currently synchronous. I might change it to an asynchronous endpoint later down the line.";
+		return endpoint;
 	});
 
 app.MapPost("/data-specifications",
 				([FromBody] PostDataSpecificationsDTO payload,
 				IDataSpecificationController controller) => controller.ProcessDataspecerPackage(payload))
-	.WithOpenApi(operation =>
+	.WithOpenApi(endpoint =>
 	{
-		operation.Summary = "Add a new data specification.";
-		operation.Description = "Exports and processes the necessary data from the Dataspecer package given in the payload's IRI. If a name is given, the processed data specification will be stored under that name, otherwise a default name will be used.";
-		return operation;
+		endpoint.Summary = "Add a new data specification.";
+		endpoint.Description = "Exports and processes the necessary data from the Dataspecer package given in the payload's IRI. If a name is given, the processed data specification will be stored under that name, otherwise a default name will be used.";
+		return endpoint;
 	});
 
 app.MapPost("/conversations",
 				([FromBody] PostConversationsDTO payload,
 				IConversationController controller) => controller.StartConversationAsync(payload))
-	.WithOpenApi(operation =>
+	.WithOpenApi(endpoint =>
 	{
-		operation.Summary = "Start a new conversation.";
-		operation.Description = "Starts a new conversation with the given title and using the given data specification in the payload. If the conversation title is not specified, a default name will be used instead.";
-		return operation;
+		endpoint.Summary = "Start a new conversation.";
+		endpoint.Description = "Starts a new conversation with the given title and using the given data specification in the payload. If the conversation title is not specified, a default name will be used instead.";
+		return endpoint;
 	});
 
 app.MapDelete("/conversations/{conversationId}",

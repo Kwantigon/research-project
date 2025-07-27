@@ -94,6 +94,22 @@ public class GeminiConnector : ILlmConnector
 		return relatedItems;
 	}
 
+	public async Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	{
+		_logger.LogTrace("Building a prompt for the item summary.");
+		string prompt = _promptConstructor.CreateGetItemSummaryPrompt(dataSpecificationItem);
+		_logger.LogDebug("Get item summary prompt: {Prompt}", prompt);
+
+		_logger.LogTrace("Prompting the LLM.");
+		string response = await SendPromptAsync(prompt);
+		_logger.LogDebug("LLM response: {Response}", response);
+
+		_logger.LogTrace("Extracting the item summary from the LLM response.");
+		string itemSummary = _responseProcessor.ExtractItemSummary(response);
+
+		_logger.LogTrace("Returning the item summary.");
+		return itemSummary;
+	}
 	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_gemini is null)
@@ -200,6 +216,17 @@ internal class PromptConstructor
 		```
 		""";
 
+	const string GET_ITEM_SUMMARY_PROMPT = """
+		Summarize the {0} with label \"{1}\" and iri \"{2}\" in a few sentences so that a non-technical person can understand it. This entity is in the following OWL file
+		```
+		{3}
+		```
+		""";
+	// {0} = Class / ObjectProperty / DatatypeProperty
+	// {1} = Item label (from OWL)
+	// {2} = Item iri (from OWL)
+	// {3} = The OWL content.
+
 	private readonly ILogger _logger;
 
 	internal PromptConstructor(ILogger logger)
@@ -224,6 +251,16 @@ internal class PromptConstructor
 		}
 		return string.Format(GET_RELATED_ITEMS_PROMPT, dataSpecification.Owl, stringBuilder.ToString(), question);
 	}
+
+	public string CreateGetItemSummaryPrompt(DataSpecificationItem item)
+	{
+		return string.Format(
+			GET_ITEM_SUMMARY_PROMPT,
+			item.Type.ToString(),
+			item.Label, item.Iri,
+			item.DataSpecification.Owl
+		);
+	}
 }
 
 internal class ResponseProcessor
@@ -243,6 +280,14 @@ internal class ResponseProcessor
 	public List<DataSpecificationItem>? ExtractRelatedItems(string llmResponse, DataSpecification dataSpecification)
 	{
 		return DeserializeDataSpecItems(llmResponse, dataSpecification);
+	}
+
+	public string ExtractItemSummary(string llmResponse)
+	{
+		// For now, I will ask the LLM to return the summary directly in the answer.
+		// No processing needed to extract the summary.
+		// Just return it.
+		return llmResponse;
 	}
 
 	private List<DataSpecificationItem>? DeserializeDataSpecItems(string llmResponse, DataSpecification dataSpecification)
