@@ -171,9 +171,16 @@ function ConversationPage() {
 	const handleItemClick = async (item: DataSpecificationItem, parentMessageId: string) => {
 		setSelectedItemForSummary({ item, parentMessageId });
 		setIsSummaryDialogOpen(true);
+		if (item.summary) {
+			// Summary is already present, no need to fetch it again.
+			setIsSummaryLoading(false);
+			setSummaryError(null);
+			return;
+		}
+
+		// If summary is not present.
 		setIsSummaryLoading(true);
 		setSummaryError(null);
-
 		try {
 			const uri = encodeURI(`${BACKEND_API_URL}${item.summaryEndpoint}`);
 			const response = await fetch(uri);
@@ -181,11 +188,14 @@ function ConversationPage() {
 				throw new Error(`Failed to fetch item summary: ${response.statusText}`);
 			}
 			const data = await response.json();
-			setSelectedItemForSummary(prev => prev ? { ...prev, item: { ...prev.item, summary: data.summary } } : null);
+			item.summary = data.summary;
+			//setSelectedItemForSummary(prev => prev ? { ...prev, item: { ...prev.item, summary: data.summary } } : null);
+			setSelectedItemForSummary({item, parentMessageId}); // Not sure if I need to call set again here but calling it just in case.
 		} catch (error) {
 			console.error('Error fetching item summary:', error);
 			setSummaryError('Failed to load item summary. Please try again.');
 			setSelectedItemForSummary(prev => prev ? { ...prev, item: { ...prev.item, summary: 'Summary could not be loaded.' } } : null);
+			// Not doing item.summary = "Summary could not be loaded." here because I want it to be fetched again upon clicking.
 		} finally {
 			setIsSummaryLoading(false);
 		}
@@ -197,21 +207,21 @@ function ConversationPage() {
 			setSelectedItemsForExpansion(updatedSelectedItems);
 			setIsSummaryDialogOpen(false);
 
-			// Simulate API call to get suggested message
-			/*fetch("/api/conversation/suggest-message", {
-				method: "POST",
+			// Call back end API to get the suggested message.
+			fetch(`${BACKEND_API_URL}/conversations/${conversationId}/user-selected-items`, {
+				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					conversationId: "current-conversation-id",
-					currentQuestion: messages[messages.length - 1]?.text, // Get the last user question
-					itemsToAdd: updatedSelectedItems.map(item => item.iri),
-				}),
+					//conversationId: "current-conversation-id",
+					//currentQuestion: messages[messages.length - 1]?.text, // Get the last user question
+					itemIriList: updatedSelectedItems.map(item => item.iri)
+				})
 			})
 			.then(res => res.json())
 			.then(data => {
 				setSuggestedMessage(data.suggestedMessage); // Set the suggested message in the chat box
 			})
-			.catch(error => console.error("Error generating suggested message:", error));*/
+			.catch(error => console.error("Error generating suggested message:", error));
 		}
 	};
 
