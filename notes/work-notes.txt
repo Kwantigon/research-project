@@ -217,15 +217,8 @@ Zbývá:
 
 # 26. 7.
 
-Pokud dataspecer connector dodá OWL, tak už to funguje.
-- V related items mi pořád chybí summary pro každý item. To můžu udělat tak, že když uživatel si rozklikne na ten item, tak tam bude třeba kolečko a POST pro summary. Když je dostupný, tak se zobrazí.
-- Musím vyřešit ten "foreign key constraint failed" problém. Pořád nevím, čím to je.
-
-Přemýšlím, jaký HTTP verb použít pro získání summary. Největší smysl dává samozřejmě GET.
-- Front end ale neví, o jakou datovou specifikaci se jedná, takže nemůže udělat GET /data-specifications/items/{itemId}/summary.
-- Ale můžu URI poslat v tom seznamu related items.
-
-Může být problém když chci poslat itemIri v URL. Nevím, jestli to jde.
+Problém: když LLM vrátí nějaké itemy, tak mohou být už v databázi. To pak vyvolává konflikt když znova volám save changes, protože EF Core si myslí, že chci uložit nové itemy, ale mají identické IRI.
 
 Package, které fungují:
-db2ad74f-ec45-4d46-84f8-24d36fbb4200
+db2ad74f-ec45-4d46-84f8-24d36fbb4200 (DCAT-...)
+ca85277a-8a2b-4874-bc7a-13bd48fe798a (Záznam informačního systému nahrazující úředně ověřený podpis)
