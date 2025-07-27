@@ -46,7 +46,6 @@ public class DataspecerConnector(
 			{
 				string dsv = reader.ReadToEnd();
 				_logger.LogTrace("Successfully read the DSV file.");
-				_logger.LogDebug(dsv);
 				return dsv;
 			}
 		}

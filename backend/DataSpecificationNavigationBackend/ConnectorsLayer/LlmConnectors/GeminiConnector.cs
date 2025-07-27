@@ -35,7 +35,6 @@ public class GeminiConnector : ILlmConnector
 
 		_logger.LogTrace("Building a prompt for mapping the question to items.");
 		string prompt = _promptConstructor.CreateQuestionToItemsMappingPrompt(question, dataSpecification);
-		_logger.LogDebug("Map question to items prompt: \"{Prompt}\"", prompt);
 
 		while (attempts < _retryAttempts && mapped is null)
 		{
@@ -68,7 +67,6 @@ public class GeminiConnector : ILlmConnector
 
 		_logger.LogTrace("Building a prompt for getting the related items.");
 		string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, mappedItems);
-		_logger.LogDebug("Get related items prompt: \"{Prompt}\"", prompt);
 
 		while (attempts < _retryAttempts && relatedItems is null)
 		{
@@ -98,7 +96,6 @@ public class GeminiConnector : ILlmConnector
 	{
 		_logger.LogTrace("Building a prompt for the item summary.");
 		string prompt = _promptConstructor.CreateGetItemSummaryPrompt(dataSpecificationItem);
-		_logger.LogDebug("Get item summary prompt: {Prompt}", prompt);
 
 		_logger.LogTrace("Prompting the LLM.");
 		string response = await SendPromptAsync(prompt);

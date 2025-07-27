@@ -47,18 +47,6 @@ public class DataSpecificationService(
 		await _database.DataSpecifications.AddAsync(dataSpecification);
 		await _database.SaveChangesAsync();
 		return dataSpecification;
-
-		// Mock
-		/*DataSpecification dataSpecification = new DataSpecification()
-		{
-			DataspecerPackageUuid = dataspecerPackageUuid,
-			Name = dataspecerPackageName,
-			Owl = File.ReadAllText("C:/Users/nquoc/MatFyz/research-project/repo/research-project/backend/DataSpecificationNavigationBackend/local/insurance.owl.ttl"),
-		};
-
-		await _database.DataSpecifications.AddAsync(dataSpecification);
-		await _database.SaveChangesAsync();
-		return dataSpecification;*/
 	}
 
 	public async Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId)

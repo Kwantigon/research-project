@@ -30,7 +30,7 @@ public class DataSpecificationController(
 	public async Task<IResult> GetItemSummaryAsync(int dataSpecificationId, string itemIri)
 	{
 		itemIri = Uri.UnescapeDataString(itemIri);
-		/*_logger.LogTrace("Getting a summary for the item with IRI = \"{Iri}\" from the data specification with ID = {DataSpecId}", itemIri, dataSpecificationId);
+		_logger.LogTrace("Getting a summary for the item with IRI = \"{Iri}\" from the data specification with ID = {DataSpecId}", itemIri, dataSpecificationId);
 
 		_logger.LogTrace("Searching for the data specification with ID={Id}.", dataSpecificationId);
 		DataSpecification? dataSpecification = await _dataSpecificationService.GetDataSpecificationAsync(dataSpecificationId);
@@ -57,15 +57,12 @@ public class DataSpecificationController(
 				_logger.LogError("Item summary is still null after the generation method finished.");
 				return Results.InternalServerError(new ErrorDTO() { Reason = $"Failed to generate a summary for item {item.Label}" });
 			}
-		} else
+		}
+		else
 		{
 			_logger.LogTrace("Item summary is already present - returning it.");
 		}
 
-		return Results.Ok(new ItemSummaryDTO(item.Summary));*/
-		_logger.LogDebug("Getting a summary for the item with IRI = \"{Iri}\" from the data specification with ID = {DataSpecId}", itemIri, dataSpecificationId);
-		await Task.Delay(2000);
-		_logger.LogTrace("Returning a mock item summary.");
-		return Results.Ok(new ItemSummaryDTO("Mock item sumary. AAAAAABBBBBBBBBCCCCCCCCC."));
+		return Results.Ok(new ItemSummaryDTO(item.Summary));
 	}
 }

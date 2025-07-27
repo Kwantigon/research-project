@@ -5,6 +5,7 @@ using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
+using DataSpecificationNavigationBackend.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,7 +63,7 @@ app.UseCors();
 app.MapGet("/", () => "Hello there!");
 
 app.MapGet("/conversations",
-			(IConversationController controller) => controller.GetAllConversationsAsync())
+			async (IConversationController controller) => await controller.GetAllConversationsAsync())
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get all ongoing conversations.";
@@ -71,7 +72,7 @@ app.MapGet("/conversations",
 	});
 
 app.MapGet("/conversations/{conversationId}",
-			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationAsync(conversationId))
+			async ([FromRoute] int conversationId, IConversationController controller) => await controller.GetConversationAsync(conversationId))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get information about the conversation.";
@@ -80,7 +81,7 @@ app.MapGet("/conversations/{conversationId}",
 	});
 
 app.MapGet("/conversations/{conversationId}/messages",
-			([FromRoute] int conversationId, IConversationController controller) => controller.GetConversationMessagesAsync(conversationId))
+			async ([FromRoute] int conversationId, IConversationController controller) => await controller.GetConversationMessagesAsync(conversationId))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get all messages in the conversation.";
@@ -89,8 +90,8 @@ app.MapGet("/conversations/{conversationId}/messages",
 	});
 
 app.MapGet("/conversations/{conversationId}/messages/{messageId}",
-			([FromRoute] int conversationId, [FromRoute] Guid messageId,
-			IConversationController controller) => controller.GetMessageAsync(conversationId, messageId))
+			async ([FromRoute] int conversationId, [FromRoute] Guid messageId,
+						IConversationController controller) => await controller.GetMessageAsync(conversationId, messageId))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Get the concrete message from a conversation.";
@@ -99,8 +100,8 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 	});
 
 app.MapGet("/data-specifications/{dataSpecificationId}/items/summary",
-			([FromRoute] int dataSpecificationId, [FromQuery] string itemIri,
-			IDataSpecificationController controller) => controller.GetItemSummaryAsync(dataSpecificationId, itemIri))
+			async ([FromRoute] int dataSpecificationId, [FromQuery] string itemIri,
+						IDataSpecificationController controller) => await controller.GetItemSummaryAsync(dataSpecificationId, itemIri))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "";
@@ -109,9 +110,9 @@ app.MapGet("/data-specifications/{dataSpecificationId}/items/summary",
 	});
 
 app.MapPost("/conversations/{conversationId}/messages",
-				([FromRoute] int conversationId,
-				[FromBody] PostConversationMessagesDTO payload,
-				IConversationController controller) => controller.ProcessUserMessageAsync(conversationId, payload))
+				async ([FromRoute] int conversationId,
+							[FromBody] PostConversationMessagesDTO payload,
+							IConversationController controller) => await controller.ProcessUserMessageAsync(conversationId, payload))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Add a message to the conversation.";
@@ -120,8 +121,8 @@ app.MapPost("/conversations/{conversationId}/messages",
 	});
 
 app.MapPost("/data-specifications",
-				([FromBody] PostDataSpecificationsDTO payload,
-				IDataSpecificationController controller) => controller.ProcessDataspecerPackage(payload))
+				async ([FromBody] PostDataSpecificationsDTO payload,
+							IDataSpecificationController controller) => await controller.ProcessDataspecerPackage(payload))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Add a new data specification.";
@@ -130,8 +131,8 @@ app.MapPost("/data-specifications",
 	});
 
 app.MapPost("/conversations",
-				([FromBody] PostConversationsDTO payload,
-				IConversationController controller) => controller.StartConversationAsync(payload))
+				async ([FromBody] PostConversationsDTO payload,
+							IConversationController controller) => await controller.StartConversationAsync(payload))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Start a new conversation.";
@@ -140,26 +141,7 @@ app.MapPost("/conversations",
 	});
 
 app.MapDelete("/conversations/{conversationId}",
-				([FromRoute] int conversationId,
-				IConversationController controller) => controller.DeleteConversationAsync(conversationId));
-
-/*app.MapPost("/ef-test/conversations",
-				([FromBody] PostConversationsDTO payload,
-				IConversationController controller) => controller.StartEfTestConversation(payload));
-
-app.MapPost("/ef-test/data-specifications",
-				([FromBody] PostDataSpecificationsDTO payload,
-				IDataSpecificationController controller) => controller.AddEfTestDataSpecification(payload));
-
-app.MapGet("/ef-test/data-specifications", (AppDbContext database) =>
-{
-	return Results.Ok(database.DataSpecifications.ToList());
-});
-
-app.MapDelete("ef-test/data-specifications", async (AppDbContext database) =>
-{
-	int rows = await database.DataSpecifications.ExecuteDeleteAsync();
-	return Results.Ok($"Deleted {rows} data specifications.");
-});*/
+				async ([FromRoute] int conversationId,
+							IConversationController controller) => await controller.DeleteConversationAsync(conversationId));
 
 app.Run();

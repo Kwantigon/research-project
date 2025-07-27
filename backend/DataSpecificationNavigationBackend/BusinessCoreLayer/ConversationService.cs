@@ -117,8 +117,6 @@ public class ConversationService(
 			return replyMessage;
 		}
 
-		// ToDo: Add the lazy loading dependency (proxies).
-		// Also change the classes in Model to support lazy loading with virtual properties.
 		_logger.LogTrace("Mapping the user's question to data specification items.");
 		List<DataSpecificationItem> mappedItems = await _llmConnector.MapQuestionToItemsAsync(userMessage.Conversation.DataSpecification, userMessage.TextValue);
 		_logger.LogTrace("Mapped the question to {ItemsCount} items.", mappedItems.Count);
@@ -148,7 +146,7 @@ public class ConversationService(
 		}
 
 		_logger.LogTrace("Saving changes to the database and returning.");
-		//await _database.SaveChangesAsync();
+		await _database.SaveChangesAsync();
 		return replyMessage;
 	}
 }
