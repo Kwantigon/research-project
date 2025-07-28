@@ -9,11 +9,13 @@ namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 public class ConversationService(
 	ILogger<ConversationService> logger,
 	AppDbContext appDbContext,
-	ILlmConnector llmConnector) : IConversationService
+	ILlmConnector llmConnector,
+	IDataSpecificationService dataSpecificationService) : IConversationService
 {
 	private readonly ILogger<ConversationService> _logger = logger;
 	private readonly AppDbContext _database = appDbContext;
 	private readonly ILlmConnector _llmConnector = llmConnector;
+	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
 
 	public async Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification)
 	{
@@ -96,6 +98,47 @@ public class ConversationService(
 		userMessage.ReplyMessageId = replyMessage.Id;
 		userMessage.ReplyMessage = replyMessage;
 
+		if (userModifiedSuggestedMessage)
+		{
+			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
+
+			_logger.LogTrace("Mapping the question to data specification items.");
+			List<DataSpecificationItem> mappedItems = await _llmConnector.MapQuestionToItemsAsync(conversation.DataSpecification, userMessage.TextValue);
+			_logger.LogDebug("Mapped the question to the following items: {MappedItems}", mappedItems);
+			if (mappedItems.Count == 0)
+			{
+				_logger.LogError("No suitable data specification items found for the question mapping.");
+				replyMessage.TextValue = "I could not find anything suitable in the data specification to help with your question.";
+				_logger.LogTrace("Not doing any changes to the conversation substructure.");
+			}
+			else
+			{
+				_logger.LogTrace("Setting the conversation data spec substructure to the newly mapped items.");
+				conversation.DataSpecificationSubstructure = mappedItems;
+			}
+		}
+		else
+		{
+			_logger.LogTrace("User did not modify the suggested message.");
+
+			if (conversation.UserSelectedItems is null || conversation.UserSelectedItems.Count == 0)
+			{
+				_logger.LogError("userModifiedSuggestedMessage==false but there are no items for expansion selected by the user in the conversation.");
+			}
+			else
+			{
+				_logger.LogTrace("Searching for the items that the user has previously selected.");
+				List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetItemsByIriListAsync(conversation.DataSpecificationId, conversation.UserSelectedItems);
+				_logger.LogDebug("conversation.UserSelectedItems.Count = {SelectedCount}, selectedItems.Count = {SelectedFound}", conversation.UserSelectedItems.Count, selectedItems.Count);
+
+				_logger.LogTrace("Filtering the selected items - keeping only those that are not already in the conversation data spec substructure.");
+				List<DataSpecificationItem>  itemsNotInConversation = selectedItems.Where(selected => !conversation.DataSpecificationSubstructure.Any(i => i.Iri == selected.Iri)).ToList();
+
+				_logger.LogTrace("Adding the selected items to the conversation.");
+				conversation.DataSpecificationSubstructure.AddRange(itemsNotInConversation);
+			}
+		}
+
 		_logger.LogTrace("Saving changes to the database and returning.");
 		await _database.SaveChangesAsync();
 		return userMessage;
@@ -117,29 +160,32 @@ public class ConversationService(
 			return replyMessage;
 		}
 
-		_logger.LogTrace("Mapping the user's question to data specification items.");
-		List<DataSpecificationItem> mappedItems = await _llmConnector.MapQuestionToItemsAsync(userMessage.Conversation.DataSpecification, userMessage.TextValue);
-		_logger.LogTrace("Mapped the question to {ItemsCount} items.", mappedItems.Count);
-		if (mappedItems.Count == 0)
-		{
-			_logger.LogWarning("No suitable data specification items found for the question mapping.");
-			replyMessage.TextValue = "I could not find anything suitable in the data specification to help with your question.";
-		}
-		else
-		{
-			// Todo: Update the conversation substructure.
-			// Which means I need to add a property that holds the substructure to the conversation.
-			_logger.LogTrace("To do: Updating the conversation's data specification substructure.");
+		// Todo: Generate a Sparql query.
+		// Which means I need to implement the Sparql generation.
+		_logger.LogTrace("To do: Generating a Sparql query.");
+		string sparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextValue}\"]";
 
-			// Todo: Generate a Sparql query.
-			// Which means I need to implement the Sparql generation.
-			_logger.LogTrace("To do: Generating a Sparql query.");
-			string sparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextValue}\"]";
+		_logger.LogTrace("Getting items related to the question.");
+		List<DataSpecificationItem> relatedItems = await _llmConnector.GetRelatedItemsAsync(
+			userMessage.Conversation.DataSpecification, userMessage.TextValue, userMessage.Conversation.DataSpecificationSubstructure);
+		_logger.LogTrace("Found {ItemsCount} related items.", relatedItems.Count);
 
-			_logger.LogTrace("Getting items related to the question.");
-			List<DataSpecificationItem> relatedItems = await _llmConnector.GetRelatedItemsAsync(
-				userMessage.Conversation.DataSpecification, userMessage.TextValue, mappedItems);
-			_logger.LogTrace("Found {ItemsCount} related items.", relatedItems.Count);
+		// Todo: Change this quick and dirty solution.
+		// Check if any of the related items is already in the database.
+		// If yes, take that item from the database instead.
+		// This is to prevent _database.SaveChangesAsync from throwing an exception that some item IRIs are already in the database.
+		for (int i = 0; i < relatedItems.Count; i++)
+		{
+			{
+				DataSpecificationItem item = relatedItems[i];
+				DataSpecificationItem? fromDb = await _database.DataSpecificationItems.SingleOrDefaultAsync(
+					i => i.DataSpecificationId == item.DataSpecificationId && i.Iri == item.Iri);
+
+				if (fromDb != null)
+				{
+					relatedItems[i] = fromDb;
+				}
+			}
 
 			replyMessage.TextValue = $"The data you want can be retrieved using the following sparl query: {sparqlQuery}";
 			replyMessage.RelatedItems = relatedItems;
@@ -148,5 +194,27 @@ public class ConversationService(
 		_logger.LogTrace("Saving changes to the database and returning.");
 		await _database.SaveChangesAsync();
 		return replyMessage;
+	}
+
+	public async Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems)
+	{
+		// Todo: Add log trace.
+		Message? userMessage = null;
+		for (int i = conversation.Messages.Count - 1; i >= 0; i--)
+		{
+			if (conversation.Messages[i].Type is MessageType.UserMessage)
+			{
+				userMessage = conversation.Messages[i];
+				break;
+			}
+		}
+		if (userMessage is null)
+		{
+			_logger.LogError("The conversation does not contain any user messages.");
+			return null;
+		}
+
+		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextValue, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
+		return suggestedMessage;
 	}
 }

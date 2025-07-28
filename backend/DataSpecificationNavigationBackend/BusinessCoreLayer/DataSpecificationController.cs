@@ -41,7 +41,7 @@ public class DataSpecificationController(
 		}
 
 		_logger.LogTrace("Searching for the item with IRI \"{Iri}\"", itemIri);
-		DataSpecificationItem? item = await _dataSpecificationService.GetDataSpecificationItem(dataSpecificationId, itemIri);
+		DataSpecificationItem? item = await _dataSpecificationService.GetDataSpecificationItemAsync(dataSpecificationId, itemIri);
 		if (item is null)
 		{
 			_logger.LogError("Item with IRI = \"{Iri}\" does not exist.", itemIri);

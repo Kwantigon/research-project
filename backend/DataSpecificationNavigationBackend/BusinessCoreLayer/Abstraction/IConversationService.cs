@@ -20,4 +20,6 @@ public interface IConversationService
 	/// The reply message containing the Sparql query and related items.
 	/// </returns>
 	Task<Message?> GenerateReplyMessage(Message userMessage);
+
+	Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems);
 }

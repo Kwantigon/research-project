@@ -107,7 +107,7 @@ function ConversationPage() {
 			const requestBody = JSON.stringify(
 					{
 						textValue: userMessage.text,
-						userModifiedPreviewMessage: !(userMessage.text === suggestedMessage)
+						userModifiedSuggestedMessage: !(userMessage.text === suggestedMessage)
 					});
 			console.log("Sending a POST request with body " + requestBody);
 			const postUserMsgResponse = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`, {

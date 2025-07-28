@@ -1,7 +1,6 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
 using GenerativeAI;
-using System.Text;
 using System.Text.Json;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
@@ -16,9 +15,6 @@ public class GeminiConnector : ILlmConnector
 
 	public GeminiConnector(ILogger<GeminiConnector> logger)
 	{
-		/*_logger = LoggerFactory
-											.Create(config => config.SetMinimumLevel(LogLevel.Trace).AddConsole())
-											.CreateLogger<GeminiConnector>();*/
 		_logger = logger;
 		_promptConstructor = new(_logger);
 		_responseProcessor = new(_logger);
@@ -34,11 +30,12 @@ public class GeminiConnector : ILlmConnector
 		List<DataSpecificationItem>? mapped = null;
 
 		_logger.LogTrace("Building a prompt for mapping the question to items.");
-		string prompt = _promptConstructor.CreateQuestionToItemsMappingPrompt(question, dataSpecification);
+		string prompt = _promptConstructor.CreateMapQuestionToItemsPrompt(question, dataSpecification);
+		_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && mapped is null)
 		{
-			_logger.LogTrace("Attempt number {AttemptCount}", attempts + 1);
+			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
 
 			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
@@ -52,25 +49,25 @@ public class GeminiConnector : ILlmConnector
 		if (mapped is null)
 		{
 			_logger.LogError("The data specification items list is still null after " + _retryAttempts + " attempts.");
-			throw new Exception("An error occurred while mapping the question to data specification items.");
-			// Todo: Gracefully handle the result instead of throwing an exception.
+			return [];
 		}
 
 		_logger.LogTrace("Returning the mapped items.");
 		return mapped;
 	}
 
-	public async Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems)
+	public async Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> currentSubstructure)
 	{
 		int attempts = 0;
 		List<DataSpecificationItem>? relatedItems = null;
 
 		_logger.LogTrace("Building a prompt for getting the related items.");
-		string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, mappedItems);
+		string prompt = _promptConstructor.CreateGetRelatedItemsPrompt(question, dataSpecification, currentSubstructure);
+		_logger.LogDebug("Get related items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && relatedItems is null)
 		{
-			_logger.LogTrace("Attempt number {AttemptCount}", attempts + 1);
+			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
 
 			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
@@ -92,10 +89,11 @@ public class GeminiConnector : ILlmConnector
 		return relatedItems;
 	}
 
-	public async Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	public async Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
 	{
 		_logger.LogTrace("Building a prompt for the item summary.");
-		string prompt = _promptConstructor.CreateGetItemSummaryPrompt(dataSpecificationItem);
+		string prompt = _promptConstructor.CreateGenerateItemSummaryPrompt(dataSpecificationItem);
+		_logger.LogDebug("Generate item summary prompt:\n{Prompt}", prompt);
 
 		_logger.LogTrace("Prompting the LLM.");
 		string response = await SendPromptAsync(prompt);
@@ -107,6 +105,24 @@ public class GeminiConnector : ILlmConnector
 		_logger.LogTrace("Returning the item summary.");
 		return itemSummary;
 	}
+
+	public async Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure)
+	{
+		_logger.LogTrace("Building a prompt for the suggested message.");
+		string prompt = _promptConstructor.CreateGenerateSuggestedMessagePrompt(originalQuestion, dataSpecification, selectedItems, currentSubstructure);
+		_logger.LogDebug("Generate suggested message:\n{Prompt}", prompt);
+
+		_logger.LogTrace("Prompting the LLM.");
+		string response = await SendPromptAsync(prompt);
+		_logger.LogDebug("LLM response: {Response}", response);
+
+		_logger.LogTrace("Extracting the suggested message from the LLM response.");
+		string itemSummary = _responseProcessor.ExtractSuggestedMessage(response);
+
+		_logger.LogTrace("Returning the suggested message.");
+		return itemSummary;
+	}
+
 	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_gemini is null)
@@ -120,112 +136,138 @@ public class GeminiConnector : ILlmConnector
 
 internal class PromptConstructor
 {
+	// {0} = Data specification (OWL file).
+	// {1} = User question.
 	const string MAP_QUESTION_TO_ITEMS_PROMPT = """
-		Given an OWL file describing a data specification and a question in natural language, map the question to relevant OWL entities and return them in a JSON according to the following schema:
-		[{{
-			"Iri": "",
-			"Type": "",
-			"Label": "",
-			"Comment": ""
-		}}]
+		You are a system that maps natural language questions to items in a structured data specification given as an OWL file.
 
-		Example output:
-		[
-			{{
-				"Iri": "https://www.example.com/item-one",
-				"Type": "Class",
-				"Label": "item one",
-				"Comment": ""
-			}},
-			{{
-				"Iri": "https://www.example.com/item-two",
-				"Type": "ObjectProperty",
-				"Label": "item two",
-				"Comment": ""
-			}},
-			{{
-				"Iri": "https://www.example.com/item-three",
-				"Type": "DatatypeProperty",
-				"Label": "item three",
-				"Comment": ""
-			}}
-		]
-
-		Return only the JSON array. Do not surround it with backticks.
-
-		The OWL file is
+		### Data specification
+		The specification describes entities and their attributes. Here is the OWL file containing the data specification:
 		```
 		{0}
 		```
 
-		The question is
-		```
-		{1}
-		```
+		### User question
+		The question that user asked is:
+		"{1}"
+
+		### Task
+		Identify which items from the specification are relevant to the question. 
+		Return a JSON array corresponding to the following schema:
+		[{{
+				"Iri": "",
+				"Type": "",
+				"Label": "",
+				"Comment": ""
+		}}]
+
+		Example output:
+		[
+			{{ "Iri": "https://www.example.com/item-one", "Type": "Class", "Label": "item one", "Comment": "" }},
+			{{ "Iri": "https://www.example.com/item-two", "Type": "ObjectProperty", "Label": "item two", "Comment": "" }},
+			{{ "Iri": "https://www.example.com/item-three", "Type": "DatatypeProperty", "Label": "item three", "Comment": "" }}
+		]
+
+		Do not include unrelated items. If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.
+		Return **only JSON** with no extra commentary and do not surround the answer in backticks.
+		
 		""";
 
+	// {0} = Data specification (OWL file).
+	// {1} = User question.
+	// {2} = Current data specification substructure in the conversation.
 	const string GET_RELATED_ITEMS_PROMPT = """
-		Given an OWL file describing a data specification, question in natural language and the OWL entities mapped from the question to the data specification, give me 5 entities from the data specification that are not the mapped entities and are relevant to the original question. Return them in a JSON according to the following schema:
-		[{{
-			"Iri": "",
-			"Type": "",
-			"Label": "",
-			"Comment": ""
-		}}]
+		You are assisting a user in exploring a data specification.
 
-		Example output:
-		[
-			{{
-				"Iri": "https://www.example.com/item-one",
-				"Type": "Class",
-				"Label": "item one",
-				"Comment": ""
-			}},
-			{{
-				"Iri": "https://www.example.com/item-two",
-				"Type": "ObjectProperty",
-				"Label": "item two",
-				"Comment": ""
-			}},
-			{{
-				"Iri": "https://www.example.com/item-three",
-				"Type": "DatatypeProperty",
-				"Label": "item three",
-				"Comment": ""
-			}}
-		]
-
-		Return only the JSON array. Do not surround it with backticks.
-
-		The OWL file is
+		### Data specification
+		Here is the data specification given as an OWL file.
 		```
 		{0}
 		```
 
-		The mapped entities are
+		### User question
+		The question that user asked is:
+		"{1}"
+
+		### Current context
+		The user’s question already involves these items:
+		{2}
+
+		### Task
+		Suggest other items from the specification that may be relevant to expanding the user’s question.
+		Return a JSON array corresponding to the following schema:
+		[{{
+				"Iri": "",
+				"Type": "",
+				"Label": "",
+				"Comment": ""
+		}}]
+
+		Example output:
+		[
+			{{ "Iri": "https://www.example.com/item-one", "Type": "Class", "Label": "item one", "Comment": "" }},
+			{{ "Iri": "https://www.example.com/item-two", "Type": "ObjectProperty", "Label": "item two", "Comment": "" }},
+			{{ "Iri": "https://www.example.com/item-three", "Type": "DatatypeProperty", "Label": "item three", "Comment": "" }}
+		]
+
+		Do not include unrelated items. If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.
+		Return **only JSON** with no extra commentary and do not surround the answer in backticks.
+		
+		""";
+
+	// {0} = Data specification (OWL file).
+	// {1} = Item iri (from OWL).
+	// {2} = Item label (from OWL).
+	// {3} = Item type (Class / ObjectProperty / DatatypeProperty).
+	const string GENERATE_ITEM_SUMMARY_PROMPT = """
+		You are generating a user-friendly summary for a data specification item.
+
+		### Data specification
+		Here is the data specification given as an OWL file.
+		```
+		{0}
+		```
+
+		### Item
+		Iri: {1}
+		Label: {2}
+		Type: {3}
+
+		### Task
+		Provide a brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification.
+		Return only the summary and nothing else.
+		""";
+
+	// {0} = Original question.
+	// {1} = Data specification in OWL.
+	// {2} = The current data speification substructure in the conversation.
+	// {3} = The items that user selected.
+
+	const string GENERATE_SUGGESTED_MESSAGE_PROMPT = """
+		You are assisting an user in refining their data query.
+
+		### Original question
+		The user originally asked:
+		"{0}"
+
+		### Data specification
+		The current data specification is given in the following OWL file
 		```
 		{1}
 		```
 
-		The question is
-		```
+		### Current context
+		The current query context includes items:
 		{2}
-		```
-		""";
 
-	const string GET_ITEM_SUMMARY_PROMPT = """
-		Explain the {0} with label \"{1}\" and iri \"{2}\" in the context of specification given the the OWL file. Provide a brief summary suitable for non-technical end-users.
-		Return only the summary and nothing else. Do not include any explanations or apologies.
-
-		The OWL file is
-		```
+		### Newly added items
+		The user has now added these items:
 		{3}
-		```
+
+		### Task
+		Generate a new natural language question that integrates the added items 
+		smoothly and remains faithful to the user’s intent. Only return the natural language question and nothing else. Do not include any explanations or apologies.
 		""";
-	// {0} = Class / ObjectProperty / DatatypeProperty
-	// {1} = Item label (from OWL)
-	// {2} = Item iri (from OWL)
-	// {3} = The OWL content.
 
 	private readonly ILogger _logger;
 
@@ -234,32 +276,49 @@ internal class PromptConstructor
 		_logger = logger;
 	}
 
-	public string CreateQuestionToItemsMappingPrompt(string question, DataSpecification dataSpecification)
+	public string CreateMapQuestionToItemsPrompt(string question, DataSpecification dataSpecification)
 	{
 		return string.Format(MAP_QUESTION_TO_ITEMS_PROMPT, dataSpecification.Owl, question);
 	}
 
-	public string CreateGetRelatedItemsPrompt(string question, DataSpecification dataSpecification, List<DataSpecificationItem> relatedItems)
+	public string CreateGetRelatedItemsPrompt(string question, DataSpecification dataSpecification, List<DataSpecificationItem> currentSubstructure)
 	{
-		StringBuilder stringBuilder = new StringBuilder();
-		string prefix = string.Empty;
-		foreach (DataSpecificationItem item in relatedItems)
-		{
-			stringBuilder.Append(prefix);
-			prefix = ", ";
-			stringBuilder.Append(item.Iri);
-		}
-		return string.Format(GET_RELATED_ITEMS_PROMPT, dataSpecification.Owl, stringBuilder.ToString(), question);
+		return string.Format(GET_RELATED_ITEMS_PROMPT, dataSpecification.Owl, question, string.Join(", ", currentSubstructure.Select(item => item.Iri)));
 	}
 
-	public string CreateGetItemSummaryPrompt(DataSpecificationItem item)
+	public string CreateGenerateItemSummaryPrompt(DataSpecificationItem item)
 	{
-		return string.Format(
-			GET_ITEM_SUMMARY_PROMPT,
-			item.Type.ToString(),
-			item.Label, item.Iri,
-			item.DataSpecification.Owl
-		);
+		return string.Format(GENERATE_ITEM_SUMMARY_PROMPT, item.DataSpecification.Owl, item.Iri, item.Label, item.Type);
+	}
+
+	public string CreateGenerateSuggestedMessagePrompt(
+		string originalQuestion, DataSpecification dataSpecification,
+		List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure)
+	{
+
+		/*StringBuilder substructureSb = new('[');
+		string prefix = string.Empty;
+		foreach (var item in currentSubstructure)
+		{
+			substructureSb.Append(prefix);
+			substructureSb.Append($"{{ \"iri\": \"{item.Iri}\", \"label\": \"{item.Label}\" }}");
+			prefix = ", ";
+		}
+		substructureSb.Append(']');
+
+		StringBuilder selectedSb = new('[');
+		foreach (var item in selectedItems)
+		{
+			selectedSb.Append(prefix);
+			selectedSb.Append($"{{ \"iri\": \"{item.Iri}\", \"label\": \"{item.Label}\" }}");
+			prefix = ", ";
+		}
+		selectedSb.Append(']');
+		return string.Format(GENERATE_SUGGESTED_MESSAGE_PROMPT, originalQuestion, dataSpecification.Owl, substructureSb.ToString(), selectedSb.ToString());*/
+
+		string substructureString = string.Join(", ", currentSubstructure.Select(item => item.Iri));
+		string selectedString = string.Join(", ", selectedItems.Select(item => item.Iri));
+		return string.Format(GENERATE_SUGGESTED_MESSAGE_PROMPT, originalQuestion, dataSpecification.Owl, substructureString, selectedString);
 	}
 }
 
@@ -283,6 +342,14 @@ internal class ResponseProcessor
 	}
 
 	public string ExtractItemSummary(string llmResponse)
+	{
+		// For now, I will ask the LLM to return the summary directly in the answer.
+		// No processing needed to extract the summary.
+		// Just return it.
+		return llmResponse;
+	}
+
+	public string ExtractSuggestedMessage(string llmResponse)
 	{
 		// For now, I will ask the LLM to return the summary directly in the answer.
 		// No processing needed to extract the summary.

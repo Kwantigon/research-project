@@ -115,25 +115,53 @@ public class ConversationController(
 
 	public async Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload)
 	{
+		_logger.LogInformation("Processing incoming user message. ConversationId = {ConvId}, payload = {Payload}", conversationId, payload);
+
+		_logger.LogTrace("Searching for the conversation.");
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation == null)
 		{
-			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
+			_logger.LogError("Conversation with ID {ConvId} not found.", conversationId);
+			return Results.NotFound(new ErrorDTO { Reason = "Conversation not found." });
 		}
 
-		Message userMessage = await _conversationService.AddNewUserMessage(conversation, payload.TextValue, DateTime.Now, payload.UserModifiedPreviewMessage);
+		_logger.LogTrace("Adding the user message to the conversation.");
+		Message userMessage = await _conversationService.AddNewUserMessage(conversation, payload.TextValue, DateTime.Now, payload.UserModifiedSuggestedMessage);
 
-		// Map the user's question to items from the data specification.
-
-		// Get a list of data specification items that are relevant to the question.
-
-		// Translate to Sparql.
-
-		// Create a reply message and add that message to the conversation. The reply message also contains the list of relevant items.
-
-		//return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", userMessage);
-		var dto = (ConversationMessageDTO)userMessage;
 		return Results.Created($"/conversations/{conversationId}/messages/{userMessage.Id}", (ConversationMessageDTO)userMessage);
+	}
+
+	public async Task<IResult> AddSelectedItemsAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload)
+	{
+		_logger.LogTrace("Items selected by the user for conversation with ID {Id}: {ItemIris}", conversationId, payload.ItemIriList);
+
+		_logger.LogTrace("Searching for the conversation with ID={Id}", conversationId);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
+		if (conversation is null)
+		{
+			_logger.LogError("Conversation with ID={Id} not found.", conversationId);
+			return Results.NotFound(new ErrorDTO() { Reason = "Conversation not found" });
+		}
+
+		_logger.LogTrace("Searching for the selected items.");
+		List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetItemsByIriListAsync(conversation.DataSpecificationId, payload.ItemIriList);
+		if (selectedItems.Count != payload.ItemIriList.Count)
+		{
+			List<string> itemsNotFound = payload.ItemIriList.Where(iri => !selectedItems.Any(itemFound => itemFound.Iri == iri)).ToList();
+			_logger.LogError("The following item IRIs were not found: {Items}", itemsNotFound);
+			return Results.BadRequest(new ErrorDTO() { Reason = "One or more selected items are not present in the data specification." });
+		}
+
+		_logger.LogTrace("Generating a suggested message.");
+		string? suggestedMessage = await _conversationService.GenerateSuggestedMessageAsync(conversation, selectedItems);
+		if (string.IsNullOrEmpty(suggestedMessage))
+		{
+			_logger.LogError("The suggested message is either null or empty.");
+			return Results.InternalServerError(new ErrorDTO() { Reason = "There was an error while generating the suggested message." });
+		}
+
+		_logger.LogTrace("Returning the suggested message: {SuggestedMessage}", suggestedMessage);
+		return Results.Ok(new SuggestedMessageDTO(suggestedMessage));
 	}
 
 	// Todo: Should call a method on ConversationService.
@@ -145,6 +173,7 @@ public class ConversationController(
 		{
 			return Results.NotFound($"Conversation with ID {conversationId} not found.");
 		}
+
 		DataSpecification dataSpecification = conversation.DataSpecification;
 		_database.DataSpecifications.Remove(dataSpecification);
 		_database.Conversations.Remove(conversation);

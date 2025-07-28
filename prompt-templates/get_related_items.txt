@@ -1,0 +1,35 @@
+You are assisting a user in exploring a data specification.
+
+### Data Specification
+Here is the data specification given as an OWL file.
+```
+{OwlFileContent}
+```
+
+### User Question
+The question that user asked is:
+"{userQuestion}"
+
+### Current Context
+The user’s question already involves these items:
+{dataSpecificationSubstructure}
+
+### Task
+Suggest other items from the specification that may be relevant to expanding the user’s question.
+Return a JSON array corresponding to the following schema:
+[{{
+		"Iri": "",
+		"Type": "",
+		"Label": "",
+		"Comment": ""
+}}]
+
+Example output:
+[
+	{{ "Iri": "https://www.example.com/item-one", "Type": "Class", "Label": "item one", "Comment": "" }},
+	{{ "Iri": "https://www.example.com/item-two", "Type": "ObjectProperty", "Label": "item two", "Comment": "" }},
+	{{ "Iri": "https://www.example.com/item-three", "Type": "DatatypeProperty", "Label": "item three", "Comment": "" }}
+]
+
+Do not include unrelated items. If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.
+Return **only JSON** with no extra commentary.

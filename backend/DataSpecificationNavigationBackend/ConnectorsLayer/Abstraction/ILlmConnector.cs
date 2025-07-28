@@ -17,9 +17,11 @@ public interface ILlmConnector
 	/// </summary>
 	/// <param name="dataSpecification">The data specification that the question relates to.</param>
 	/// <param name="question">The question that was used to get the mapped items.</param>
-	/// <param name="mappedItems">Data specification items that the question mapped to.</param>
+	/// <param name="currentSubstructure">Data specification items that the question mapped to.</param>
 	/// <returns>Data specification items that somehow relate to the question and can be used to expand the question.</returns>
-	Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> mappedItems);
+	Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> currentSubstructure);
 
-	Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
+	Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
+
+	Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure);
 }

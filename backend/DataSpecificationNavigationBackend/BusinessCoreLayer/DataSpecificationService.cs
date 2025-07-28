@@ -54,7 +54,7 @@ public class DataSpecificationService(
 		return await _database.DataSpecifications.SingleOrDefaultAsync(dataSpec => dataSpec.Id == dataSpecificationId);
 	}
 
-	public async Task<DataSpecificationItem?> GetDataSpecificationItem(int dataSpecificationId, string itemIri)
+	public async Task<DataSpecificationItem?> GetDataSpecificationItemAsync(int dataSpecificationId, string itemIri)
 	{
 		return await _database.DataSpecificationItems.SingleOrDefaultAsync(item => item.DataSpecificationId == dataSpecificationId && item.Iri == itemIri);
 	}
@@ -68,12 +68,19 @@ public class DataSpecificationService(
 		}
 
 		_logger.LogTrace("Generating a summary for item [IRI={Iri}, Label={Label}].", item.Iri, item.Label);
-		string summary = await _llmConnector.GetItemSummaryAsync(item);
+		string summary = await _llmConnector.GenerateItemSummaryAsync(item);
 		_logger.LogTrace("Summary generated successfully: {Summary}", summary);
 
 		_logger.LogTrace("Setting the item.Summary property and saving to database.");
 		item.Summary = summary;
 		await _database.SaveChangesAsync();
+	}
+
+	public async Task<List<DataSpecificationItem>> GetItemsByIriListAsync(int dataSpecificationId, List<string> itemIriList)
+	{
+		return await _database.DataSpecificationItems
+			.Where(item => item.DataSpecificationId == dataSpecificationId && itemIriList.Contains(item.Iri))
+			.ToListAsync();
 	}
 
 	private IGraph ConvertDsvToOwl(IGraph dsvGraph)

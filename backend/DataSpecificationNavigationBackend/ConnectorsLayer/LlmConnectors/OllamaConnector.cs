@@ -6,7 +6,7 @@ using System.Text;
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
 
 public class OllamaConnector(
-	ILogger<OllamaConnector> logger) : ILlmConnector
+	ILogger<OllamaConnector> logger)// : ILlmConnector
 {
 	private readonly ILogger<OllamaConnector> _logger = logger;
 	private readonly OllamaPromptConstructor _promptConstructor = new OllamaPromptConstructor();
@@ -16,7 +16,12 @@ public class OllamaConnector(
 	private OllamaApiClient? _ollamaClient;
 	private Chat? _chat;
 
-	public Task<string> GetItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	public Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure)
 	{
 		throw new NotImplementedException();
 	}

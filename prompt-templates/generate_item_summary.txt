@@ -1,0 +1,15 @@
+You are generating a user-friendly summary for a data specification item.
+
+### Data specification
+Here is the data specification given as an OWL file.
+```
+{OwlFileContent}
+```
+
+### Item
+Iri: {itemIri}
+Label: {itemLabel}
+Type: {itemType}
+
+### Task
+Provide a brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification.

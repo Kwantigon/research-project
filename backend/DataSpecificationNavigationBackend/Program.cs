@@ -140,6 +140,10 @@ app.MapPost("/conversations",
 		return endpoint;
 	});
 
+app.MapPut("/conversations/{conversationId}/user-selected-items",
+	async ([FromRoute] int conversationId, [FromBody] PutDataSpecItemsDTO payload,
+				IConversationController controller) => await controller.AddSelectedItemsAndGetSuggestedMessage(conversationId, payload));
+
 app.MapDelete("/conversations/{conversationId}",
 				async ([FromRoute] int conversationId,
 							IConversationController controller) => await controller.DeleteConversationAsync(conversationId));
