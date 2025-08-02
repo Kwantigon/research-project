@@ -10,16 +10,11 @@ public interface IConversationService
 
 	Task<Conversation?> GetConversationAsync(int conversationId, bool includeMessages = false);
 
-	Task<Message> AddNewUserMessage(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage);
+	Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage);
 
-	/// <summary>
-	/// Generate a reply to the user's message.
-	/// </summary>
-	/// <param name="userMessage">The message to reply to.</param>
-	/// <returns>
-	/// The reply message containing the Sparql query and related items.
-	/// </returns>
-	Task<Message?> GenerateReplyMessage(Message userMessage);
+	Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage);
 
 	Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems);
+
+	Task<UserMessage?> GetUserMessagePrecedingReplyAsync(ReplyMessage replyMessage);
 }

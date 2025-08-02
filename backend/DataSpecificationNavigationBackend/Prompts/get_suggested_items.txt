@@ -1,0 +1,39 @@
+You are assisting me in exploring a data specification.
+
+### Data specification
+Here is the data specification given as an OWL file.
+```
+{0}
+```
+
+### Current question
+The question that I asked is:
+"{1}"
+
+### Current context
+My question already involves these items:
+{2}
+
+### Task
+Suggest other items from the specification that may be relevant to expanding my current question. Do not suggest items that are already in the current context.
+Return a JSON array corresponding to the following schema:
+[{{
+	"Iri": "string",
+	"Type": "string",
+	"Label": "string",
+	"Comment": "string",
+	"Reason": "string",
+	"Expands": "string",
+	"Summary": "string"
+}}]
+
+Explanation of the JSON fields:
+- Iri: The IRI of the item from the data specification.
+- Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
+- Label: The label of the item from the data specification.
+- Comment: The item's comment from the data specification, if it is present.
+- Reason: Explanation of why the item could be relevant to my current question.
+- Expands: Iri of the item from the current context that this suggested item would expand.
+- Summary: A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
+
+If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.  Return **only JSON** with no extra commentary.

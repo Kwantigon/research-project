@@ -36,7 +36,6 @@ interface MappedItem {
 	mappedWords: string;
 	mappedOrSuggested: "Mapped";
 }
-
 interface SuggestedItem {
 	iri: string;
 	label: string;
@@ -53,7 +52,7 @@ const isSuggestedItem = (item: MappedItem | SuggestedItem): item is SuggestedIte
 	return item.mappedOrSuggested === "Suggested";
 }
 
-function ConversationPage() {
+function ConversationPageMock() {
 	const [messages, setMessages] = useState<(SystemMessage | UserMessage)[]>([]);
 	const [currentMessage, setCurrentMessage] = useState<string>("");
 	const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null);
@@ -69,35 +68,81 @@ function ConversationPage() {
 	const [summaryError, setSummaryError] = useState<string | null>(null);
 
 	const fetchMessages = async () => {
-		try {
-			setIsLoading(true);
-			setError(null); // Clear previous error if there was one.
-			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`);
-			if (!response.ok) {
-				console.error("Failed to fetch messages.")
-				console.error("Response status: " + response.status);
-				console.error(response.body);
-				throw new Error("Error fetching messages.");
-			}
-			const messages = await response.json();
-			const fetchedMessages: (SystemMessage | UserMessage)[] = [];
-			messages.forEach(msg => {
-				// Todo: update messages
-			});
-
-			// Look for the most recent message with a suggestedItems list.
-			for (let i = messages.length - 1; i >= 0; i--) {
-				if (messages[i].suggestedItems) {
-					setMostRecentReplyMessageId(messages[i].id);
-					break;
+		setIsLoading(false);
+		setMessages([
+			{
+				id: "sm1-id",
+				sender: "System",
+				text: "Hello there!",
+				timestamp: new Date().toDateString()
+			},
+			{
+				id: "um1-id",
+				sender: "User",
+				text: "Hello, I am the user",
+				timestamp: new Date().toDateString()
+			},
+			{
+				id: "sm2-id",
+				sender: "System",
+				timestamp: new Date().toDateString(),
+				mappingText: "I have identified the following items from your data specification which play a role in your question:",
+				mappedItems: [
+					{
+						iri: "mapped-item-one",
+						label: "Mapped item one",
+						summary: "Summary for mapped item one.",
+						mappedWords: "I am",
+						mappedOrSuggested: "Mapped"
+					},
+					{
+						iri: "mapped-item-two",
+						label: "Mapped item 2",
+						summary: "Summary for mapped item 2.",
+						mappedWords: "Hello",
+						mappedOrSuggested: "Mapped"
+					}
+				],
+				sparqlText: "I have formulated a Sparql query for your question.",
+				sparqlQuery: "SELECT bla bla bla",
+				suggestItemsText: "I found some items which could expand your question.",
+				suggestedItemsGrouped: {
+					"Hello": [
+						{
+							iri: "fdeaf",
+							label: "Suggestion one",
+							summary: "Summary for item one.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						},
+						{
+							iri: "jytrt",
+							label: "Suggestion 2",
+							summary: "Summary for item.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						}
+					],
+					"I am": [
+						{
+							iri: "iuyo",
+							label: "Suggestion 245",
+							summary: "Summary for item.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						},
+						{
+							iri: "hnm,",
+							label: "Suggestion 11",
+							summary: "Summary for item.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						}
+					]
 				}
 			}
-		} catch (error) {
-			console.error(error);
-			setError("Failed to retrieve messages in the conversation.");
-		} finally {
-			setIsLoading(false);
-		}
+		]);
+		setMostRecentReplyMessageId("sm2-id");
 	};
 
 	useEffect(() => {
@@ -504,4 +549,4 @@ function ConversationPage() {
 	);
 }
 
-export default ConversationPage;
+export default ConversationPageMock;

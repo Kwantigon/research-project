@@ -6,28 +6,18 @@ public class Message
 {
 	public Guid Id { get; set; }
 
-	public MessageType Type { get; set; }
+	public Source Sender { get; set; }
 
-	public string TextValue { get; set; } = string.Empty;
+	public string TextContent { get; set; } = string.Empty;
 
-	public DateTime TimeStamp { get; set; }
-
-	public virtual List<DataSpecificationItem>? RelatedItems { get; set; }
-
-	public int ConversationId { get; set; }
+	public DateTime Timestamp { get; set; }
 
 	public required virtual Conversation Conversation { get; set; }
 
-	public Guid? ReplyMessageId { get; set; }
-
-	public virtual Message? ReplyMessage { get; set; }
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter<MessageType>))]
-public enum MessageType
-{
-	UserMessage,
-	WelcomeMessage,
-	ReplyMessage,
-	SuggestedMessage
+	[JsonConverter(typeof(JsonStringEnumConverter<Source>))]
+	public enum Source
+	{
+		System,
+		User
+	}
 }

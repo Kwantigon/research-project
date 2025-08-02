@@ -14,17 +14,15 @@ public class DataSpecificationItem
 
 	public string? Summary { get; set; }
 
-	public string? Comment { get; set; }
-
-	public virtual List<Message>? Messages { get; set; }
-
 	public int DataSpecificationId { get; set; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-	public virtual DataSpecification DataSpecification { get; set; }
-	// Not using the "required" keyword for this property.
-	// It causes trouble when deserializing from the LLM response to an item.
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+	public required virtual DataSpecification DataSpecification { get; set; }
+
+	public virtual List<DataSpecificationItemSuggestion> ItemSuggestionsTable { get; set; } = [];
+	public virtual List<ReplyMessage> SuggestedInMessages { get; set; } = [];
+
+	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
+	public virtual List<UserMessage> MappedInMessages { get; set; } = [];
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]

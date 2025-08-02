@@ -237,7 +237,7 @@ function ConversationManagementPage() {
                 {newConversationError}
               </div>
             )}
-            <div className="grid grid-cols-4 items-center gap-4">
+            {/* <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataspecerIRI" className="text-right">
                 Dataspecer package UUID
               </Label>
@@ -247,9 +247,9 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationDataSpecIri(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., 061e24ee-2cba-4c19-9510-7fe5278ae02c"
-								disabled={/* For debugging purposes I will enable this field */false}
+								disabled={true}
               />
-            </div>
+            </div> */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="dataSpecName" className="text-right">
                 Dataspecer package name
@@ -260,7 +260,7 @@ function ConversationManagementPage() {
                 onChange={(e) => setNewConversationDataSpecName(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., Badminton specification"
-								disabled={/* For debugging purposes I will enable this field */false}
+								disabled={/* For debugging purposes I will enable this field */true}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

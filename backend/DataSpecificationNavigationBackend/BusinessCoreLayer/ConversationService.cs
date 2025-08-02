@@ -22,20 +22,18 @@ public class ConversationService(
 		Conversation conversation = new()
 		{
 			Title = conversationTitle,
-			DataSpecificationId = dataSpecification.Id,
-			DataSpecification = dataSpecification,
-			LastUpdated = DateTime.UtcNow,
+			DataSpecification = dataSpecification
 		};
 
 		Message welcomeMsg = new Message()
 		{
-			Conversation = conversation,
-			ConversationId = conversation.Id,
-			TextValue = "Your data specification has been loaded. What would you like to know?",
-			Type = MessageType.WelcomeMessage,
-			TimeStamp = DateTime.Now
+			Sender = Message.Source.System,
+			TextContent = "Your data specification has been loaded. What would you like to know?",
+			Timestamp = DateTime.Now,
+			Conversation = conversation
 		};
 		conversation.Messages.Add(welcomeMsg);
+		conversation.LastUpdated = welcomeMsg.Timestamp;
 
 		await _database.Messages.AddAsync(welcomeMsg);
 		await _database.Conversations.AddAsync(conversation);
@@ -58,7 +56,7 @@ public class ConversationService(
 		if (includeMessages)
 		{
 			return await _database.Conversations
-				.Include(conversation => conversation.Messages.OrderBy(message => message.TimeStamp))
+				.Include(conversation => conversation.Messages.OrderBy(message => message.Timestamp))
 				.SingleOrDefaultAsync(conv => conv.Id == conversationId);
 		}
 		else
@@ -67,29 +65,27 @@ public class ConversationService(
 		}
 	}
 
-	public async Task<Message> AddNewUserMessage(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage)
+	public async Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage)
 	{
 		_logger.LogTrace("Creating a new user message object.");
-		Message userMessage = new()
+		UserMessage userMessage = new()
 		{
-			Conversation = conversation,
-			ConversationId = conversation.Id,
-			TextValue = messageText,
-			TimeStamp = timestamp,
-			Type = MessageType.UserMessage
+			Sender = Message.Source.User,
+			TextContent = messageText,
+			Timestamp = timestamp,
+			Conversation = conversation
 		};
 
 		_logger.LogTrace("Creating a new reply message associated with the user message.");
-		Message replyMessage = new()
+		ReplyMessage replyMessage = new()
 		{
-			Type = MessageType.ReplyMessage,
-			Conversation = conversation,
-			ConversationId = conversation.Id,
-			TimeStamp = (DateTime.Now > userMessage.TimeStamp) ? DateTime.Now : DateTime.Now.AddSeconds(1)
+			Sender = Message.Source.System,
+			Timestamp = (DateTime.Now > userMessage.Timestamp) ? DateTime.Now : userMessage.Timestamp.AddSeconds(1),
+			Conversation = conversation
 		};
 
 		// Calling AddRangeAsync explicitly so that I get generated IDs for the messages.
-		_logger.LogTrace("Adding messages to the database.");
+		_logger.LogTrace("Adding messages to the database to retrieve their IDs.");
 		await _database.Messages.AddRangeAsync([userMessage, replyMessage]);
 		conversation.Messages.Add(userMessage);
 		conversation.Messages.Add(replyMessage);
@@ -103,21 +99,31 @@ public class ConversationService(
 			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
 
 			_logger.LogTrace("Mapping the question to data specification items.");
-			List<DataSpecificationItem> mappedItems = await _llmConnector.MapQuestionToItemsAsync(conversation.DataSpecification, userMessage.TextValue);
-			_logger.LogDebug("Mapped the question to the following items: {MappedItems}", mappedItems);
-			if (mappedItems.Count == 0)
+			List<DataSpecificationItemMapping> mappings = await _llmConnector.MapQuestionToItemsAsync(conversation.DataSpecification, userMessage.TextContent);
+			_logger.LogDebug("Mapped the question to the following items: {MappedItems}", mappings);
+			if (mappings.Count == 0)
 			{
 				_logger.LogError("No suitable data specification items found for the question mapping.");
-				replyMessage.TextValue = "I could not find anything suitable in the data specification to help with your question.";
+				replyMessage.TextContent = "I could not find anything suitable in the data specification to help with your question.";
 				_logger.LogTrace("Not doing any changes to the conversation substructure.");
 			}
-			else
+			else // mappings.Count > 0
 			{
-				_logger.LogTrace("Setting the conversation data spec substructure to the newly mapped items.");
-				conversation.DataSpecificationSubstructure = mappedItems;
+				_logger.LogTrace("Setting the conversation data spec substructure and mappings in data spec item and message.");
+				foreach (DataSpecificationItemMapping mapping in mappings)
+				{
+					// I'm assuming all fields of the mapping are already set.
+					conversation.DataSpecificationSubstructure.Add(mapping.Item);
+
+					mapping.Item.MappedInMessages.Add(mapping.UserMessage);
+					mapping.Item.ItemMappingsTable.Add(mapping);
+
+					//mapping.UserMessage.MappedItems.Add(mapping.Item);
+					mapping.UserMessage.ItemMappingsTable.Add(mapping);
+				}
 			}
 		}
-		else
+		else // userModifiedSuggestedMessage is false
 		{
 			_logger.LogTrace("User did not modify the suggested message.");
 
@@ -128,7 +134,7 @@ public class ConversationService(
 			else
 			{
 				_logger.LogTrace("Searching for the items that the user has previously selected.");
-				List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetItemsByIriListAsync(conversation.DataSpecificationId, conversation.UserSelectedItems);
+				List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetItemsByIriListAsync(conversation.DataSpecification.Id, conversation.UserSelectedItems);
 				_logger.LogDebug("conversation.UserSelectedItems.Count = {SelectedCount}, selectedItems.Count = {SelectedFound}", conversation.UserSelectedItems.Count, selectedItems.Count);
 
 				_logger.LogTrace("Filtering the selected items - keeping only those that are not already in the conversation data spec substructure.");
@@ -144,30 +150,39 @@ public class ConversationService(
 		return userMessage;
 	}
 
-	public async Task<Message?> GenerateReplyMessage(Message userMessage)
+	public async Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage)
 	{
 		_logger.LogTrace("Getting the reply message associated to the user message.");
-		Message? replyMessage = userMessage.ReplyMessage;
+		ReplyMessage? replyMessage = userMessage.ReplyMessage;
 		if (replyMessage is null)
 		{
-			_logger.LogError("User message with ID {UserMsgId} does not have an associated reply message.", userMessage.Id);
+			_logger.LogError("User message with text \"{UserMsgText}\" does not have an associated reply message.", userMessage.TextContent);
 			return null;
 		}
 
-		if (replyMessage.TextValue != string.Empty)
+		if (replyMessage.IsGenerated)
 		{
 			_logger.LogInformation("The reply message was previously generated already - returning it.");
 			return replyMessage;
 		}
 
+		// Item mappings answer.
+		/*List<DataSpecificationItemMapping> mappings = await _database.DataSpecificationItemMappings
+																																.Where(mapping => mapping.UserMessageId == userMessage.Id)
+																																.ToListAsync();*/
+		if (userMessage.ItemMappingsTable.Count > 0)
+		{
+			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question:";
+		}
+
 		// Todo: Generate a Sparql query.
 		// Which means I need to implement the Sparql generation.
 		_logger.LogTrace("To do: Generating a Sparql query.");
-		string sparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextValue}\"]";
+		string sparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
 
 		_logger.LogTrace("Getting items related to the question.");
 		List<DataSpecificationItem> relatedItems = await _llmConnector.GetRelatedItemsAsync(
-			userMessage.Conversation.DataSpecification, userMessage.TextValue, userMessage.Conversation.DataSpecificationSubstructure);
+			userMessage.Conversation.DataSpecification, userMessage.TextContent, userMessage.Conversation.DataSpecificationSubstructure);
 		_logger.LogTrace("Found {ItemsCount} related items.", relatedItems.Count);
 
 		// Todo: Change this quick and dirty solution.
@@ -187,8 +202,7 @@ public class ConversationService(
 				}
 			}
 
-			replyMessage.TextValue = $"The data you want can be retrieved using the following sparl query: {sparqlQuery}";
-			replyMessage.RelatedItems = relatedItems;
+			replyMessage.TextContent = $"The data you want can be retrieved using the following sparl query: {sparqlQuery}";
 		}
 
 		_logger.LogTrace("Saving changes to the database and returning.");
@@ -202,7 +216,7 @@ public class ConversationService(
 		Message? userMessage = null;
 		for (int i = conversation.Messages.Count - 1; i >= 0; i--)
 		{
-			if (conversation.Messages[i].Type is MessageType.UserMessage)
+			if (conversation.Messages[i] is UserMessage)
 			{
 				userMessage = conversation.Messages[i];
 				break;
@@ -214,7 +228,13 @@ public class ConversationService(
 			return null;
 		}
 
-		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextValue, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
+		//string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextContent, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
+		string suggestedMessage = "LLM call is commented out.";
 		return suggestedMessage;
+	}
+
+	public async Task<UserMessage?> GetUserMessagePrecedingReplyAsync(ReplyMessage replyMessage)
+	{
+		return await (_database.UserMessages.SingleOrDefaultAsync(msg => msg.ReplyMessageId == replyMessage.Id));
 	}
 }

@@ -5,7 +5,6 @@ using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
-using DataSpecificationNavigationBackend.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +19,10 @@ builder.Services
 	.AddScoped<IDataspecerConnector, DataspecerConnector>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
+	.AddScoped<ILlmConnector, GeminiConnector>()
 
-	// Singleton services (created once when the server starts).
-	.AddSingleton<ILlmConnector, GeminiConnector>()
+	// Singletons (created only once when the server starts).
+	.AddSingleton<IPromptConstructor, PromptConstructor>() // Singleton because I don't want to load templates from files every time there is a request.
 	;
 
 builder.Services.AddCors(options =>
@@ -147,5 +147,12 @@ app.MapPut("/conversations/{conversationId}/user-selected-items",
 app.MapDelete("/conversations/{conversationId}",
 				async ([FromRoute] int conversationId,
 							IConversationController controller) => await controller.DeleteConversationAsync(conversationId));
+
+
+// Test endpoints
+app.MapGet("/tests/llm", (IPromptConstructor promptConstructor) =>
+{
+	return Results.Ok(promptConstructor.BuildItemsMappingPrompt(null!, "abc"));
+});
 
 app.Run();

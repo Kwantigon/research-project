@@ -1,13 +1,80 @@
 ﻿using DataSpecificationNavigationBackend.Model;
+using System.Text.Json.Serialization;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
 
-public record ConversationMessageDTO(Guid Id, MessageType Type, string Text, List<DataSpecificationItemDTO>? RelatedItems, DateTime Timestamp, string? ReplyUri)
+public record ConversationMessageDTO
 {
-	public static explicit operator ConversationMessageDTO(Message message)
-	{
-		string? replyUri = message.ReplyMessageId == null ? null : $"/conversations/{message.ConversationId}/messages/{message.ReplyMessageId}";
-		List<DataSpecificationItemDTO>? relatedItems = message.RelatedItems?.Select(item => (DataSpecificationItemDTO)item).ToList();
-		return new ConversationMessageDTO(message.Id, message.Type, message.TextValue, relatedItems, message.TimeStamp, replyUri);
-	}
+	#region Common fields for all types of messages.
+	[JsonPropertyName("id")]
+	public Guid Id { get; set; }
+
+	[JsonPropertyName("sender")]
+	public Message.Source Sender { get; set; }
+
+	[JsonPropertyName("textContent")]
+	public string? TextContent { get; set; }
+
+	[JsonPropertyName("timestamp")]
+	public DateTime Timestamp { get; set; }
+	#endregion Common fields for all types of messages.
+
+	#region Fields for reply messages.
+	[JsonPropertyName("mappingText")]
+	public string? MappingText { get; set; }
+
+	[JsonPropertyName("mappedItems")]
+	public List<MappedItemDTO> MappedItems { get; set; } = [];
+
+	[JsonPropertyName("sparqlText")]
+	public string? SparqlText { get; set; }
+
+	[JsonPropertyName("sparqlQuery")]
+	public string? SparqlQuery { get; set; }
+
+	[JsonPropertyName("suggestItemsText")]
+	public string? SuggestItemsText { get; set; }
+
+	/// <summary>
+	/// Keys = Words that the suggested items would expand.<br/>
+	/// Values = The suggested items info.
+	/// </summary>
+	[JsonPropertyName("suggestedItems")]
+	public Dictionary<string, List<SuggestedItemDTO>> SuggestedItems { get; set; } = [];
+	#endregion Fields for reply messages.
+
+	#region Fields for user messages.
+
+	[JsonPropertyName("replyMessageUri")]
+	public string? ReplyMessageUri { get; set; }
+	#endregion Fields for user messages.
+}
+
+public record MappedItemDTO
+{
+	[JsonPropertyName("iri")]
+	public required string Iri { get; init; }
+
+	[JsonPropertyName("label")]
+	public required string Label { get; init; }
+
+	[JsonPropertyName("summary")]
+	public string? Summary { get; set; }
+	[JsonPropertyName("mappedWords")]
+	public required string MappedWords { get; init; }
+}
+
+public record SuggestedItemDTO
+{
+	[JsonPropertyName("iri")]
+	public required string Iri { get; init; }
+
+	[JsonPropertyName("label")]
+	public required string Label { get; init; }
+
+	[JsonPropertyName("summary")]
+	public string? Summary { get; set; }
+
+	[JsonPropertyName("reason")]
+	public required string Reason { get; init; }
 }
