@@ -15,25 +15,29 @@ My question already involves these items:
 {2}
 
 ### Task
-Suggest other items from the specification that may be relevant to expanding my current question. Do not suggest items that are already in the current context.
+Suggest other items from the specification that may be relevant to expanding my current question. Do not suggest items that are already in the current context. For each item, include the following:
+- A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
+- The reason why you are proposing this item for question expansion.
+- What item from the current context it would expand.
+
 Return a JSON array corresponding to the following schema:
 [{{
 	"Iri": "string",
-	"Type": "string",
 	"Label": "string",
+	"Type": "string",
 	"Comment": "string",
+	"Summary": "string",
 	"Reason": "string",
-	"Expands": "string",
-	"Summary": "string"
+	"Expands": "string"
 }}]
 
 Explanation of the JSON fields:
 - Iri: The IRI of the item from the data specification.
-- Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
 - Label: The label of the item from the data specification.
+- Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
 - Comment: The item's comment from the data specification, if it is present.
+- Summary: A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
 - Reason: Explanation of why the item could be relevant to my current question.
 - Expands: Iri of the item from the current context that this suggested item would expand.
-- Summary: A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
 
 If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.  Return **only JSON** with no extra commentary.

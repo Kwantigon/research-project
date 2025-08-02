@@ -17,5 +17,5 @@ public class DataSpecificationItemSuggestion
 
 	public required string ReasonForSuggestion { get; set; }
 
-	public required string ExpandsOnWords { get; set; }
+	public required string ExpandsItem { get; set; }
 }

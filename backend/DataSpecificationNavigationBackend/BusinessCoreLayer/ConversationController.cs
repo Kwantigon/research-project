@@ -93,11 +93,20 @@ public class ConversationController(
 
 				foreach (DataSpecificationItemSuggestion suggestion in replyMessage.ItemSuggestionsTable)
 				{
+					DataSpecificationItemMapping? mapping = await _database.DataSpecificationItemMappings
+					.SingleOrDefaultAsync(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == precedingUserMsg.Id);
+					if (mapping is null)
+					{
+						_logger.LogError("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", suggestion.ExpandsItem, precedingUserMsg.Id);
+					}
+
+					string expandWords = mapping?.MappedWords ?? suggestion.ExpandsItem;
+
 					List<SuggestedItemDTO>? items;
-					if (!messageDTO.SuggestedItems.TryGetValue(suggestion.ExpandsOnWords, out items))
+					if (!messageDTO.SuggestedItems.TryGetValue(expandWords, out items))
 					{
 						items = [];
-						messageDTO.SuggestedItems[suggestion.ExpandsOnWords] = items;
+						messageDTO.SuggestedItems[suggestion.ExpandsItem] = items;
 					}
 					items.Add(new SuggestedItemDTO()
 					{
@@ -175,14 +184,14 @@ public class ConversationController(
 					MappedWords = mapping.MappedWords
 				}).ToList();
 
-			Dictionary<string, List<SuggestedItemDTO>> suggestedItems = [];
+			Dictionary<string, List<SuggestedItemDTO>> suggestedItemsPreprocessing = [];
 			foreach (var suggestion in replyMessage.ItemSuggestionsTable)
 			{
 				List<SuggestedItemDTO>? list;
-				if (!suggestedItems.TryGetValue(suggestion.ExpandsOnWords, out list))
+				if (!suggestedItemsPreprocessing.TryGetValue(suggestion.ExpandsItem, out list))
 				{
 					list = new List<SuggestedItemDTO>();
-					suggestedItems.Add(suggestion.ExpandsOnWords, list);
+					suggestedItemsPreprocessing.Add(suggestion.ExpandsItem, list);
 				}
 				list.Add(new SuggestedItemDTO()
 				{
@@ -191,6 +200,21 @@ public class ConversationController(
 					Summary = suggestion.Item.Summary,
 					Reason = suggestion.ReasonForSuggestion
 				});
+			}
+
+			Dictionary<string, List<SuggestedItemDTO>> suggestedItems = [];
+			foreach (var pair in suggestedItemsPreprocessing)
+			{
+				// pair.Key is the Iri of the item that the suggested items would expand.
+				DataSpecificationItemMapping? mapping = await _database.DataSpecificationItemMappings
+					.SingleOrDefaultAsync(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == pair.Key && m.UserMessageId == userMessage.Id);
+				if (mapping is null)
+				{
+					_logger.LogError("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", pair.Key, userMessage.Id);
+				}
+
+				string expandWords = mapping?.MappedWords ?? pair.Key;
+				suggestedItems.Add(expandWords, pair.Value);
 			}
 
 			ConversationMessageDTO replyMessageDTO = new()

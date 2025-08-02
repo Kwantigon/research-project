@@ -8,5 +8,9 @@ namespace DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 /// </summary>
 public interface ILlmResponseProcessor
 {
-	List<DataSpecificationItemMapping>? ExtractMappedItems(string llmResponse, Conversation conversation);
+	List<DataSpecificationItemMapping>? ExtractMappedItems(string llmResponse, UserMessage userMessage);
+
+	List<DataSpecificationItemSuggestion>? ExtractSuggestedItems(string llmResponse, UserMessage userMessage);
+
+	string? ExtractSuggestedMessage(string llmResponse) => llmResponse;
 }

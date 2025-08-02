@@ -2,6 +2,7 @@
 
 public class ReplyMessage : Message
 {
+	public override Source Sender { get => Source.System; }
 	public bool IsGenerated { get; set; } = false;
 
 	public string MappingText { get; set; } = string.Empty;

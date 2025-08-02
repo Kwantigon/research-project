@@ -1,5 +1,5 @@
-﻿using DataSpecificationNavigationBackend.ConnectorsLayer;
-using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
@@ -99,26 +99,37 @@ public class ConversationService(
 			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
 
 			_logger.LogTrace("Mapping the question to data specification items.");
-			List<DataSpecificationItemMapping> mappings = await _llmConnector.MapQuestionToItemsAsync(conversation.DataSpecification, userMessage.TextContent);
-			_logger.LogDebug("Mapped the question to the following items: {MappedItems}", mappings);
+			List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToItemsAsync(conversation.DataSpecification, userMessage);
+
 			if (mappings.Count == 0)
 			{
 				_logger.LogError("No suitable data specification items found for the question mapping.");
-				replyMessage.TextContent = "I could not find anything suitable in the data specification to help with your question.";
-				_logger.LogTrace("Not doing any changes to the conversation substructure.");
+
+				_logger.LogTrace("Clearing the data specification substructure of the conversation.");
+				conversation.DataSpecificationSubstructure.Clear();
 			}
 			else // mappings.Count > 0
 			{
 				_logger.LogTrace("Setting the conversation data spec substructure and mappings in data spec item and message.");
 				foreach (DataSpecificationItemMapping mapping in mappings)
 				{
-					// I'm assuming all fields of the mapping are already set.
-					conversation.DataSpecificationSubstructure.Add(mapping.Item);
+					// Check the database and conversation substructure for the item.
+					DataSpecificationItem? item = await _database.DataSpecificationItems
+						.SingleOrDefaultAsync(item => item.DataSpecificationId == mapping.ItemDataSpecificationId && item.Iri == mapping.ItemIri);
+					if (item is not null)
+					{
+						// Change the reference to the actual item from the database.
+						// So that there is no duplicate item conflict when I save later.
+						mapping.Item = item;
+					}
 
-					mapping.Item.MappedInMessages.Add(mapping.UserMessage);
+					if (!conversation.DataSpecificationSubstructure.Any(item => item.Iri == mapping.ItemIri))
+					{
+						// If the mapped item is not already in the substructure, add it.
+						// This should be the case for all the items.
+						conversation.DataSpecificationSubstructure.Add(mapping.Item);
+					}
 					mapping.Item.ItemMappingsTable.Add(mapping);
-
-					//mapping.UserMessage.MappedItems.Add(mapping.Item);
 					mapping.UserMessage.ItemMappingsTable.Add(mapping);
 				}
 			}
@@ -138,7 +149,7 @@ public class ConversationService(
 				_logger.LogDebug("conversation.UserSelectedItems.Count = {SelectedCount}, selectedItems.Count = {SelectedFound}", conversation.UserSelectedItems.Count, selectedItems.Count);
 
 				_logger.LogTrace("Filtering the selected items - keeping only those that are not already in the conversation data spec substructure.");
-				List<DataSpecificationItem>  itemsNotInConversation = selectedItems.Where(selected => !conversation.DataSpecificationSubstructure.Any(i => i.Iri == selected.Iri)).ToList();
+				List<DataSpecificationItem> itemsNotInConversation = selectedItems.Where(selected => !conversation.DataSpecificationSubstructure.Any(i => i.Iri == selected.Iri)).ToList();
 
 				_logger.LogTrace("Adding the selected items to the conversation.");
 				conversation.DataSpecificationSubstructure.AddRange(itemsNotInConversation);
@@ -172,37 +183,46 @@ public class ConversationService(
 																																.ToListAsync();*/
 		if (userMessage.ItemMappingsTable.Count > 0)
 		{
-			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question:";
+			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question.";
+		}
+		else
+		{
+			replyMessage.MappingText = "Sorry, I did not manage to find anything from the data specification that matches your question.";
 		}
 
 		// Todo: Generate a Sparql query.
 		// Which means I need to implement the Sparql generation.
 		_logger.LogTrace("To do: Generating a Sparql query.");
-		string sparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
+		replyMessage.SparqlText = "I have formulated a Sparql query for your question:";
+		replyMessage.SparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
 
-		_logger.LogTrace("Getting items related to the question.");
-		List<DataSpecificationItem> relatedItems = await _llmConnector.GetRelatedItemsAsync(
-			userMessage.Conversation.DataSpecification, userMessage.TextContent, userMessage.Conversation.DataSpecificationSubstructure);
-		_logger.LogTrace("Found {ItemsCount} related items.", relatedItems.Count);
+		_logger.LogTrace("Getting item suggestions.");
+		List<DataSpecificationItemSuggestion> suggestedItems = await _llmConnector.GetSuggestedItemsAsync(
+			userMessage.Conversation.DataSpecification, userMessage, userMessage.Conversation.DataSpecificationSubstructure);
+		_logger.LogTrace("The LLM suggested {ItemsCount} items.", suggestedItems.Count);
 
-		// Todo: Change this quick and dirty solution.
-		// Check if any of the related items is already in the database.
-		// If yes, take that item from the database instead.
-		// This is to prevent _database.SaveChangesAsync from throwing an exception that some item IRIs are already in the database.
-		for (int i = 0; i < relatedItems.Count; i++)
+		if (suggestedItems.Count == 0)
 		{
+			replyMessage.SuggestItemsText = "Unfortunately, I did not manage to find any suitable items to suggest to you to further expand your question.";
+		}
+		else
+		{
+			replyMessage.SuggestItemsText = "I found some items which could expand your question.";
+
+			foreach (DataSpecificationItemSuggestion suggestion in suggestedItems)
 			{
-				DataSpecificationItem item = relatedItems[i];
-				DataSpecificationItem? fromDb = await _database.DataSpecificationItems.SingleOrDefaultAsync(
-					i => i.DataSpecificationId == item.DataSpecificationId && i.Iri == item.Iri);
-
-				if (fromDb != null)
+				// Check the database and conversation substructure for the item.
+				DataSpecificationItem? item = await _database.DataSpecificationItems
+					.SingleOrDefaultAsync(item => item.DataSpecificationId == suggestion.ItemDataSpecificationId && item.Iri == suggestion.ItemIri);
+				if (item is not null)
 				{
-					relatedItems[i] = fromDb;
+					// Change the reference to the actual item from the database.
+					// So that there is no duplicate item conflict when I save later.
+					suggestion.Item = item;
 				}
+				suggestion.Item.ItemSuggestionsTable.Add(suggestion);
+				suggestion.ReplyMessage.ItemSuggestionsTable.Add(suggestion);
 			}
-
-			replyMessage.TextContent = $"The data you want can be retrieved using the following sparl query: {sparqlQuery}";
 		}
 
 		_logger.LogTrace("Saving changes to the database and returning.");

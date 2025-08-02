@@ -5,6 +5,7 @@ using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
+using DataSpecificationNavigationBackend.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ builder.Services
 	.AddScoped<IDataspecerConnector, DataspecerConnector>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
+	.AddScoped<ILlmResponseProcessor, DefaultResponseProcessor>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 
 	// Singletons (created only once when the server starts).
@@ -150,9 +152,87 @@ app.MapDelete("/conversations/{conversationId}",
 
 
 // Test endpoints
-app.MapGet("/tests/llm", (IPromptConstructor promptConstructor) =>
+app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 {
-	return Results.Ok(promptConstructor.BuildItemsMappingPrompt(null!, "abc"));
+	DataSpecification ds = new()
+	{
+		DataspecerPackageUuid = "test-package",
+		Name = "Test package",
+		Owl = File.ReadAllText("C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\backend\\DataSpecificationNavigationBackend\\local\\data-specification.owl.ttl")
+	};
+
+	Conversation c = new()
+	{
+		DataSpecification = ds,
+		Title = "Conversation title",
+		DataSpecificationSubstructure = [],
+		LastUpdated = DateTime.Now
+	};
+
+	ReplyMessage replyMessage = new()
+	{
+		Id = Guid.NewGuid(),
+		Conversation = c,
+		Sender = Message.Source.System,
+	};
+
+	UserMessage userMessage = new()
+	{
+		Id = Guid.NewGuid(),
+		Conversation = c,
+		Sender = Message.Source.User,
+		TextContent = "I want to see public services providing electronic signatures.",
+		ReplyMessageId = replyMessage.Id,
+		ReplyMessage = replyMessage
+	};
+
+	List<DataSpecificationItemMapping> mappings = await llmConnector.MapUserMessageToItemsAsync(ds, userMessage);
+	return Results.Ok();
+});
+
+app.MapGet("/tests/add-user-msg", async (AppDbContext database, IConversationService service) =>
+{
+	/*DataSpecification ds = new()
+	{
+		DataspecerPackageUuid = "test-package",
+		Name = "Test package",
+		Owl = File.ReadAllText("C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\backend\\DataSpecificationNavigationBackend\\local\\data-specification.owl.ttl")
+	};
+
+	Conversation c = new()
+	{
+		DataSpecification = ds,
+		Title = "Conversation title",
+		DataSpecificationSubstructure = [],
+		LastUpdated = DateTime.Now
+	};
+
+	await database.Conversations.AddAsync(c);*/
+	Conversation? conversation = await database.Conversations.SingleOrDefaultAsync(c => c.Id == 1);
+	if (conversation is null)
+	{
+		return Results.NotFound();
+	}
+
+	UserMessage userMessage = await service.AddNewUserMessageAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now, userModifiedSuggestedMessage: true);
+
+	await database.SaveChangesAsync();
+	return Results.Ok();
+});
+
+app.MapGet("/tests/generate-reply", async (AppDbContext database, IConversationService service) =>
+{
+	Conversation? conversation = await database.Conversations.SingleOrDefaultAsync(c => c.Id == 1);
+	if (conversation is null)
+	{
+		return Results.NotFound();
+	}
+
+	UserMessage userMessage = await service.AddNewUserMessageAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now, userModifiedSuggestedMessage: true);
+	ReplyMessage? replyMessage = await service.GenerateReplyMessageAsync(userMessage);
+
+	await database.SaveChangesAsync();
+	return Results.Ok();
 });
 
 app.Run();

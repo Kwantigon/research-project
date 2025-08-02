@@ -6,7 +6,7 @@ public class Message
 {
 	public Guid Id { get; set; }
 
-	public Source Sender { get; set; }
+	public virtual Source Sender { get; set; }
 
 	public string TextContent { get; set; } = string.Empty;
 

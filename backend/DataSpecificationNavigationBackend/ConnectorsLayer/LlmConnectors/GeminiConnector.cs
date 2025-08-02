@@ -56,7 +56,7 @@ public class GeminiConnector : ILlmConnector
 			_logger.LogDebug("LLM response: {Response}", response);
 
 			_logger.LogTrace("Extracting the mapped items from the LLM response.");
-			mapped = _responseProcessor.ExtractMappedItems(response, userMessage.Conversation);
+			mapped = _responseProcessor.ExtractMappedItems(response, userMessage);
 			attempts++;
 		}
 
@@ -70,41 +70,42 @@ public class GeminiConnector : ILlmConnector
 		return mapped;
 	}
 
-	public async Task<List<DataSpecificationItem>> GetRelatedItemsAsync(DataSpecification dataSpecification, string question, List<DataSpecificationItem> currentSubstructure)
+	public async Task<List<DataSpecificationItemSuggestion>> GetSuggestedItemsAsync(DataSpecification dataSpecification, UserMessage userMessage, List<DataSpecificationItem> currentSubstructure)
 	{
 		int attempts = 0;
-		List<DataSpecificationItem>? relatedItems = null;
+		List<DataSpecificationItemSuggestion>? suggestedItems = null;
 
 		_logger.LogTrace("Building a prompt for getting the related items.");
-		string prompt = _promptConstructor.BuildGetSuggestedItemsPrompt(dataSpecification, question, currentSubstructure);
+		string prompt = _promptConstructor.BuildGetSuggestedItemsPrompt(dataSpecification, userMessage.TextContent, currentSubstructure);
 		_logger.LogDebug("Get related items prompt:\n{Prompt}", prompt);
 
-		while (attempts < _retryAttempts && relatedItems is null)
+		while (attempts < _retryAttempts && suggestedItems is null)
 		{
 			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
 
 			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
+			
 			_logger.LogDebug("LLM response: {Response}", response);
 
 			_logger.LogTrace("Extracting the related items from the LLM response.");
-			relatedItems = _responseProcessor.ExtractRelatedItems(response, dataSpecification);
+			suggestedItems = _responseProcessor.ExtractSuggestedItems(response, userMessage);
 			attempts++;
 		}
 
-		if (relatedItems is null)
+		if (suggestedItems is null)
 		{
 			_logger.LogError("The relatedItems list is still null after " + _retryAttempts + " attempts.");
 			return [];
 		}
 
 		_logger.LogTrace("Returning the related items.");
-		return relatedItems;
+		return suggestedItems;
 	}
 
 	public async Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
 	{
-		_logger.LogTrace("Building a prompt for the item summary.");
+		/*_logger.LogTrace("Building a prompt for the item summary.");
 		//string prompt = _promptConstructor.CreateGenerateItemSummaryPrompt(dataSpecificationItem);
 		//_logger.LogDebug("Generate item summary prompt:\n{Prompt}", prompt);
 
@@ -117,7 +118,9 @@ public class GeminiConnector : ILlmConnector
 		string itemSummary = _responseProcessor.ExtractItemSummary(response);
 
 		_logger.LogTrace("Returning the item summary.");
-		return itemSummary;
+		return itemSummary;*/
+
+		return string.Empty;
 	}
 
 	public async Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure)
@@ -131,7 +134,12 @@ public class GeminiConnector : ILlmConnector
 		_logger.LogDebug("LLM response: {Response}", response);
 
 		_logger.LogTrace("Extracting the suggested message from the LLM response.");
-		string itemSummary = _responseProcessor.ExtractSuggestedMessage(response);
+		string? itemSummary = _responseProcessor.ExtractSuggestedMessage(response);
+		if (itemSummary is null)
+		{
+			_logger.LogError("Failed to extract the item summary from the LLM response.");
+			return string.Empty;
+		}
 
 		_logger.LogTrace("Returning the suggested message.");
 		return itemSummary;
