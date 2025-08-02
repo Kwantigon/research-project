@@ -232,7 +232,7 @@ public class ConversationService(
 
 	public async Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems)
 	{
-		// Todo: Add log trace.
+		_logger.LogTrace("Searching for the most recent user message.");
 		Message? userMessage = null;
 		for (int i = conversation.Messages.Count - 1; i >= 0; i--)
 		{
@@ -248,8 +248,7 @@ public class ConversationService(
 			return null;
 		}
 
-		//string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextContent, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
-		string suggestedMessage = "LLM call is commented out.";
+		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextContent, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
 		return suggestedMessage;
 	}
 

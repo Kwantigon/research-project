@@ -10,5 +10,5 @@ public interface ILlmConnector
 
 	Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
 
-	Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure);
+	Task<string> GenerateSuggestedMessageAsync(DataSpecification dataSpecification, UserMessage userMessage, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure);
 }
