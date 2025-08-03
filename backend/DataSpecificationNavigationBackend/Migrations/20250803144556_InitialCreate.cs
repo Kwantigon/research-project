@@ -35,7 +35,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserSelectedItems = table.Column<string>(type: "TEXT", nullable: true)
+                    UserSelectedItems = table.Column<string>(type: "TEXT", nullable: true),
+                    SuggestedMessage = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -142,7 +143,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     ItemIri = table.Column<string>(type: "TEXT", nullable: false),
                     ReplyMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
                     ReasonForSuggestion = table.Column<string>(type: "TEXT", nullable: false),
-                    ExpandsOnWords = table.Column<string>(type: "TEXT", nullable: false)
+                    ExpandsItem = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -204,7 +205,8 @@ namespace DataSpecificationNavigationBackend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReplyMessageId",
                 table: "Messages",
-                column: "ReplyMessageId");
+                column: "ReplyMessageId",
+                unique: true);
         }
 
         /// <inheritdoc />

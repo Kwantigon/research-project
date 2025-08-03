@@ -20,10 +20,9 @@ builder.Services
 	.AddScoped<IDataspecerConnector, DataspecerConnector>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
-	.AddScoped<ILlmResponseProcessor, DefaultResponseProcessor>()
+	.AddScoped<ILlmResponseProcessor, ResponseProcessor>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 
-	// Singletons (created only once when the server starts).
 	.AddSingleton<IPromptConstructor, PromptConstructor>() // Singleton because I don't want to load templates from files every time there is a request.
 	;
 
@@ -47,7 +46,6 @@ builder.Services.AddCors(options =>
 });*/
 
 var connectionString = builder.Configuration.GetConnectionString("Chatbot") ?? "Data Source=Chatbot.db";
-//builder.Services.AddSqlite<AppDbContext>(connectionString);
 builder.Services.AddDbContext<AppDbContext>(b => b.UseSqlite(connectionString).UseLazyLoadingProxies());
 
 var app = builder.Build();
@@ -169,22 +167,24 @@ app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 		LastUpdated = DateTime.Now
 	};
 
-	ReplyMessage replyMessage = new()
-	{
-		Id = Guid.NewGuid(),
-		Conversation = c,
-		Sender = Message.Source.System,
-	};
-
 	UserMessage userMessage = new()
 	{
 		Id = Guid.NewGuid(),
 		Conversation = c,
 		Sender = Message.Source.User,
 		TextContent = "I want to see public services providing electronic signatures.",
-		ReplyMessageId = replyMessage.Id,
-		ReplyMessage = replyMessage
 	};
+
+	ReplyMessage replyMessage = new()
+	{
+		Id = Guid.NewGuid(),
+		Conversation = c,
+		Sender = Message.Source.System,
+		PrecedingUserMessage = userMessage
+	};
+
+	userMessage.ReplyMessage = replyMessage;
+	userMessage.ReplyMessageId = replyMessage.Id;
 
 	List<DataSpecificationItemMapping> mappings = await llmConnector.MapUserMessageToItemsAsync(ds, userMessage);
 	return Results.Ok();

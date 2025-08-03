@@ -8,6 +8,5 @@ public class UserMessage : Message
 
 	public virtual ReplyMessage? ReplyMessage { get; set; }
 
-
-	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
+	public virtual List<DataSpecificationItemMapping> ItemMappings { get; set; } = [];
 }

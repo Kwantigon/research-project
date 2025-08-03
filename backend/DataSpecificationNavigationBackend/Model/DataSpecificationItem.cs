@@ -19,10 +19,8 @@ public class DataSpecificationItem
 	public required virtual DataSpecification DataSpecification { get; set; }
 
 	public virtual List<DataSpecificationItemSuggestion> ItemSuggestionsTable { get; set; } = [];
-	//public virtual List<ReplyMessage> SuggestedInMessages { get; set; } = [];
 
 	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
-	//public virtual List<UserMessage> MappedInMessages { get; set; } = [];
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]

@@ -1,8 +1,6 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
-using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.Model;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
@@ -12,13 +10,11 @@ namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 public class ConversationController(
 	ILogger<ConversationController> logger,
 	IConversationService conversationService,
-	IDataSpecificationService dataSpecificationService,
-	AppDbContext appDbContext) : IConversationController
+	IDataSpecificationService dataSpecificationService) : IConversationController
 {
 	private readonly ILogger<ConversationController> _logger = logger;
 	private readonly IConversationService _conversationService = conversationService;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
-	private readonly AppDbContext _database = appDbContext; // Will be removed later.
 
 	public async Task<IResult> StartConversationAsync(PostConversationsDTO payload)
 	{
@@ -77,13 +73,9 @@ public class ConversationController(
 			if (msg is ReplyMessage replyMessage)
 			{
 				messageDTO.MappingText = replyMessage.MappingText;
-				UserMessage? precedingUserMsg = await _conversationService.GetUserMessagePrecedingReplyAsync(replyMessage);
-				if (precedingUserMsg is null)
-				{
-					_logger.LogError("The reply message with ID \"{ReplMsgId}\" does not have a preceding user message.", replyMessage.Id);
-					return Results.InternalServerError(new ErrorDTO { Reason = "Found a reply message without the preceding user message." });
-				}
-				messageDTO.MappedItems = precedingUserMsg.ItemMappingsTable
+
+				UserMessage precedingUserMsg = replyMessage.PrecedingUserMessage;
+				messageDTO.MappedItems = precedingUserMsg.ItemMappings
 					.Select(m => new MappedItemDTO { Iri = m.ItemIri, Label = m.Item.Label, Summary = m.Item.Summary, MappedWords = m.MappedWords })
 					.ToList();
 
@@ -91,22 +83,22 @@ public class ConversationController(
 				messageDTO.SparqlQuery = replyMessage.SparqlQuery;
 				messageDTO.SuggestItemsText = replyMessage.SuggestItemsText;
 
-				foreach (DataSpecificationItemSuggestion suggestion in replyMessage.ItemSuggestionsTable)
+				foreach (DataSpecificationItemSuggestion suggestion in replyMessage.ItemSuggestions)
 				{
-					DataSpecificationItemMapping? mapping = await _database.DataSpecificationItemMappings
-					.SingleOrDefaultAsync(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == precedingUserMsg.Id);
+					DataSpecificationItemMapping? mapping = replyMessage.PrecedingUserMessage.ItemMappings
+						.Find(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == precedingUserMsg.Id);
 					if (mapping is null)
 					{
 						_logger.LogError("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", suggestion.ExpandsItem, precedingUserMsg.Id);
 					}
 
-					string expandWords = mapping?.MappedWords ?? suggestion.ExpandsItem;
+					string expandWords = mapping != null ? mapping.MappedWords : string.Empty;
 
 					List<SuggestedItemDTO>? items;
 					if (!messageDTO.SuggestedItems.TryGetValue(expandWords, out items))
 					{
 						items = [];
-						messageDTO.SuggestedItems[suggestion.ExpandsItem] = items;
+						messageDTO.SuggestedItems[expandWords] = items;
 					}
 					items.Add(new SuggestedItemDTO()
 					{
@@ -116,9 +108,8 @@ public class ConversationController(
 						Reason = suggestion.ReasonForSuggestion
 					});
 				}
-
-				responseDTO.Add(messageDTO);
 			}
+			responseDTO.Add(messageDTO);
 		}
 
 		return Results.Ok(responseDTO);
@@ -146,13 +137,7 @@ public class ConversationController(
 		_logger.LogTrace("Found the requested message in conversation [Title={ConvTitle}, Id={ConvId}]", conversation.Title, conversation.Id);
 		if (requestedMessage is ReplyMessage replyMessage)
 		{
-			_logger.LogTrace("Searching for the user message preceding this reply message.");
-			UserMessage? userMessage = await _conversationService.GetUserMessagePrecedingReplyAsync(replyMessage);
-			if (userMessage is null)
-			{
-				_logger.LogError("The reply message with ID \"{ReplMsgId}\" does not have a preceding user message.", replyMessage.Id);
-				return Results.InternalServerError(new ErrorDTO { Reason = "Found a reply message without the preceding user message." });
-			}
+			UserMessage userMessage = replyMessage.PrecedingUserMessage;
 
 			if (replyMessage.IsGenerated is false)
 			{
@@ -175,7 +160,7 @@ public class ConversationController(
 
 			// Build the DTO to return.
 
-			List<MappedItemDTO> mappedItems = userMessage.ItemMappingsTable
+			List<MappedItemDTO> mappedItems = userMessage.ItemMappings
 				.Select(mapping => new MappedItemDTO
 				{
 					Iri = mapping.ItemIri,
@@ -184,14 +169,22 @@ public class ConversationController(
 					MappedWords = mapping.MappedWords
 				}).ToList();
 
-			Dictionary<string, List<SuggestedItemDTO>> suggestedItemsPreprocessing = [];
-			foreach (var suggestion in replyMessage.ItemSuggestionsTable)
+			Dictionary<string, List<SuggestedItemDTO>> suggestedItems = [];
+			foreach (var suggestion in replyMessage.ItemSuggestions)
 			{
+				DataSpecificationItemMapping? mapping = replyMessage.PrecedingUserMessage.ItemMappings
+					.Find(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == userMessage.Id);
+				if (mapping is null)
+				{
+					_logger.LogInformation("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", suggestion.ExpandsItem, userMessage.Id);
+				}
+				string expandWords = mapping != null ? mapping.MappedWords : string.Empty;
+
 				List<SuggestedItemDTO>? list;
-				if (!suggestedItemsPreprocessing.TryGetValue(suggestion.ExpandsItem, out list))
+				if (!suggestedItems.TryGetValue(expandWords, out list))
 				{
 					list = new List<SuggestedItemDTO>();
-					suggestedItemsPreprocessing.Add(suggestion.ExpandsItem, list);
+					suggestedItems.Add(expandWords, list);
 				}
 				list.Add(new SuggestedItemDTO()
 				{
@@ -202,21 +195,6 @@ public class ConversationController(
 				});
 			}
 
-			Dictionary<string, List<SuggestedItemDTO>> suggestedItems = [];
-			foreach (var pair in suggestedItemsPreprocessing)
-			{
-				// pair.Key is the Iri of the item that the suggested items would expand.
-				DataSpecificationItemMapping? mapping = await _database.DataSpecificationItemMappings
-					.SingleOrDefaultAsync(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == pair.Key && m.UserMessageId == userMessage.Id);
-				if (mapping is null)
-				{
-					_logger.LogError("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", pair.Key, userMessage.Id);
-				}
-
-				string expandWords = mapping?.MappedWords ?? pair.Key;
-				suggestedItems.Add(expandWords, pair.Value);
-			}
-
 			ConversationMessageDTO replyMessageDTO = new()
 			{
 				Id = replyMessage.Id,
@@ -224,6 +202,7 @@ public class ConversationController(
 				MappingText = replyMessage.MappingText,
 				MappedItems = mappedItems,
 				SparqlText = replyMessage.SparqlText,
+				SparqlQuery = replyMessage.SparqlQuery,
 				SuggestItemsText = replyMessage.SuggestItemsText,
 				SuggestedItems = suggestedItems
 			};
@@ -255,6 +234,10 @@ public class ConversationController(
 	public async Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload)
 	{
 		_logger.LogInformation("Processing incoming user message. ConversationId = {ConvId}, payload = {Payload}", conversationId, payload);
+		if (string.IsNullOrWhiteSpace(payload.TextValue))
+		{
+			return Results.BadRequest(new ErrorDTO { Reason = "The user message does not contain any text." });
+		}
 
 		_logger.LogTrace("Searching for the conversation.");
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
@@ -302,7 +285,8 @@ public class ConversationController(
 		}
 
 		_logger.LogTrace("Generating a suggested message.");
-		string? suggestedMessage = await _conversationService.GenerateSuggestedMessageAsync(conversation, selectedItems);
+
+		string? suggestedMessage = await _conversationService.UpdateSelectedItemsAndGenerateSuggestedMessageAsync(conversation, selectedItems);
 		if (string.IsNullOrEmpty(suggestedMessage))
 		{
 			_logger.LogError("The suggested message is either null or empty.");
@@ -313,20 +297,16 @@ public class ConversationController(
 		return Results.Ok(new SuggestedMessageDTO(suggestedMessage));
 	}
 
-	// Todo: Should call a method on ConversationService.
-	// That method shoudld remove all other things related to the conversation.
 	public async Task<IResult> DeleteConversationAsync(int conversationId)
 	{
-		Conversation? conversation = await _database.Conversations.SingleOrDefaultAsync(c => c.Id == conversationId);
-		if (conversation is null)
+		bool result = await _conversationService.DeleteConversationAndAssociatedResourcesAsync(conversationId);
+		if (result)
 		{
-			return Results.NotFound($"Conversation with ID {conversationId} not found.");
+			return Results.Ok();
 		}
-
-		DataSpecification dataSpecification = conversation.DataSpecification;
-		_database.Conversations.Remove(conversation);
-		_database.DataSpecifications.Remove(dataSpecification);
-		_database.SaveChanges();
-		return Results.NoContent();
+		else
+		{
+			return Results.InternalServerError(new ErrorDTO { Reason = "There was an unexpected error while deleting the conversation." });
+		}
 	}
 }

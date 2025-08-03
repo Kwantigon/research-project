@@ -11,7 +11,11 @@ The question that user asked is:
 "{1}"
 
 ### Task
-Identify, which items from the specification are mentioned in the question. Map each of the identified item to the words that correspond to them in the user question and give a brief summary for each item. If an item cannot be mapped to its corresponding words from the user question, do not return that item.
+Identify, which items from the specification are mentioned in the question.
+Map each of the identified item to the words that correspond to them in the user question.
+No more than one item can be mapped to the same words from the user question.
+Give a brief summary for each item.
+If an item cannot be mapped to its corresponding words from the user question, do not return that item.
 
 Return a JSON array corresponding to the following schema:
 [{{
@@ -28,7 +32,7 @@ Explanation of the JSON fields:
 - Label: The label of the item from the data specification.
 - Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
 - Comment: The item's comment from the data specification, if it is present.
-- Summary: A brief summary suitable for non-technical end-users describing this item in the context of the given data specification.
+- Summary: A brief summary in 3 or 4 sentences suitable for non-technical end-users describing this item in the context of the given data specification.
 - MappedWords: The words from the user question that could be referring to this item.
 
 

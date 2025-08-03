@@ -12,7 +12,7 @@ public record ConversationMessageDTO
 	[JsonPropertyName("sender")]
 	public Message.Source Sender { get; set; }
 
-	[JsonPropertyName("textContent")]
+	[JsonPropertyName("text")]
 	public string? TextContent { get; set; }
 
 	[JsonPropertyName("timestamp")]
@@ -39,7 +39,7 @@ public record ConversationMessageDTO
 	/// Keys = Words that the suggested items would expand.<br/>
 	/// Values = The suggested items info.
 	/// </summary>
-	[JsonPropertyName("suggestedItems")]
+	[JsonPropertyName("suggestedItemsGrouped")]
 	public Dictionary<string, List<SuggestedItemDTO>> SuggestedItems { get; set; } = [];
 	#endregion Fields for reply messages.
 
@@ -62,6 +62,9 @@ public record MappedItemDTO
 	public string? Summary { get; set; }
 	[JsonPropertyName("mappedWords")]
 	public required string MappedWords { get; init; }
+
+	[JsonPropertyName("mappedOrSuggested")]
+	public string MappedOrSuggested => "Mapped"; // This property is purely for the front end to identify, which type of item it is.
 }
 
 public record SuggestedItemDTO
@@ -77,4 +80,7 @@ public record SuggestedItemDTO
 
 	[JsonPropertyName("reason")]
 	public required string Reason { get; init; }
+
+	[JsonPropertyName("mappedOrSuggested")]
+	public string MappedOrSuggested => "Suggested"; // This property is purely for the front end to identify, which type of item it is.
 }

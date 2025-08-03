@@ -9,4 +9,6 @@ public interface IPromptConstructor
 	string BuildGetSuggestedItemsPrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> mappedItems);
 
 	string BuildGenerateSuggestedMessagePrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> mappedItems, List<DataSpecificationItem> selectedItems);
+
+	string BuildDataSpecSubstructureItemsMappingPrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> dataSpecificationSubstructure);
 }

@@ -21,4 +21,6 @@ public class Conversation
 	/// IRIs of the items that user has selected for question expansion.
 	/// </summary>
 	public List<string>? UserSelectedItems { get; set; }
+
+	public string? SuggestedMessage { get; set; }
 }

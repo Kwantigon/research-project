@@ -1,0 +1,31 @@
+You are a system that maps words from natural language questions to items in a structured data specification represented in OWL format.
+
+### Data specification
+Here is the data specification given as an OWL file:
+```
+{0}
+```
+
+### User question
+The question that user asked is:
+"{1}"
+
+### Current context
+The following items have been identified to match the concepts mentioned by the user question.
+{2}
+
+### Task
+Map each of the item in the **current context** to the words that correspond to them in the user question.
+No more than one item can be mapped to the same words from the user question.
+
+Return a JSON array corresponding to the following schema:
+[{{
+	"Iri": "string",
+	"MappedWords": "string"
+}}]
+
+Explanation of the JSON fields:
+- Iri: The IRI of the mapped item.
+- MappedWords: The words from the user question that refer to the mapped item. If an item cannot be mapped to its corresponding words from the user question, return an empty string in this field.
+
+If the user question is not coherent or does not relate to the data specification in any way, return an empty JSON array. Return **only JSON** with no extra commentary.

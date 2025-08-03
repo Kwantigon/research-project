@@ -15,8 +15,8 @@ My question already involves these items:
 {2}
 
 ### Task
-Suggest other items from the specification that may be relevant to expanding my current question. Do not suggest items that are already in the current context. For each item, include the following:
-- A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
+Suggest up to 10 other items from the data specification that are most relevant to my current question. Do not suggest items that are already in the current context. For each item, include the following:
+- A brief summary in 3 or 4 sentences suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
 - The reason why you are proposing this item for question expansion.
 - What item from the current context it would expand.
 
@@ -38,6 +38,6 @@ Explanation of the JSON fields:
 - Comment: The item's comment from the data specification, if it is present.
 - Summary: A brief summary suitable for non-technical end-users describing the purpose and relevance of this item in the context of the specification and the current question.
 - Reason: Explanation of why the item could be relevant to my current question.
-- Expands: Iri of the item from the current context that this suggested item would expand.
+- Expands: Iri of the item that this suggested item would expand.
 
 If the question is not coherent or does not relate to the data specification in any way, return an empty JSON array.  Return **only JSON** with no extra commentary.

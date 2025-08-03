@@ -1,7 +1,6 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
 using GenerativeAI;
-using System.Text.Json;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.LlmConnectors;
 
@@ -85,7 +84,7 @@ public class GeminiConnector : ILlmConnector
 
 			_logger.LogTrace("Prompting the LLM.");
 			string response = await SendPromptAsync(prompt);
-			
+
 			_logger.LogDebug("LLM response: {Response}", response);
 
 			_logger.LogTrace("Extracting the related items from the LLM response.");
@@ -103,9 +102,9 @@ public class GeminiConnector : ILlmConnector
 		return suggestedItems;
 	}
 
-	public async Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	/*public async Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
 	{
-		/*_logger.LogTrace("Building a prompt for the item summary.");
+		_logger.LogTrace("Building a prompt for the item summary.");
 		//string prompt = _promptConstructor.CreateGenerateItemSummaryPrompt(dataSpecificationItem);
 		//_logger.LogDebug("Generate item summary prompt:\n{Prompt}", prompt);
 
@@ -118,15 +117,13 @@ public class GeminiConnector : ILlmConnector
 		string itemSummary = _responseProcessor.ExtractItemSummary(response);
 
 		_logger.LogTrace("Returning the item summary.");
-		return itemSummary;*/
+		return itemSummary;
+	}*/
 
-		return string.Empty;
-	}
-
-	public async Task<string> GenerateSuggestedMessageAsync(string originalQuestion, DataSpecification dataSpecification, List<DataSpecificationItem> selectedItems, List<DataSpecificationItem> currentSubstructure)
+	public async Task<string> GenerateSuggestedMessageAsync(DataSpecification dataSpecification, UserMessage userMessage, List<DataSpecificationItem> currentSubstructure, List<DataSpecificationItem> selectedItems)
 	{
 		_logger.LogTrace("Building a prompt for the suggested message.");
-		string prompt = _promptConstructor.BuildGenerateSuggestedMessagePrompt(dataSpecification, originalQuestion, currentSubstructure, selectedItems);
+		string prompt = _promptConstructor.BuildGenerateSuggestedMessagePrompt(dataSpecification, userMessage.TextContent, currentSubstructure, selectedItems);
 		_logger.LogDebug("Generate suggested message:\n{Prompt}", prompt);
 
 		_logger.LogTrace("Prompting the LLM.");
@@ -145,6 +142,36 @@ public class GeminiConnector : ILlmConnector
 		return itemSummary;
 	}
 
+	public async Task<List<DataSpecificationItemMapping>> MapUserMessageToConversationDataSpecSubstructureAsync(UserMessage userMessage)
+	{
+		int attempts = 0;
+		List<DataSpecificationItemMapping>? mapped = null;
+
+		_logger.LogTrace("Building a prompt for mapping the question to items.");
+		string prompt = _promptConstructor.BuildDataSpecSubstructureItemsMappingPrompt(userMessage.Conversation.DataSpecification, userMessage.TextContent, userMessage.Conversation.DataSpecificationSubstructure);
+		_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
+
+		while (attempts < _retryAttempts && mapped is null)
+		{
+			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
+			string response = await SendPromptAsync(prompt);
+			_logger.LogDebug("LLM response: {Response}", response);
+
+			_logger.LogTrace("Extracting the mapped items from the LLM response.");
+			mapped = _responseProcessor.ExtractDataSpecSubstructureMapping(response, userMessage);
+			attempts++;
+		}
+
+		if (mapped is null)
+		{
+			_logger.LogError("The data specification items list is still null after " + _retryAttempts + " attempts.");
+			return [];
+		}
+
+		_logger.LogTrace("Returning the mapped items.");
+		return mapped;
+	}
+
 	private async Task<string> SendPromptAsync(string prompt)
 	{
 		if (_gemini is null)
@@ -153,5 +180,11 @@ public class GeminiConnector : ILlmConnector
 		}
 		var response = await _gemini.GenerateContentAsync(prompt);
 		return response.Text;
+	}
+
+	public async Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem)
+	{
+		await Task.CompletedTask;
+		return "Item summary generation is deprecated.";
 	}
 }

@@ -33,6 +33,9 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SuggestedMessage")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -135,7 +138,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<Guid>("ReplyMessageId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ExpandsOnWords")
+                    b.Property<string>("ExpandsItem")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -220,7 +223,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<Guid?>("ReplyMessageId")
                         .HasColumnType("TEXT");
 
-                    b.HasIndex("ReplyMessageId");
+                    b.HasIndex("ReplyMessageId")
+                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("UserMessage");
                 });
@@ -254,7 +258,7 @@ namespace DataSpecificationNavigationBackend.Migrations
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemMapping", b =>
                 {
                     b.HasOne("DataSpecificationNavigationBackend.Model.UserMessage", "UserMessage")
-                        .WithMany("ItemMappingsTable")
+                        .WithMany("ItemMappings")
                         .HasForeignKey("UserMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -273,7 +277,7 @@ namespace DataSpecificationNavigationBackend.Migrations
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemSuggestion", b =>
                 {
                     b.HasOne("DataSpecificationNavigationBackend.Model.ReplyMessage", "ReplyMessage")
-                        .WithMany("ItemSuggestionsTable")
+                        .WithMany("ItemSuggestions")
                         .HasForeignKey("ReplyMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -303,8 +307,8 @@ namespace DataSpecificationNavigationBackend.Migrations
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.UserMessage", b =>
                 {
                     b.HasOne("DataSpecificationNavigationBackend.Model.ReplyMessage", "ReplyMessage")
-                        .WithMany()
-                        .HasForeignKey("ReplyMessageId");
+                        .WithOne("PrecedingUserMessage")
+                        .HasForeignKey("DataSpecificationNavigationBackend.Model.UserMessage", "ReplyMessageId");
 
                     b.Navigation("ReplyMessage");
                 });
@@ -325,12 +329,15 @@ namespace DataSpecificationNavigationBackend.Migrations
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.ReplyMessage", b =>
                 {
-                    b.Navigation("ItemSuggestionsTable");
+                    b.Navigation("ItemSuggestions");
+
+                    b.Navigation("PrecedingUserMessage")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.UserMessage", b =>
                 {
-                    b.Navigation("ItemMappingsTable");
+                    b.Navigation("ItemMappings");
                 });
 #pragma warning restore 612, 618
         }

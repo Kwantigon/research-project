@@ -14,7 +14,7 @@ public interface IConversationService
 
 	Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage);
 
-	Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems);
+	Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems);
 
-	Task<UserMessage?> GetUserMessagePrecedingReplyAsync(ReplyMessage replyMessage);
+	Task<bool> DeleteConversationAndAssociatedResourcesAsync(int conversationId);
 }

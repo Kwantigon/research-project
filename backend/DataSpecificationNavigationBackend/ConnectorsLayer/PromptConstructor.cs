@@ -30,6 +30,14 @@ public class PromptConstructor : IPromptConstructor
 	/// </summary>
 	private readonly string _generateSuggestedMessageTemplate;
 
+	/// <summary>
+	/// Has the following parameters:<br/>
+	/// {0} = Data specification (OWL file).<br/>
+	/// {1} = User question.<br/>
+	/// {2} = Current substructure (a list of items that the conversation has built).
+	/// </summary>
+	private readonly string _dataSpecSubstructureItemsMappingTemplate;
+
 	public PromptConstructor(IConfiguration appSettings)
 	{
 		string? baseDirectory = appSettings["Prompts:BaseDirectory"];
@@ -82,6 +90,21 @@ public class PromptConstructor : IPromptConstructor
 		{
 			_generateSuggestedMessageTemplate = File.ReadAllText(file);
 		}
+
+		string? substructureItemMapping = appSettings["Prompts:DataSpecSubstructureItemsMapping"];
+		if (substructureItemMapping is null)
+		{
+			throw new Exception("The key Prompts:DataSpecSubstructureItemsMapping is missing in the config file.");
+		}
+		file = Path.Combine(baseDirectory, substructureItemMapping);
+		if (!File.Exists(file))
+		{
+			throw new Exception($"The template file \"{file}\" does not exist");
+		}
+		else
+		{
+			_dataSpecSubstructureItemsMappingTemplate = File.ReadAllText(file);
+		}
 	}
 
 	public string BuildItemsMappingPrompt(DataSpecification dataSpecification, string userQuestion)
@@ -115,5 +138,16 @@ public class PromptConstructor : IPromptConstructor
 		}
 
 		return string.Format(_generateSuggestedMessageTemplate, dataSpecification.Owl, userQuestion, currentSubstructure.ToString(), selected.ToString());
+	}
+
+	public string BuildDataSpecSubstructureItemsMappingPrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> dataSpecificationSubstructure)
+	{
+		StringBuilder currentSubstructure = new();
+		foreach (DataSpecificationItem item in dataSpecificationSubstructure)
+		{
+			currentSubstructure.AppendLine($"- {item.Iri}");
+		}
+
+		return string.Format(_dataSpecSubstructureItemsMappingTemplate, dataSpecification.Owl, userQuestion, currentSubstructure.ToString());
 	}
 }

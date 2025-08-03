@@ -3,6 +3,7 @@ using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
@@ -12,10 +13,12 @@ public class ConversationService(
 	ILlmConnector llmConnector,
 	IDataSpecificationService dataSpecificationService) : IConversationService
 {
+	#region Private fields
 	private readonly ILogger<ConversationService> _logger = logger;
 	private readonly AppDbContext _database = appDbContext;
 	private readonly ILlmConnector _llmConnector = llmConnector;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
+	#endregion Private fields
 
 	public async Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification)
 	{
@@ -81,12 +84,14 @@ public class ConversationService(
 		{
 			Sender = Message.Source.System,
 			Timestamp = (DateTime.Now > userMessage.Timestamp) ? DateTime.Now : userMessage.Timestamp.AddSeconds(1),
-			Conversation = conversation
+			Conversation = conversation,
+			PrecedingUserMessage = userMessage
 		};
 
-		// Calling AddRangeAsync explicitly so that I get generated IDs for the messages.
+		// Calling AddAsync explicitly so that I get generated IDs for the messages.
 		_logger.LogTrace("Adding messages to the database to retrieve their IDs.");
-		await _database.Messages.AddRangeAsync([userMessage, replyMessage]);
+		await _database.UserMessages.AddAsync(userMessage);
+		await _database.ReplyMessages.AddAsync(replyMessage);
 		conversation.Messages.Add(userMessage);
 		conversation.Messages.Add(replyMessage);
 
@@ -94,47 +99,27 @@ public class ConversationService(
 		userMessage.ReplyMessageId = replyMessage.Id;
 		userMessage.ReplyMessage = replyMessage;
 
-		if (userModifiedSuggestedMessage)
+		if (conversation.SuggestedMessage == null || userMessage.TextContent.ToLower() != conversation.SuggestedMessage.ToLower())
 		{
 			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
 
 			_logger.LogTrace("Mapping the question to data specification items.");
 			List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToItemsAsync(conversation.DataSpecification, userMessage);
 
+			_logger.LogTrace("Clearing the data specification substructure of the conversation.");
+			conversation.DataSpecificationSubstructure.Clear();
 			if (mappings.Count == 0)
 			{
 				_logger.LogError("No suitable data specification items found for the question mapping.");
-
-				_logger.LogTrace("Clearing the data specification substructure of the conversation.");
-				conversation.DataSpecificationSubstructure.Clear();
 			}
 			else // mappings.Count > 0
 			{
 				_logger.LogTrace("Setting the conversation data spec substructure and mappings in data spec item and message.");
-				foreach (DataSpecificationItemMapping mapping in mappings)
-				{
-					// Check the database and conversation substructure for the item.
-					DataSpecificationItem? item = await _database.DataSpecificationItems
-						.SingleOrDefaultAsync(item => item.DataSpecificationId == mapping.ItemDataSpecificationId && item.Iri == mapping.ItemIri);
-					if (item is not null)
-					{
-						// Change the reference to the actual item from the database.
-						// So that there is no duplicate item conflict when I save later.
-						mapping.Item = item;
-					}
-
-					if (!conversation.DataSpecificationSubstructure.Any(item => item.Iri == mapping.ItemIri))
-					{
-						// If the mapped item is not already in the substructure, add it.
-						// This should be the case for all the items.
-						conversation.DataSpecificationSubstructure.Add(mapping.Item);
-					}
-					mapping.Item.ItemMappingsTable.Add(mapping);
-					mapping.UserMessage.ItemMappingsTable.Add(mapping);
-				}
+				StoreMappingsAndUpdateItsReferences(mappings);
+				conversation.DataSpecificationSubstructure = mappings.Select(m => m.Item).ToList();
 			}
 		}
-		else // userModifiedSuggestedMessage is false
+		else // User sent the suggested message as is without any modifications.
 		{
 			_logger.LogTrace("User did not modify the suggested message.");
 
@@ -153,11 +138,18 @@ public class ConversationService(
 
 				_logger.LogTrace("Adding the selected items to the conversation.");
 				conversation.DataSpecificationSubstructure.AddRange(itemsNotInConversation);
+
+				// Do the mapping for items.
+				List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToConversationDataSpecSubstructureAsync(userMessage);
+				StoreMappingsAndUpdateItsReferences(mappings);
 			}
 		}
 
+		conversation.UserSelectedItems?.Clear();
+		conversation.SuggestedMessage = null;
 		_logger.LogTrace("Saving changes to the database and returning.");
 		await _database.SaveChangesAsync();
+		PrintSubstructureForDebugging(conversation);
 		return userMessage;
 	}
 
@@ -177,11 +169,7 @@ public class ConversationService(
 			return replyMessage;
 		}
 
-		// Item mappings answer.
-		/*List<DataSpecificationItemMapping> mappings = await _database.DataSpecificationItemMappings
-																																.Where(mapping => mapping.UserMessageId == userMessage.Id)
-																																.ToListAsync();*/
-		if (userMessage.ItemMappingsTable.Count > 0)
+		if (userMessage.ItemMappings.Count > 0)
 		{
 			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question.";
 		}
@@ -221,7 +209,7 @@ public class ConversationService(
 					suggestion.Item = item;
 				}
 				suggestion.Item.ItemSuggestionsTable.Add(suggestion);
-				suggestion.ReplyMessage.ItemSuggestionsTable.Add(suggestion);
+				suggestion.ReplyMessage.ItemSuggestions.Add(suggestion);
 			}
 		}
 
@@ -230,30 +218,90 @@ public class ConversationService(
 		return replyMessage;
 	}
 
-	public async Task<string?> GenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems)
+	public async Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems)
 	{
 		_logger.LogTrace("Searching for the most recent user message.");
-		Message? userMessage = null;
+		UserMessage? userMessage = null;
 		for (int i = conversation.Messages.Count - 1; i >= 0; i--)
 		{
 			if (conversation.Messages[i] is UserMessage)
 			{
-				userMessage = conversation.Messages[i];
+				userMessage = (UserMessage?)conversation.Messages[i];
 				break;
 			}
 		}
 		if (userMessage is null)
 		{
 			_logger.LogError("The conversation does not contain any user messages.");
+			conversation.UserSelectedItems?.Clear();
 			return null;
 		}
 
-		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(userMessage.TextContent, conversation.DataSpecification, selectedItems, conversation.DataSpecificationSubstructure);
+		conversation.UserSelectedItems = selectedItems.Select(item => item.Iri).ToList();
+		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(conversation.DataSpecification, userMessage, conversation.DataSpecificationSubstructure, selectedItems);
+		conversation.SuggestedMessage = suggestedMessage;
+
+		await _database.SaveChangesAsync();
 		return suggestedMessage;
 	}
 
-	public async Task<UserMessage?> GetUserMessagePrecedingReplyAsync(ReplyMessage replyMessage)
+	public async Task<bool> DeleteConversationAndAssociatedResourcesAsync(int conversationId)
 	{
-		return await (_database.UserMessages.SingleOrDefaultAsync(msg => msg.ReplyMessageId == replyMessage.Id));
+		Conversation? conversation = await _database.Conversations.SingleOrDefaultAsync(c => c.Id == conversationId);
+		if (conversation is null)
+		{
+			_logger.LogError("Conversation with ID {Id} not found. But it's OK because there is nothing to delete.", conversationId);
+			return true;
+		}
+
+		_database.Messages.RemoveRange(conversation.Messages);
+		_database.DataSpecifications.Remove(conversation.DataSpecification);
+		_database.Conversations.Remove(conversation);
+		try
+		{
+			await _database.SaveChangesAsync();
+		}
+		catch (Exception e)
+		{
+			_logger.LogError("An exception occured while saving to the database: {Ex}", e);
+			return false;
+		}
+		return true;
 	}
+
+	#region Private methods
+
+	private void StoreMappingsAndUpdateItsReferences(List<DataSpecificationItemMapping> mappings)
+	{
+		if (mappings.Count == 0)
+			return;
+
+		foreach (DataSpecificationItemMapping mapping in mappings)
+		{
+			// Check the database and conversation substructure for the item.
+			DataSpecificationItem? item = _database.DataSpecificationItems
+				.SingleOrDefault(item => item.DataSpecificationId == mapping.ItemDataSpecificationId && item.Iri == mapping.ItemIri);
+			if (item is not null)
+			{
+				// Change the reference to the actual item from the database.
+				// So that there is no duplicate item conflict when I save later.
+				mapping.Item = item;
+			}
+
+			mapping.Item.ItemMappingsTable.Add(mapping);
+			mapping.UserMessage.ItemMappings.Add(mapping);
+		}
+	}
+
+	private void PrintSubstructureForDebugging(Conversation conversation)
+	{
+		StringBuilder sb = new();
+		foreach (var item in conversation.DataSpecificationSubstructure)
+		{
+			sb.AppendLine($"- {item.Label} ({item.Iri})");
+		}
+		_logger.LogDebug("Current data specification substructure in the conversation:\n{Substructure}", sb.ToString());
+	}
+
+	#endregion Private methods
 }
