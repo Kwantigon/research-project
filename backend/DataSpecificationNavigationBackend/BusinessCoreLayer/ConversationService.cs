@@ -111,6 +111,8 @@ public class ConversationService(
 			if (mappings.Count == 0)
 			{
 				_logger.LogError("No suitable data specification items found for the question mapping.");
+				_logger.LogTrace("No mapping found so clearing the conversation data specification substructure.");
+				conversation.DataSpecificationSubstructure.Clear();
 			}
 			else // mappings.Count > 0
 			{
@@ -172,47 +174,47 @@ public class ConversationService(
 		if (userMessage.ItemMappings.Count > 0)
 		{
 			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question.";
-		}
-		else
-		{
-			replyMessage.MappingText = "Sorry, I did not manage to find anything from the data specification that matches your question.";
-		}
+			// Todo: Generate a Sparql query.
+			// Which means I need to implement the Sparql generation.
+			_logger.LogTrace("To do: Generating a Sparql query.");
+			replyMessage.SparqlText = "I have formulated a Sparql query for your question:";
+			replyMessage.SparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
 
-		// Todo: Generate a Sparql query.
-		// Which means I need to implement the Sparql generation.
-		_logger.LogTrace("To do: Generating a Sparql query.");
-		replyMessage.SparqlText = "I have formulated a Sparql query for your question:";
-		replyMessage.SparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
+			_logger.LogTrace("Getting item suggestions.");
+			List<DataSpecificationItemSuggestion> suggestedItems = await _llmConnector.GetSuggestedItemsAsync(
+				userMessage.Conversation.DataSpecification, userMessage, userMessage.Conversation.DataSpecificationSubstructure);
+			_logger.LogTrace("The LLM suggested {ItemsCount} items.", suggestedItems.Count);
 
-		_logger.LogTrace("Getting item suggestions.");
-		List<DataSpecificationItemSuggestion> suggestedItems = await _llmConnector.GetSuggestedItemsAsync(
-			userMessage.Conversation.DataSpecification, userMessage, userMessage.Conversation.DataSpecificationSubstructure);
-		_logger.LogTrace("The LLM suggested {ItemsCount} items.", suggestedItems.Count);
-
-		if (suggestedItems.Count == 0)
-		{
-			replyMessage.SuggestItemsText = "Unfortunately, I did not manage to find any suitable items to suggest to you to further expand your question.";
-		}
-		else
-		{
-			replyMessage.SuggestItemsText = "I found some items which could expand your question.";
-
-			foreach (DataSpecificationItemSuggestion suggestion in suggestedItems)
+			if (suggestedItems.Count == 0)
 			{
-				// Check the database and conversation substructure for the item.
-				DataSpecificationItem? item = await _database.DataSpecificationItems
-					.SingleOrDefaultAsync(item => item.DataSpecificationId == suggestion.ItemDataSpecificationId && item.Iri == suggestion.ItemIri);
-				if (item is not null)
-				{
-					// Change the reference to the actual item from the database.
-					// So that there is no duplicate item conflict when I save later.
-					suggestion.Item = item;
-				}
-				suggestion.Item.ItemSuggestionsTable.Add(suggestion);
-				suggestion.ReplyMessage.ItemSuggestions.Add(suggestion);
+				replyMessage.SuggestItemsText = "Unfortunately, I did not manage to find any suitable items to suggest to you to further expand your question.";
 			}
-		}
+			else
+			{
+				replyMessage.SuggestItemsText = "I found some items which could expand your question.";
 
+				foreach (DataSpecificationItemSuggestion suggestion in suggestedItems)
+				{
+					// Check the database and conversation substructure for the item.
+					DataSpecificationItem? item = await _database.DataSpecificationItems
+						.SingleOrDefaultAsync(item => item.DataSpecificationId == suggestion.ItemDataSpecificationId && item.Iri == suggestion.ItemIri);
+					if (item is not null)
+					{
+						// Change the reference to the actual item from the database.
+						// So that there is no duplicate item conflict when I save later.
+						suggestion.Item = item;
+					}
+					suggestion.Item.ItemSuggestionsTable.Add(suggestion);
+					suggestion.ReplyMessage.ItemSuggestions.Add(suggestion);
+				}
+			}
+			replyMessage.IsGenerated = true;
+		}
+		else
+		{
+			replyMessage.TextContent = "Sorry, I did not manage to find anything from the data specification that matches your question.";
+			replyMessage.IsGenerated = true;
+		}
 		_logger.LogTrace("Saving changes to the database and returning.");
 		await _database.SaveChangesAsync();
 		return replyMessage;

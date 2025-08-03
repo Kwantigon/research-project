@@ -198,6 +198,8 @@ public class ConversationController(
 			ConversationMessageDTO replyMessageDTO = new()
 			{
 				Id = replyMessage.Id,
+				Sender = replyMessage.Sender,
+				TextContent = replyMessage.TextContent,
 				Timestamp = replyMessage.Timestamp,
 				MappingText = replyMessage.MappingText,
 				MappedItems = mappedItems,
