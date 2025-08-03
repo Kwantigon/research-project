@@ -211,7 +211,6 @@ Todo (vyřešit někdy později):
 # 1. 8.
 Cíl:
 - Vyřešit konflikt při ukládání vrácených itemů od LLM (mohou být už v databázi).
-- Vymyslet, jak konstantně zobrazit uživateli jeho položený dotaz (odscrolluje a už nevidí, s jakým dotazem pracuje).
 - Změnit nadpis "data specification helper" na něco vhodnějšího.
 - Zkrátit OWL soubor pomocí prefixů.
 

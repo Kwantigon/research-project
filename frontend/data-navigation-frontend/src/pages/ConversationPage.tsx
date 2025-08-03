@@ -67,6 +67,7 @@ function ConversationPage() {
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
 	const [summaryError, setSummaryError] = useState<string | null>(null);
 	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
+	const [isWaitingForBackend, setIsWaitingForBackend] = useState<boolean>(false);
 
 	const fetchMessages = async () => {
 		try {
@@ -118,7 +119,7 @@ function ConversationPage() {
 	}, [messages]);
 
 	const handleSendMessage = async () => {
-		if (currentMessage.trim() === "" && suggestedMessage === null) return;
+		if (currentMessage.trim() === "") return;
 		setError(null);
 
 		const messageToSend = currentMessage;
@@ -141,6 +142,7 @@ function ConversationPage() {
 		setMostRecentUserMessage(messageToSend);
 
 		try {
+			setIsWaitingForBackend(true);
 			const requestBody = JSON.stringify(
 					{
 						textValue: userMessage.text,
@@ -204,6 +206,8 @@ function ConversationPage() {
 					timestamp: new Date().toLocaleString()
 				}
 			]);
+		} finally {
+			setIsWaitingForBackend(false);
 		}
 	};
 
@@ -228,14 +232,13 @@ function ConversationPage() {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					//conversationId: "current-conversation-id",
-					//currentQuestion: messages[messages.length - 1]?.text, // Get the last user question
 					itemIriList: updatedSelectedItems.map(item => item.iri)
 				})
 			})
 			.then(res => res.json())
 			.then(data => {
-				setSuggestedMessage(data.suggestedMessage); // Set the suggested message in the chat box
+				setSuggestedMessage(data.suggestedMessage);
+				setCurrentMessage(data.suggestedMessage);
 			})
 			.catch(error => console.error("Error generating suggested message:", error));
 		}
@@ -381,6 +384,17 @@ function ConversationPage() {
 						</Card>
 					</div>
 				)))}
+        {isWaitingForBackend && (
+          <div className="flex justify-start">
+            <Card className="bg-gray-100 max-w-2xl">
+              <CardContent className="p-3">
+                <div className="h-4 w-4 rounded-full border-2 border-gray-300 border-t-blue-500 animate-spin"></div>
+								<div>Thinking....</div>
+								<div>This might take a minute.</div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 			</div>
 
 			{suggestedMessage && (
@@ -402,21 +416,15 @@ function ConversationPage() {
 			<div className="flex mt-4 space-x-2">
 				<Input
 					placeholder={suggestedMessage ? "Modify suggestion or send as is..." : "Type your message..."}
-					value={suggestedMessage || currentMessage} // Display suggested message or current input
-					onChange={(e) => {
-						if (suggestedMessage) {
-							setSuggestedMessage(e.target.value); // Allow modification of suggested message
-						} else {
-							setCurrentMessage(e.target.value);
-						}
-					}}
+					value={currentMessage}
+					onChange={(e) => setCurrentMessage(e.target.value)}
 					onKeyDown={(e) => {
 						if (e.key === "Enter") {
 							handleSendMessage();
 						}
 					}}
 				/>
-				<Button onClick={handleSendMessage}>SEND</Button>
+				<Button onClick={handleSendMessage} disabled={isWaitingForBackend}>SEND</Button>
 			</div>
 
 			<Dialog open={isSummaryDialogOpen} onOpenChange={setIsSummaryDialogOpen}>
