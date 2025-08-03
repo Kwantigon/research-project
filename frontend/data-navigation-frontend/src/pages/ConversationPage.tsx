@@ -65,7 +65,6 @@ function ConversationPage() {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const { conversationId } = useParams<{ conversationId: string }>();
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
-	const [isSummaryLoading, setIsSummaryLoading] = useState<boolean>(false);
 	const [summaryError, setSummaryError] = useState<string | null>(null);
 
 	const fetchMessages = async () => {
@@ -79,16 +78,15 @@ function ConversationPage() {
 				console.error(response.body);
 				throw new Error("Error fetching messages.");
 			}
-			const messages = await response.json();
-			const fetchedMessages: (SystemMessage | UserMessage)[] = [];
-			messages.forEach(msg => {
-				// Todo: update messages
-			});
+			const fetchedMessages = await response.json();
+			console.log("Fetched messages in the conversation.");
+			console.log(fetchedMessages);
+			setMessages(fetchedMessages);
 
 			// Look for the most recent message with a suggestedItems list.
-			for (let i = messages.length - 1; i >= 0; i--) {
-				if (messages[i].suggestedItems) {
-					setMostRecentReplyMessageId(messages[i].id);
+			for (let i = fetchedMessages.length - 1; i >= 0; i--) {
+				if (isSystemMessage(fetchedMessages[i])) {
+					setMostRecentReplyMessageId(fetchedMessages[i].id);
 					break;
 				}
 			}
@@ -155,7 +153,7 @@ function ConversationPage() {
 			const postUserMsgData = await postUserMsgResponse.json();
 			console.log(`postUserMsgData: ${JSON.stringify(postUserMsgData)}`);
 			userMessage.id = postUserMsgData.id; // Set the message ID that the back end generated.
-			userMessage.replyMessageUri = postUserMsgData.replyUri;
+			userMessage.replyMessageUri = postUserMsgData.replyMessageUri;
 
 			// Do another fetch to get the reply to user's message.
 			console.log(`Fetching a reply from ${BACKEND_API_URL}${userMessage.replyMessageUri}`);
@@ -169,7 +167,7 @@ function ConversationPage() {
 			console.log(`getReplyMsgData: ${JSON.stringify(getReplyMsgData)}`);
 			
 			// Create a dictionary from the suggested items.
-			const suggestedItemsGrouped: Record<string, SuggestedItem[]> = {};
+			/*const suggestedItemsGrouped: Record<string, SuggestedItem[]> = {};
 			if (getReplyMsgData.suggestedItems) {
 				for (const key in getReplyMsgData.suggestedItems) {
 					suggestedItemsGrouped[key] = getReplyMsgData.suggestedItems[key].map((item: any) => ({
@@ -179,7 +177,7 @@ function ConversationPage() {
 						reason: item.reason,
 					}));
 				}
-			}
+			}*/
 			// Create the reply message object.
 			const replyMessage: SystemMessage = {
 				id: getReplyMsgData.id,
@@ -187,15 +185,17 @@ function ConversationPage() {
 				text: getReplyMsgData.textContent,
 				timestamp: getReplyMsgData.timestamp,
 				mappingText: getReplyMsgData.mappingText,
-				mappedItems: getReplyMsgData.mappedItems?.map((item: any) => ({
+				/*mappedItems: getReplyMsgData.mappedItems?.map((item: any) => ({
 					id: item.iri,
 					name: item.label,
 					summary: item.summary,
 					mappedWords: item.mappedWords
-				})),
+				})),*/
+				mappedItems: getReplyMsgData.mappedItems,
 				sparqlText: getReplyMsgData.sparqlText,
+				sparqlQuery: getReplyMsgData.sparqlQuery,
 				suggestItemsText: getReplyMsgData.suggestItemsText,
-				suggestedItemsGrouped: suggestedItemsGrouped
+				suggestedItemsGrouped: getReplyMsgData.suggestedItemsGrouped
 			};
 
 			setMessages((prevMessages) => [
@@ -222,9 +222,9 @@ function ConversationPage() {
 		setIsSummaryDialogOpen(true);
 		if (item.summary) {
 			// Summary is already present, no need to fetch it again.
-			setIsSummaryLoading(false);
 			setSummaryError(null);
-			return;
+		} else {
+			setSummaryError('Failed to load item summary. Please try again.');
 		}
 
 		// If summary is not present.
@@ -326,7 +326,7 @@ function ConversationPage() {
 															(selectedItem) => selectedItem.iri === item.iri
 														);
 														return (
-															<li key={item.iri} className="flex items-center space-x-1">
+															<li key={`${msg.id}-${item.iri}`} className="flex items-center space-x-1">
 																<Button
 																	variant="link"
 																	onClick={() => handleItemClick(item, msg.id)}
@@ -369,9 +369,9 @@ function ConversationPage() {
 										{msg.suggestItemsText && msg.suggestedItemsGrouped && Object.keys(msg.suggestedItemsGrouped).length > 0 && (
 											<div className="mt-4">
 												<p className="font-semibold text-sm">{msg.suggestItemsText}</p>
-												{Object.entries(msg.suggestedItemsGrouped).map(([mappedWord, items]) => (
-													<div key={mappedWord} className="mt-2">
-														<p className="text-sm font-medium italic">Expand "{mappedWord}":</p>
+												{Object.entries(msg.suggestedItemsGrouped).map(([mappedWords, items]) => (
+													<div key={mappedWords} className="mt-2">
+														<p className="text-sm font-medium italic">{mappedWords === "" ? "More items to consider" : `Expand "${mappedWords}"`}:</p>
 														<ul className="list-disc list-inside ml-4 mt-1">
 															{items.map((item) => {
 																const isSelected = selectedItemsForExpansion.some(
@@ -448,8 +448,7 @@ function ConversationPage() {
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Summary of "{selectedItemForSummary?.item.label}"</DialogTitle>
-						{}
-						{isSummaryLoading && (
+						{/*isSummaryLoading && (
 							<DialogDescription className="flex items-center text-blue-500">
 								<svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -457,7 +456,7 @@ function ConversationPage() {
 								</svg>
 								Loading summary...
 							</DialogDescription>
-						)}
+						)*/}
 						{summaryError && (
 							<DialogDescription className="text-red-500">
 								Error: {summaryError}
@@ -465,7 +464,7 @@ function ConversationPage() {
 						)}
 					</DialogHeader>
 					<div className="py-4">
-						{selectedItemForSummary?.item.summary && !isSummaryLoading && !summaryError && (
+						{selectedItemForSummary?.item.summary && !summaryError && (
               <>
                 <p>{selectedItemForSummary.item.summary}</p>
                 {isSuggestedItem(selectedItemForSummary.item) ? (
@@ -480,7 +479,7 @@ function ConversationPage() {
               isSuggestedItem(selectedItemForSummary.item) ? (
                 // If it's a suggested item, show the button to add it to the question
                 !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                  <Button onClick={() => handleAddItemToQuestion()} className="mt-4" disabled={isSummaryLoading || !!summaryError}>
+                  <Button onClick={() => handleAddItemToQuestion()} className="mt-4" disabled={!!summaryError}>
                     Add item to my question
                   </Button>
                 ) : (

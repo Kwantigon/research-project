@@ -107,6 +107,22 @@ function ConversationPageMock() {
 				sparqlQuery: "SELECT bla bla bla",
 				suggestItemsText: "I found some items which could expand your question.",
 				suggestedItemsGrouped: {
+					"": [
+						{
+							iri: "iuyo",
+							label: "Suggestion 245",
+							summary: "Summary for item.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						},
+						{
+							iri: "hnm,",
+							label: "Suggestion 11",
+							summary: "Summary for item.",
+							reason: "Some reason for the suggestion.",
+							mappedOrSuggested: "Suggested"
+						}
+					],
 					"Hello": [
 						{
 							iri: "fdeaf",
@@ -414,9 +430,9 @@ function ConversationPageMock() {
 										{msg.suggestItemsText && msg.suggestedItemsGrouped && Object.keys(msg.suggestedItemsGrouped).length > 0 && (
 											<div className="mt-4">
 												<p className="font-semibold text-sm">{msg.suggestItemsText}</p>
-												{Object.entries(msg.suggestedItemsGrouped).map(([mappedWord, items]) => (
-													<div key={mappedWord} className="mt-2">
-														<p className="text-sm font-medium italic">Expand "{mappedWord}":</p>
+												{Object.entries(msg.suggestedItemsGrouped).map(([mappedWords, items]) => (
+													<div key={mappedWords} className="mt-2">
+														<p className="text-sm font-medium italic">{mappedWords === "" ? "More items to consider" : `Expand "${mappedWords}"`}:</p>
 														<ul className="list-disc list-inside ml-4 mt-1">
 															{items.map((item) => {
 																const isSelected = selectedItemsForExpansion.some(
