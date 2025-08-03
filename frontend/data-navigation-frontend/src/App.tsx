@@ -9,7 +9,7 @@ function App() {
 		<Router>
 			<div className="flex flex-col h-screen">
 				<header className="flex items-center justify-between p-4 border-b">
-					<h1 className="text-xl font-bold">Data specification helper</h1>
+					<h1 className="text-xl font-bold">Data specification navigator</h1>
 					<nav>
 						<ul className="flex space-x-4">
 							<li>

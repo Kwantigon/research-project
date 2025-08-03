@@ -6,7 +6,7 @@ function AboutPage() {
 		<div className="bg-gray-50 text-gray-900 min-h-screen flex items-center justify-center">
 			<div className="max-w-[90vw] mx-auto p-8 md:p-12 text-center bg-white rounded-xl shadow-lg">
 				<h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-6">
-					Data specification helper
+					Data specification navigator
 				</h1>
 
 				<p className="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
