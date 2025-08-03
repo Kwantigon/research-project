@@ -60,16 +60,17 @@ function ConversationPage() {
 	const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SuggestedItem[]>([]);
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<{ item: SuggestedItem | MappedItem, parentMessageId: string } | null>(null);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const { conversationId } = useParams<{ conversationId: string }>();
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
 	const [summaryError, setSummaryError] = useState<string | null>(null);
+	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
 
 	const fetchMessages = async () => {
 		try {
-			setIsLoading(true);
+			setIsFetchingMessages(true);
 			setError(null); // Clear previous error if there was one.
 			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`);
 			if (!response.ok) {
@@ -83,18 +84,26 @@ function ConversationPage() {
 			console.log(fetchedMessages);
 			setMessages(fetchedMessages);
 
-			// Look for the most recent message with a suggestedItems list.
+			// Look for the most recent system message.
 			for (let i = fetchedMessages.length - 1; i >= 0; i--) {
 				if (isSystemMessage(fetchedMessages[i])) {
 					setMostRecentReplyMessageId(fetchedMessages[i].id);
 					break;
 				}
 			}
+			// Look for the most recent user message.
+			for (let i = fetchedMessages.length - 1; i >= 0; i--) {
+				if (!isSystemMessage(fetchedMessages[i])) {
+					setMostRecentUserMessage(fetchedMessages[i].text);
+					break;
+				}
+			}
+
 		} catch (error) {
 			console.error(error);
 			setError("Failed to retrieve messages in the conversation.");
 		} finally {
-			setIsLoading(false);
+			setIsFetchingMessages(false);
 		}
 	};
 
@@ -112,7 +121,7 @@ function ConversationPage() {
 		if (currentMessage.trim() === "" && suggestedMessage === null) return;
 		setError(null);
 
-		const messageToSend = suggestedMessage || currentMessage;
+		const messageToSend = currentMessage;
 		const userMessage: UserMessage = {
 				id: `UserMessage-${new Date().toString()}`, // ID is generated on the back end. Will be set later.
 				sender: "User",
@@ -129,6 +138,7 @@ function ConversationPage() {
 		setCurrentMessage("");
 		setSuggestedMessage(null);
 		setSelectedItemsForExpansion([]);
+		setMostRecentUserMessage(messageToSend);
 
 		try {
 			const requestBody = JSON.stringify(
@@ -163,45 +173,25 @@ function ConversationPage() {
 			} else {
 				console.log("Reply message fetched successfully.");
 			}
-			const getReplyMsgData = await getReplyMsgResponse.json();
-			console.log(`getReplyMsgData: ${JSON.stringify(getReplyMsgData)}`);
-			
-			// Create a dictionary from the suggested items.
-			/*const suggestedItemsGrouped: Record<string, SuggestedItem[]> = {};
-			if (getReplyMsgData.suggestedItems) {
-				for (const key in getReplyMsgData.suggestedItems) {
-					suggestedItemsGrouped[key] = getReplyMsgData.suggestedItems[key].map((item: any) => ({
-						iri: item.iri,
-						label: item.label,
-						summary: item.summary,
-						reason: item.reason,
-					}));
-				}
-			}*/
-			// Create the reply message object.
-			const replyMessage: SystemMessage = {
+			const replyMsgData = await getReplyMsgResponse.json();
+			console.log(`getReplyMsgData: ${JSON.stringify(replyMsgData)}`);
+			/*const replyMessage: SystemMessage = {
 				id: getReplyMsgData.id,
 				sender: getReplyMsgData.sender,
-				text: getReplyMsgData.textContent,
+				text: getReplyMsgData.text,
 				timestamp: getReplyMsgData.timestamp,
 				mappingText: getReplyMsgData.mappingText,
-				/*mappedItems: getReplyMsgData.mappedItems?.map((item: any) => ({
-					id: item.iri,
-					name: item.label,
-					summary: item.summary,
-					mappedWords: item.mappedWords
-				})),*/
 				mappedItems: getReplyMsgData.mappedItems,
 				sparqlText: getReplyMsgData.sparqlText,
 				sparqlQuery: getReplyMsgData.sparqlQuery,
 				suggestItemsText: getReplyMsgData.suggestItemsText,
 				suggestedItemsGrouped: getReplyMsgData.suggestedItemsGrouped
-			};
+			};*/
 
 			setMessages((prevMessages) => [
-				...prevMessages, replyMessage
+				...prevMessages, replyMsgData
 			]);
-			setMostRecentReplyMessageId(replyMessage.id);
+			setMostRecentReplyMessageId(replyMsgData.id);
 
 		} catch (error) {
 			console.error("Error sending message:", error);
@@ -221,36 +211,13 @@ function ConversationPage() {
 		setSelectedItemForSummary({ item, parentMessageId });
 		setIsSummaryDialogOpen(true);
 		if (item.summary) {
-			// Summary is already present, no need to fetch it again.
 			setSummaryError(null);
 		} else {
 			setSummaryError('Failed to load item summary. Please try again.');
 		}
-
-		// If summary is not present.
-		/*setIsSummaryLoading(true);
-		setSummaryError(null);
-		try {
-			const uri = encodeURI(`${BACKEND_API_URL}${item.summaryEndpoint}`);
-			const response = await fetch(uri);
-			if (!response.ok) {
-				throw new Error(`Failed to fetch item summary: ${response.statusText}`);
-			}
-			const data = await response.json();
-			item.summary = data.summary;
-			//setSelectedItemForSummary(prev => prev ? { ...prev, item: { ...prev.item, summary: data.summary } } : null);
-			setSelectedItemForSummary({item, parentMessageId}); // Not sure if I need to call set again here but calling it just in case.
-		} catch (error) {
-			console.error('Error fetching item summary:', error);
-			setSummaryError('Failed to load item summary. Please try again.');
-			setSelectedItemForSummary(prev => prev ? { ...prev, item: { ...prev.item, summary: 'Summary could not be loaded.' } } : null);
-			// Not doing item.summary = "Summary could not be loaded." here because I want it to be fetched again upon clicking.
-		} finally {
-			setIsSummaryLoading(false);
-		}*/
 	};
 
-	const handleAddItemToQuestion = () => {
+	const handleAddItemToMessage = () => {
 		if (selectedItemForSummary && isSuggestedItem(selectedItemForSummary.item) && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
 			const updatedSelectedItems = [...selectedItemsForExpansion, selectedItemForSummary.item];
 			setSelectedItemsForExpansion(updatedSelectedItems);
@@ -279,7 +246,7 @@ function ConversationPage() {
 	return (
 		<div className="flex flex-col h-full p-4">
 			<div ref={messagesEndRef} className="flex-1 overflow-y-auto border rounded-md p-4 space-y-4">
-				{isLoading ? (
+				{isFetchingMessages ? (
 					// Display skeleton loaders while loading
 					<div className="space-y-4">
 						<Skeleton className="h-10 w-3/4" />
@@ -358,7 +325,7 @@ function ConversationPage() {
 										{/* Sparql query */}
 										{msg.sparqlText && (
 											<div className="mt-2">
-												<p className="font-semibold text-sm">I have formulated a Sparql query for your question:</p>
+												<p className="font-semibold text-sm">{msg.sparqlText}</p>
 												<pre className="mt-2 p-2 bg-gray-50 rounded text-sm overflow-x-auto">
 													<code>{msg.sparqlQuery}</code>
 												</pre>
@@ -424,9 +391,17 @@ function ConversationPage() {
 				</Card>
 			)}
 
+			{mostRecentUserMessage && (
+        <Card className="mt-4 p-3 bg-blue-50 border-blue-200">
+          <CardContent className="p-0">
+            <p className="text-sm font-medium">Your current message: {mostRecentUserMessage}</p>
+          </CardContent>
+        </Card>
+      )}
+
 			<div className="flex mt-4 space-x-2">
 				<Input
-					placeholder={suggestedMessage ? "Modify suggestion or send as is..." : "Ask your question..."}
+					placeholder={suggestedMessage ? "Modify suggestion or send as is..." : "Type your message..."}
 					value={suggestedMessage || currentMessage} // Display suggested message or current input
 					onChange={(e) => {
 						if (suggestedMessage) {
@@ -448,15 +423,6 @@ function ConversationPage() {
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Summary of "{selectedItemForSummary?.item.label}"</DialogTitle>
-						{/*isSummaryLoading && (
-							<DialogDescription className="flex items-center text-blue-500">
-								<svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-									<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-								</svg>
-								Loading summary...
-							</DialogDescription>
-						)*/}
 						{summaryError && (
 							<DialogDescription className="text-red-500">
 								Error: {summaryError}
@@ -477,14 +443,14 @@ function ConversationPage() {
 						{selectedItemForSummary && isSelectedItemFromMostRecentAnswer ? (
               // Check if the item is a suggested item
               isSuggestedItem(selectedItemForSummary.item) ? (
-                // If it's a suggested item, show the button to add it to the question
+                // If it's a suggested item, show the button to add it to the message
                 !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                  <Button onClick={() => handleAddItemToQuestion()} className="mt-4" disabled={!!summaryError}>
-                    Add item to my question
+                  <Button onClick={() => handleAddItemToMessage()} className="mt-4" disabled={!!summaryError}>
+                    Add item to my message
                   </Button>
                 ) : (
                   <p className="mt-4 text-sm text-green-600 font-semibold">
-                    This item has been added to your question.
+                    This item has been added to your message.
                   </p>
                 )
               ) : (
