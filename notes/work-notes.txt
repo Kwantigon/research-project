@@ -210,7 +210,6 @@ Todo (vyřešit někdy později):
 
 # 1. 8.
 Cíl:
-- Vylepšit prompty, aby LLM vracel extra informace: mapování na slova z otázky, vysvětlení related itemů.
 - Vyřešit konflikt při ukládání vrácených itemů od LLM (mohou být už v databázi).
 - Vymyslet, jak konstantně zobrazit uživateli jeho položený dotaz (odscrolluje a už nevidí, s jakým dotazem pracuje).
 - Změnit nadpis "data specification helper" na něco vhodnějšího.
@@ -242,3 +241,43 @@ Front end by potřeboval další věci vázané k DataSpecificationItem:
 Package, které fungují:
 db2ad74f-ec45-4d46-84f8-24d36fbb4200 (DCAT-...)
 ca85277a-8a2b-4874-bc7a-13bd48fe798a (Záznam informačního systému nahrazující úředně ověřený podpis)
+
+Mohl bych pokud nenajdu suggested item mapping, tak ten item vyhodit.
+- Tady je trochu problém s tím, jak hledám ten mapping.
+- LLM vrátí nějaký suggested item v souvislosti s celým substructure.
+- Když si vezmu item v substructure a hledám mapping s user message pro reply, který stavím, tak to nemusí existovat. Ale to mapping může být s minulou zprávou v této konverzaci.
+- Další problém s tím mapping je když posílám unmodified suggested message, tak potom ani nemám to mapování.
+- Taky nemusí být na škodu brát v potaz itemy bez mapování. To je možná ještě zajímavější, že ten item nebyl nijak zmíněn v otázce, ale mohl být přidán do otázky.
+
+Momentálně dělám mapování, pokud uživatel nějak ručně zadal nebo upravil zprávu.
+Když přijde neupravená zpráva, tak nedělám mapování.
+- To je v pořádku, ale potom nebudu mít ta slova z otázky, která se mapují na itemy.
+- Možná v případě neupravené zprávy musím udělat mapování, ale ne na celou datovou specifikaci, nýbrž pouze na substructure v konverzaci.
+
+Když přijde nemodifikovaná zpráva, tak:
+1. Přidám itemy do substructure.
+2. Řeknu LLM, aby namapoval slova z otázky na itemy v substructure.
+- Pokud něco se nepovede namapovat, tak co? Zvolím si nějaký slovo indikující chybu mapování?
+3. V tuto chvíli už každý item v substructure by měl mít mapování na slovo z otázky, takže bych pro každý suggested item měl být schopen najít mapované slovo.
+4. Pokud pro suggested item nenajdu item v current substructure, tak to je možná zajímavý, protože sice není zmíněn v konverzaci, ale LLM si myslí, že se hodí.
+- Přemýšlím, jak takovýto item prezentovat uživateli.
+- Ostatní itemy mám jako Expands "slovo": a pak vyjmenované.
+- Tady nemůžu Expands "other items".
+
+Teď:
+Dodělat mapování na substructure.
+Tím zajistím, že pro suggested items -> expands budu mít vždy nějaké mapování.
+Pokud suggested item expands neukazuje na item v substructure, tak vyřešit prezentaci pro uživatele.
+- Že tento item nerozšiřuje přímo slova z otázky, ale pořád může rozšířit otázku.
+
+Přidat kolečko, že chatbot přemýšlí.
+Zobrazit nahoře current question.
+Když namapuju nebo suggestnu item, který už je v databázi, tak asi by bylo lepší aktualizovat ten původní item s novými daty (reason, summary).
+- Actually reason se pojí se "suggestion" entry, takže nemusím aktualizovat.
+- Ale summary bych asi mohl.
+
+Musím trochu upravit mapping prompt i v případě nemodifikované otázky:
+- Pokud si uživatel vybere item1, který má rozšiřovat item2, ale item2 ještě není v mém substructure.
+- Může se stát - LLM si může myslet, že item1 se hodí.
+- Ale pokud přidám item1, tak bych měl přidat item2, abych tam měl tu vazbu ne?
+Tady to vyřeším pak. Teď přidám kolečko-thinking a zobrazení current question.
