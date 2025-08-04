@@ -1,0 +1,4 @@
+Do Expand "mapped words" bych měl dát i label toho namapovaného itemu. Mapped words dát do závorek.
+Ke každému suggestion dát třeba ikonku nebo něco - že ta properta vede do třídy nebo z třídy.
+Některé věci nabízím jako 2 itemy: properta a třída. To může být klidně jeden item.
+Přidat možnost si zobrazit podstrukturu, kterou buduju.
