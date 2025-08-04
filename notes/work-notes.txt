@@ -210,12 +210,7 @@ Todo (vyřešit někdy později):
 
 # 1. 8.
 Cíl:
-- Vyřešit konflikt při ukládání vrácených itemů od LLM (mohou být už v databázi).
-- Změnit nadpis "data specification helper" na něco vhodnějšího.
 - Zkrátit OWL soubor pomocí prefixů.
-
-Mám trochu vylepšené prompty. Related items musím ještě víc vylepšit, ale prozatím to ještě nebudu dělat.
-Chci implementovat prompt loader, abych prompty neměl přímo v kódu.
 
 Jakým způsobem řešit PromptConstructor a ResponseProcessor?
 Mám 2 možnosti:
@@ -280,3 +275,9 @@ Musím trochu upravit mapping prompt i v případě nemodifikované otázky:
 - Může se stát - LLM si může myslet, že item1 se hodí.
 - Ale pokud přidám item1, tak bych měl přidat item2, abych tam měl tu vazbu ne?
 Tady to vyřeším pak. Teď přidám kolečko-thinking a zobrazení current question.
+
+Absolutně musím dodělat:
+1. Sparql generation.
+2. Získání reusedProperty.
+3. Když dsv soubor má @base <>
+4. Mazání konverzace pořád nefunguje.
