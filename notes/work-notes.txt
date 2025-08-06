@@ -281,3 +281,17 @@ Absolutně musím dodělat:
 2. Získání reusedProperty.
 3. Když dsv soubor má @base <>
 4. Mazání konverzace pořád nefunguje.
+
+# 5. 8. 2025
+
+Zkouším modelovat třídy, atributy a vztahy OWLu.
+Zkouším to cestou dědičnosti.
+- Zatím se mi dědičcnost zdá zbytečně složité.
+
+Mám třídy. Každá třída mát 0 až N atributů. Každý atribut třídy je definován triplem.
+- Pokud atribut má jednoduchý typ (tzv. není objekt), tak je definován triplem, kde ten atribut je předmět.
+- Např. třída T má název: ex:máNázev rdfs:domain T a ex:máNázev rdfs:range rdfs:Literal
+Actually ono je to jednodušší. Existuje pouze Class a Property.
+- Property může být ObjectProperty pokud spojuje Class s jiným Class.
+- Property je DatatypeProperty pokud spojuje Class s jednoduchým datovým typem.
+Property je atribut pro Class.
