@@ -252,6 +252,8 @@ public class ConversationController(
 		_logger.LogTrace("Adding the user message to the conversation.");
 		UserMessage userMessage = await _conversationService.AddNewUserMessageAsync(conversation, payload.TextValue, DateTime.Now, payload.UserModifiedSuggestedMessage);
 
+		// To do: Generate reply here (instead of waiting for a get message call).
+
 		return Results.Created(
 			$"/conversations/{conversation.Id}/messages/{userMessage.Id}",
 			new ConversationMessageDTO

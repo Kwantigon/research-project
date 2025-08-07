@@ -11,13 +11,15 @@ public class ConversationService(
 	ILogger<ConversationService> logger,
 	AppDbContext appDbContext,
 	ILlmConnector llmConnector,
-	IDataSpecificationService dataSpecificationService) : IConversationService
+	IDataSpecificationService dataSpecificationService,
+	ISparqlTranslationService sparqlTranslationService) : IConversationService
 {
 	#region Private fields
 	private readonly ILogger<ConversationService> _logger = logger;
 	private readonly AppDbContext _database = appDbContext;
 	private readonly ILlmConnector _llmConnector = llmConnector;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
+	private readonly ISparqlTranslationService _sparqlTranslationService = sparqlTranslationService;
 	#endregion Private fields
 
 	public async Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification)
@@ -104,7 +106,7 @@ public class ConversationService(
 			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
 
 			_logger.LogTrace("Mapping the question to data specification items.");
-			List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToItemsAsync(conversation.DataSpecification, userMessage);
+			List<DataSpecificationItemMapping> mappings = await MapToDataSpecificationAsync(conversation.DataSpecification, userMessage);
 
 			_logger.LogTrace("Clearing the data specification substructure of the conversation.");
 			conversation.DataSpecificationSubstructure.Clear();
@@ -121,7 +123,7 @@ public class ConversationService(
 				conversation.DataSpecificationSubstructure = mappings.Select(m => m.Item).ToList();
 			}
 		}
-		else // User sent the suggested message as is without any modifications.
+		else // User sent the suggested message as is, without any modifications.
 		{
 			_logger.LogTrace("User did not modify the suggested message.");
 
@@ -142,7 +144,8 @@ public class ConversationService(
 				conversation.DataSpecificationSubstructure.AddRange(itemsNotInConversation);
 
 				// Do the mapping for items.
-				List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToConversationDataSpecSubstructureAsync(userMessage);
+				//List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToConversationDataSpecSubstructureAsync(userMessage);
+				List<DataSpecificationItemMapping> mappings = await MapToSubstructureAsync(userMessage);
 				StoreMappingsAndUpdateItsReferences(mappings);
 			}
 		}
@@ -174,14 +177,16 @@ public class ConversationService(
 		if (userMessage.ItemMappings.Count > 0)
 		{
 			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question.";
-			// Todo: Generate a Sparql query.
-			// Which means I need to implement the Sparql generation.
-			_logger.LogTrace("To do: Generating a Sparql query.");
 			replyMessage.SparqlText = "I have formulated a Sparql query for your question:";
-			replyMessage.SparqlQuery = $"[PLACEHOLDER_SPARQL_QUERY for question \"{userMessage.TextContent}\"]";
+			// I assume that userMessage is the most recent user message in the conversation.
+			// In that case the conversation data specification substructure corresponds to the items mapped from the user message.
+			_logger.LogTrace("Generating a Sparql query.");
+			replyMessage.SparqlQuery = _sparqlTranslationService.TranslateSubstructure(userMessage.Conversation.DataSpecificationSubstructure);
 
 			_logger.LogTrace("Getting item suggestions.");
-			List<DataSpecificationItemSuggestion> suggestedItems = await _llmConnector.GetSuggestedItemsAsync(
+			/*List<DataSpecificationItemSuggestion> suggestedItems = await _llmConnector.GetSuggestedItemsAsync(
+				userMessage.Conversation.DataSpecification, userMessage, userMessage.Conversation.DataSpecificationSubstructure);*/
+			List<DataSpecificationItemSuggestion> suggestedItems = await GetItemSuggestionsAsync(
 				userMessage.Conversation.DataSpecification, userMessage, userMessage.Conversation.DataSpecificationSubstructure);
 			_logger.LogTrace("The LLM suggested {ItemsCount} items.", suggestedItems.Count);
 
@@ -292,6 +297,79 @@ public class ConversationService(
 
 			mapping.Item.ItemMappingsTable.Add(mapping);
 			mapping.UserMessage.ItemMappings.Add(mapping);
+		}
+	}
+
+	private async Task<List<DataSpecificationItemMapping>> MapToDataSpecificationAsync(DataSpecification dataSpecification, UserMessage userMessage)
+	{
+
+	}
+
+	private async Task<List<DataSpecificationItemMapping>> MapToSubstructureAsync(DataSpecificationSubstructure substructure, UserMessage userMessage)
+	{
+		// The substructure should already contains all data specification items.
+		// This method will only map words from the userMessage to items in the substructure.
+	}
+
+	private async Task<List<DataSpecificationItemSuggestion>> GetItemSuggestionsAsync(DataSpecification dataSpecification, UserMessage userMessage, IReadOnlyCollection<DataSpecificationItem> dataSpecificationSubstructure)
+	{
+
+	}
+
+	private void AddSelectedItemsToSubstructure(DataSpecificationSubstructure substructure, IReadOnlyCollection<DataSpecificationItem> itemsToAdd)
+	{
+		// itemsToAdd obsahuje třídy a properties těch tříd.
+		// Musím poskládat, jaké properties patří jaké třídě.
+		// Pak jen stačí nacpat buď do substructure.Targets nebo substructure.NonTargets.
+
+		var allSubstructureClasses = substructure.Targets.Concat(substructure.NonTargets).ToList();
+		// Key = class item IRI, Value = the class item object.
+		Dictionary<string, DataSpecificationSubstructure.ClassItem> map = allSubstructureClasses.ToDictionary(c => c.Iri, c => c);
+		foreach (DataSpecificationItem item in itemsToAdd)
+		{
+			switch (item.Type)
+			{
+				case ItemType.Class:
+					if (map.ContainsKey(item.Iri))
+					{
+						// This case should not happen.
+						// I should only be adding items that are not already in the substructure.
+						_logger.LogWarning("Item {Label} is already in the data specification substructure.", item.Label);
+					}
+					else
+					{
+						DataSpecificationSubstructure.ClassItem newItem = new();
+						newItem.Iri = item.Iri;
+						newItem.Label = item.Label;
+						// To do: Add to targets or non-targets?
+						substructure.Targets.Add(newItem);
+						//substructure.NonTargets.Add(newItem);
+						map.Add(item.Iri, newItem);
+					}
+					break;
+				case ItemType.ObjectProperty:
+					if (item.Domain is null || item.Range is null)
+					{
+						_logger.LogError("Item {Label} is of type ObjectProperty but either domain or range is null.", item.Label);
+						throw new Exception("ObjectProperty has null domain or range.");
+					}
+					DataSpecificationSubstructure.ClassItem? domain = map[item.Domain];
+					DataSpecificationSubstructure.ClassItem? range = map[item.Range];
+					if (domain is null || range is null)
+					{
+						// It could be that the null value is not yet added.
+						// This will likely happen often with range.
+						// I'm adding a new property and its range is another new class that is in 'itemsToAdd'
+						// but I haven't gotten to that item yet.
+						//
+						// So I should first add all classes and then add properties.
+						// And I should make sure that whenever the substructure is expanded,
+						// it is expanded with both the property and its range or domain.
+					}
+					break;
+				case ItemType.DatatypeProperty:
+					break;
+			}
 		}
 	}
 
