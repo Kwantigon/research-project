@@ -22,6 +22,7 @@ builder.Services
 	.AddScoped<IRdfProcessor, RdfProcessor>()
 	.AddScoped<ILlmResponseProcessor, ResponseProcessor>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
+	.AddScoped<ISparqlTranslationService, SparqlTranslationService>()
 
 	.AddSingleton<IPromptConstructor, PromptConstructor>() // Singleton because I don't want to load templates from files every time there is a request.
 	;

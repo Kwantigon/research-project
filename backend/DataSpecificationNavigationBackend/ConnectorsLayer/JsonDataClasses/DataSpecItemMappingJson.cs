@@ -2,10 +2,11 @@
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.JsonDataClasses;
 
-public record ItemMappingJson(
+public record DataSpecItemMappingJson(
 	string Iri,
 	string Label,
 	ItemType Type,
-	string Comment,
+	string Domain,
+	string Range,
 	string Summary,
 	string MappedWords);

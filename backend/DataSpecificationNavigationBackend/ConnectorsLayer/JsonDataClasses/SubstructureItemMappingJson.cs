@@ -1,5 +1,5 @@
 ﻿namespace DataSpecificationNavigationBackend.ConnectorsLayer.JsonDataClasses;
 
-public record ItemMappingForSubstructureJson(
+public record SubstructureItemMappingJson(
 	string Iri,
 	string MappedWords);

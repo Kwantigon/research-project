@@ -15,7 +15,7 @@ public class ResponseProcessor(
 		llmResponse = RemoveBackticks(llmResponse.Trim());
 		try
 		{
-			List<ItemMappingJson>? jsonData = JsonSerializer.Deserialize<List<ItemMappingJson>>(llmResponse);
+			List<DataSpecItemMappingJson>? jsonData = JsonSerializer.Deserialize<List<DataSpecItemMappingJson>>(llmResponse);
 			if (jsonData is null)
 			{
 				_logger.LogError("The result of the JSON deserialization is null.");
@@ -23,7 +23,7 @@ public class ResponseProcessor(
 			}
 
 			List<DataSpecificationItemMapping> result = [];
-			foreach (ItemMappingJson jsonItem in jsonData)
+			foreach (DataSpecItemMappingJson jsonItem in jsonData)
 			{
 				DataSpecificationItem dataSpecItem = new()
 				{
@@ -115,7 +115,7 @@ public class ResponseProcessor(
 		llmResponse = RemoveBackticks(llmResponse.Trim());
 		try
 		{
-			List<ItemMappingForSubstructureJson>? jsonData = JsonSerializer.Deserialize<List<ItemMappingForSubstructureJson>>(llmResponse);
+			List<SubstructureItemMappingJson>? jsonData = JsonSerializer.Deserialize<List<SubstructureItemMappingJson>>(llmResponse);
 			if (jsonData is null)
 			{
 				_logger.LogError("The result of the JSON deserialization is null.");
@@ -123,7 +123,7 @@ public class ResponseProcessor(
 			}
 
 			List<DataSpecificationItemMapping> result = [];
-			foreach (ItemMappingForSubstructureJson jsonItem in jsonData)
+			foreach (SubstructureItemMappingJson jsonItem in jsonData)
 			{
 				DataSpecificationItem? dataSpecItem = userMessage.Conversation.DataSpecificationSubstructure.Find(item => item.Iri == jsonItem.Iri);
 				if (dataSpecItem is null)
