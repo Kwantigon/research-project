@@ -20,7 +20,7 @@ public class RdfProcessor : IRdfProcessor
 	/// <returns>The string containing RDF Turtle.</returns>
 	public string WriteGraphToString(IGraph graph)
 	{
-		IRdfWriter rdfWriter = new CompressingTurtleWriter();
+		IRdfWriter rdfWriter = new CompressingTurtleWriter(TurtleSyntax.W3C);
 		string rdfTurtle = VDS.RDF.Writing.StringWriter.Write(graph, rdfWriter);
 		return rdfTurtle;
 	}
