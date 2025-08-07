@@ -1,9 +1,10 @@
-﻿using DataSpecificationNavigationBackend.Model;
+﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
+using DataSpecificationNavigationBackend.Model;
 using System.Text;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
-public class SparqlTranslationService
+public class SparqlTranslationService : ISparqlTranslationService
 {
 	public string TranslateSubstructure(IReadOnlyCollection<DataSpecificationItem> substructure)
 	{
@@ -67,6 +68,75 @@ public class SparqlTranslationService
 
 			// If filtering is supported, add it here.
 			//sparql.AppendLine($"\t{BuildFilterClause(domainVar, DataType.String, rangeVar)}");
+		}
+
+		sparql.AppendLine("}");
+		return sparql.ToString();
+	}
+
+	public string TranslateSubstructure(DataSpecificationSubstructure substructure)
+	{
+		List<DataSpecificationSubstructure.ClassItem> classes = substructure.Targets.Concat(substructure.NonTargets).ToList();
+		Dictionary<string, string> classesVarMap = classes.ToDictionary(
+				c => c.Iri,
+				c => c.Label.ToLower().Replace(' ', '_')
+		);
+
+		StringBuilder sparql = new();
+		sparql.Append("SELECT");
+		foreach (DataSpecificationSubstructure.ClassItem target in substructure.Targets)
+		{
+			sparql.Append($" ?{classesVarMap[target.Iri]}");
+		}
+		sparql.AppendLine();
+
+		sparql.AppendLine("WHERE {");
+
+		foreach (DataSpecificationSubstructure.ClassItem classItem in classes)
+		{
+			sparql.AppendLine($"\t{classesVarMap[classItem.Iri]} a {classItem.Iri} .");
+
+			foreach (DataSpecificationSubstructure.PropertyItem property in classItem.ObjectProperties)
+			{
+				if (property.Domain is null || property.Range is null)
+				{
+					Console.WriteLine("ERROR: {0} {1} {2} .", property.Domain, property.Iri, property.Range);
+					throw new Exception($"Domain or range of the property \"{property.Label}\" is null.");
+				}
+
+				string? domainVar = classesVarMap[property.Domain];
+				string? rangeVar = classesVarMap[property.Range];
+				if (domainVar is null || rangeVar is null)
+				{
+					Console.WriteLine("ERROR: domainVar = {0}, rangeVar = {1}.", domainVar, rangeVar);
+					throw new Exception($"Domain variable or range variable of property \"{property.Label}\" is null.");
+				}
+
+				sparql.AppendLine($"\t{domainVar} {property.Iri} {rangeVar} .");
+			}
+
+			foreach (DataSpecificationSubstructure.PropertyItem property in classItem.DatatypeProperties)
+			{
+				if (property.Domain is null || property.Range is null)
+				{
+					Console.WriteLine("ERROR: {0} {1} {2} .", property.Domain, property.Iri, property.Range);
+					throw new Exception($"Domain or range of the property \"{property.Label}\" is null.");
+				}
+
+				string? domainVar = classesVarMap[property.Domain];
+				if (domainVar is null)
+				{
+					throw new Exception($"Domain variable of property \"{property.Label}\" is null.");
+				}
+
+				string rangeVar = $"?{property.Label.ToLower().Replace(' ', '_')}";
+				sparql.AppendLine($"\t{domainVar} {property.Iri} {rangeVar} .");
+
+				// If filtering is supported, add it here.
+				//sparql.AppendLine($"\t{BuildFilterClause(domainVar, DataType.String, rangeVar)}");
+			}
+
+			sparql.AppendLine(); // Leave 1 empty line after each class item.
 		}
 
 		sparql.AppendLine("}");
