@@ -28,7 +28,7 @@
     <None Update="Prompts\get_suggested_items.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Prompts\items_mapping.txt">
+    <None Update="Prompts\map_to_data_specification.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\insurance.owl.ttl">
