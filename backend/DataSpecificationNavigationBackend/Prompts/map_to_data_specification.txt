@@ -22,7 +22,8 @@ Return a JSON array corresponding to the following schema:
 	"Iri": "string",
 	"Label": "string",
 	"Type": "string",
-	"Comment": "string",
+	"Domain": "string",
+	"Range": "string",
 	"Summary": "string",
 	"MappedWords": "string"
 }}]
@@ -31,7 +32,8 @@ Explanation of the JSON fields:
 - Iri: The IRI of the item from the data specification.
 - Label: The label of the item from the data specification.
 - Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
-- Comment: The item's comment from the data specification, if it is present.
+- Domain: The IRI of the item's domain, if it's and ObjectProperty or DatatypeProperty.
+- Range: The range of the item. If the item is an ObjectProperty, then the range is an IRI. If the item is a DatatypeProperty, then the range is its data type.
 - Summary: A brief summary in 3 or 4 sentences suitable for non-technical end-users describing this item in the context of the given data specification.
 - MappedWords: The words from the user question that could be referring to this item.
 

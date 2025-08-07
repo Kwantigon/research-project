@@ -1,5 +1,0 @@
-I want to build my back end in C# so LangChain will probably not be suitable since it supports Python and JavaScript.
-
-I found Microsoft Semantic Kernel which seems to be a library for working with LLM.
-
-I want my app to support any LLM so I need to find out, if Semantic Kernel will allow that.

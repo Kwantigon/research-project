@@ -295,3 +295,52 @@ Actually ono je to jednodušší. Existuje pouze Class a Property.
 - Property může být ObjectProperty pokud spojuje Class s jiným Class.
 - Property je DatatypeProperty pokud spojuje Class s jednoduchým datovým typem.
 Property je atribut pro Class.
+
+# 7. 8. 2025
+
+Koukám na převod DSV do OWL.
+Dalo by se během té operace vytvořit všechny itemy.
+- Ale zpracovávám jeden triple po druhém.
+- Takže musím zavést dictionary, kde key = subject node uri.
+- Pak když narazím na triple, tak vyhledám iri a případně vložím nový item nebo aktualizuju nalezený item.
+- To znamená, že vytvoření konverzace zabere ještě více času.
+
+Zatím nebudu vytvářet itemy během konverze do OWLu.
+
+Když rozšiřuju dotaz (a tedy současnou podstrukturu), tak bych měl vždycky uživateli nabídnout object nebo datatype property, který rozšiřuje třídu včetně range té property.
+Příklad:
+- Mám podstrukturu s 1 itemem A.
+- Měl bych nabídnout properties, které mají domain A. K těm properties bych měl rovnou přidat range.
+- Nabídnu properties P1, P2, P3. Každý má domain A. Pokud si uživatel vybere P1, P2, tak bych měl rovnou přidat range(P1) a range(P2).
+
+Suggestion improvement:
+Říct si o 5 nejrelevantnějších properties, které mají domain nebo range v současné struktuře.
+- Na to, abych ukazoval nejbližší okolí nepotřebuju LLM.
+- Ale tady využívám LLM na získání těch "nejrelevantnějších" properties.
+(nápad: chatbot se učí a nejrelevantnější budou ty properties, na které se uživatelé často ptají.)
+
+Říct si o další 4 itemy (ať už class nebo property), které sice nemusí rozšiřovat přímo současnou podstrukturu, ale jsou nějakým způsobem zajímavé.
+
+Teď budu muset zadefinovat reprezentaci substructure.
+- Potřebuju něco vhodnějšího než List<DataSpecificationItem>
+- Použiju to pro generaci sparqlu a pro zobrazení uživateli.
+Zadefinoval jsem znova ClassItem a PropertyItem, ale přemýšlím, že možná můžu použít DataSpecificationItem.
+- Ale tam chybí seznam object properties a seznam datatype properties.
+No docela se mi líbí substructure, který jsem definoval.
+
+Jen teď musím nějak vyřešit to, že teoreticky uživatel může položit otázku, kde jsou 2 nebo i více root classes.
+- Např. I want to see tournaments and sponsors.
+- Můžu pak nabízet nějak properties, aby propojili ty roots, ale to až potom.
+
+Možná "root" je trochu zavádějící.
+Když uživatel položí otázku ve stylu "I want to see A, B and C, ...", tak itemy A, B, C by měly být proměnné v selectu (SELECT ?A ?B ?C WHERE ...)
+- Podle mě je jedno, jestli všechny proměnné (v tomto případě A, B, C) jsou nějakým způsobem propojené nebo ne.
+- Jen pro ně musím správně specifikovat WHERE clause.
+- Takže místo "root" class bych to měl nazvat něco jako "select targets". A může jich být víc.
+Jen je problém s tím, jak to vhodně nebo hezky zobrazit na front endu.
+- Když mám jen jeden root class, tak tam začnu a postupně projdu dolů.
+- Když ne, tak musím začít s nějakým class a postupně vyhazovat ty itemy, které jsem už prošel.
+
+Měl bych se ujistit, že když rozšiřuju dotaz, tak rozšiřuju o property i range nebo domain té property.
+- Tady ale narazím na ten problém, že když uživatel napíše dotaz typu "I want to see oranges and apples", tak to vlastně nevadí! Protože tam není property, který bych potřeboval přidat do substructure.
+- Prostě musí platit invariant, že rozšíření property znamená, že mám její range i domain.
