@@ -21,12 +21,25 @@ public class DataSpecificationItem
 	public virtual List<DataSpecificationItemSuggestion> ItemSuggestionsTable { get; set; } = [];
 
 	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
+
+	/// <summary>
+	/// IRI of the DataSpecificationItem that is the domain for this item.<br/>
+	/// (only if this item is of type ObjectProperty or DatatypeProperty)
+	/// </summary>
+	public string? Domain { get; set; }
+
+	/// <summary>
+	/// Type of the item. It can be one of:<br/>
+	/// - IRI of a DataSpecificationItem (in case of an ObjectProperty).<br/>
+	/// - The string "rdfs:Literal" (in case of a DatatypeProperty).
+	/// </summary>
+	public string? Range { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]
 public enum ItemType
 {
-	Class, // Entities.
-	ObjectProperty, // Relationship between entities.
-	DatatypeProperty // Attributes of entities.
+	Class,
+	ObjectProperty, // Relation between classes: class -> class.
+	DatatypeProperty // Relation between a class and a literal: class -> literal.
 }
