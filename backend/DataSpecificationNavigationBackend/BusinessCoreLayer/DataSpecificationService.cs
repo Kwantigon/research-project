@@ -123,21 +123,21 @@ internal class DsvToOwlConverter
 			// Rules to transform nodes to OWL
 			if (objectNode.NodeType is NodeType.Uri)
 			{
-				string nodeUri = ((UriNode)objectNode).Uri.ToSafeString();
+				string objectUri = ((UriNode)objectNode).Uri.ToSafeString();
 
-				if (nodeUri == DSV_CLASS_PROFILE)
+				if (objectUri == DSV_CLASS_PROFILE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
 				}
 
-				if (nodeUri == DSV_OBJECT_PROPERTY_PROFILE)
+				if (objectUri == DSV_OBJECT_PROPERTY_PROFILE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
 				}
 
-				if (nodeUri == DSV_DATATYPE_PROPERTY_PROFILE)
+				if (objectUri == DSV_DATATYPE_PROPERTY_PROFILE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
