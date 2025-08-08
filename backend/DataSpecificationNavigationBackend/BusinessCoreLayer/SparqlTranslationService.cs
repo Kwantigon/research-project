@@ -84,11 +84,21 @@ public class SparqlTranslationService : ISparqlTranslationService
 
 		StringBuilder sparql = new();
 		sparql.Append("SELECT");
-		foreach (DataSpecificationSubstructure.ClassItem target in substructure.Targets)
+		if (substructure.Targets.Count == 0)
 		{
-			sparql.Append($" ?{classesVarMap[target.Iri]}");
+			// Targets.Count should never be zero.
+			// But it could happen if the LLM never maps anything to be a target.
+			// In that case, just select everything.
+			sparql.AppendLine(" *");
 		}
-		sparql.AppendLine();
+		else
+		{
+			foreach (DataSpecificationSubstructure.ClassItem target in substructure.Targets)
+			{
+				sparql.Append($" ?{classesVarMap[target.Iri]}");
+			}
+			sparql.AppendLine();
+		}
 
 		sparql.AppendLine("WHERE {");
 
