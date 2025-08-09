@@ -42,7 +42,8 @@ public class ResponseProcessor(
 					UserMessageId = userMessage.Id,
 					Item = dataSpecItem,
 					UserMessage = userMessage,
-					MappedWords = jsonItem.MappedWords
+					MappedWords = jsonItem.MappedWords,
+					IsSelectTarget = jsonItem.IsSelectTarget
 				};
 
 				result.Add(mapping);
@@ -68,7 +69,7 @@ public class ResponseProcessor(
 		llmResponse = RemoveBackticks(llmResponse.Trim());
 		try
 		{
-			List<ItemSuggestionJson>? jsonData = JsonSerializer.Deserialize<List<ItemSuggestionJson>>(llmResponse);
+			List<PropertySuggestionJson>? jsonData = JsonSerializer.Deserialize<List<PropertySuggestionJson>>(llmResponse);
 			if (jsonData is null)
 			{
 				_logger.LogError("The result of the JSON deserialization is null.");
@@ -76,27 +77,61 @@ public class ResponseProcessor(
 			}
 
 			List<DataSpecificationItemSuggestion> result = [];
-			foreach (ItemSuggestionJson jsonItem in jsonData)
+			foreach (PropertySuggestionJson jsonItem in jsonData)
 			{
-				DataSpecificationItem dataSpecItem = new()
+				if (jsonItem.Type is ItemType.Class)
+				{
+					_logger.LogError("LLM response contains a suggested item of type Class: {0}.", jsonItem);
+					continue;
+				}
+
+				DataSpecificationItem suggestedProperty = new()
 				{
 					Iri = jsonItem.Iri,
 					Label = jsonItem.Label,
 					Type = jsonItem.Type,
 					Summary = jsonItem.Summary,
 					DataSpecification = userMessage.Conversation.DataSpecification,
+					DataSpecificationId = userMessage.Conversation.DataSpecification.Id,
+					Domain = jsonItem.DomainClass.Iri,
+					Range = jsonItem.RangeClass.Iri
+				};
+				DataSpecificationItem domainItem = new()
+				{
+					Iri = jsonItem.DomainClass.Iri,
+					Label = jsonItem.DomainClass.Label,
+					Type = ItemType.Class,
+					Summary = jsonItem.DomainClass.Summary,
+					DataSpecification = userMessage.Conversation.DataSpecification,
 					DataSpecificationId = userMessage.Conversation.DataSpecification.Id
 				};
 
+				DataSpecificationItem? rangeItem = null;
+				if (jsonItem.Type is ItemType.ObjectProperty)
+				{
+					rangeItem = new()
+					{
+						Iri = jsonItem.RangeClass.Iri,
+						Label = jsonItem.RangeClass.Label,
+						Type = ItemType.Class,
+						Summary = jsonItem.RangeClass.Summary,
+						DataSpecification = userMessage.Conversation.DataSpecification,
+						DataSpecificationId = userMessage.Conversation.DataSpecification.Id
+					};
+				}
+
 				DataSpecificationItemSuggestion suggestion = new()
 				{
-					ItemDataSpecificationId = dataSpecItem.DataSpecificationId,
-					ItemIri = dataSpecItem.Iri,
-					ReplyMessageId = (Guid)userMessage.ReplyMessageId, // Cannot implicitly convert from Guid? to Guid.
-					Item = dataSpecItem,
+					ItemDataSpecificationId = suggestedProperty.DataSpecificationId,
+					ItemIri = suggestedProperty.Iri,
+					ReplyMessageId = (Guid)userMessage.ReplyMessageId, // Explicit conversion because the compiler says "cannot implicitly convert from Guid? to Guid".
+					Item = suggestedProperty,
 					ReplyMessage = userMessage.ReplyMessage,
 					ReasonForSuggestion = jsonItem.Reason,
-					ExpandsItem = jsonItem.Expands
+					DomainItemIri = jsonItem.DomainClass.Iri,
+					DomainItem = domainItem,
+					RangeItemIri = jsonItem.RangeClass.Iri,
+					RangeItem = rangeItem
 				};
 
 				result.Add(suggestion);
@@ -110,7 +145,7 @@ public class ResponseProcessor(
 		}
 	}
 
-	public List<DataSpecificationItemMapping>? ExtractDataSpecSubstructureMapping(string llmResponse, UserMessage userMessage)
+	public List<DataSpecificationItemMapping>? ExtractSubstructureMapping(string llmResponse, UserMessage userMessage)
 	{
 		llmResponse = RemoveBackticks(llmResponse.Trim());
 		try
@@ -123,23 +158,42 @@ public class ResponseProcessor(
 			}
 
 			List<DataSpecificationItemMapping> result = [];
+			List<object> substructureItems = new();
+			foreach (var classItem in userMessage.Conversation.DataSpecificationSubstructure.ClassItems)
+			{
+				substructureItems.Add(new DataSpecificationSubstructure.ClassItem()
+				{
+					Iri = classItem.Iri,
+					Label = classItem.Label,
+					IsSelectTarget = classItem.IsSelectTarget,
+					DatatypeProperties = null!,
+					ObjectProperties = null!
+				});
+				substructureItems.AddRange(classItem.ObjectProperties);
+				substructureItems.AddRange(classItem.DatatypeProperties);
+			}
 			foreach (SubstructureItemMappingJson jsonItem in jsonData)
 			{
-				DataSpecificationItem? dataSpecItem = userMessage.Conversation.DataSpecificationSubstructure.Find(item => item.Iri == jsonItem.Iri);
-				if (dataSpecItem is null)
+				DataSpecificationItem placeholderItem = new()
 				{
-					_logger.LogError("Item {Iri} is not in the data specification substructure but it was returned as one of the mapped items.", jsonItem.Iri);
-					return null;
-				}
+					Iri = jsonItem.Iri,
+					Label = "Placeholder item from substructure mapping",
+					DataSpecification = null!
+				};
+
 
 				DataSpecificationItemMapping mapping = new()
 				{
-					ItemDataSpecificationId = dataSpecItem.DataSpecificationId,
-					ItemIri = dataSpecItem.Iri,
+					ItemDataSpecificationId = userMessage.Conversation.DataSpecification.Id,
+					ItemIri = jsonItem.Iri,
 					UserMessageId = userMessage.Id,
-					Item = dataSpecItem,
+					Item = placeholderItem,
+					// This placeholderItem reference will be replaced in conversation service where the mapping references are updated.
+					// The assumption is that when the mapping to substructure methods are called, the conversation substructure already contains that item.
+					// So this reference will be replaced later by a reference to the actual item in the database.
 					UserMessage = userMessage,
-					MappedWords = jsonItem.MappedWords
+					MappedWords = jsonItem.MappedWords,
+					IsSelectTarget = jsonItem.IsSelectTarget
 				};
 
 				result.Add(mapping);

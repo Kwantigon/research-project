@@ -14,5 +14,5 @@ public interface ILlmResponseProcessor
 
 	string? ExtractSuggestedMessage(string llmResponse) => llmResponse;
 
-	List<DataSpecificationItemMapping>? ExtractDataSpecSubstructureMapping(string llmResponse, UserMessage userMessage);
+	List<DataSpecificationItemMapping>? ExtractSubstructureMapping(string llmResponse, UserMessage userMessage);
 }

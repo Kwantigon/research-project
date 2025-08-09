@@ -4,13 +4,13 @@ namespace DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 
 public interface ILlmConnector
 {
-	Task<List<DataSpecificationItemMapping>> MapUserMessageToItemsAsync(DataSpecification dataSpecification, UserMessage userMessage);
+	Task<List<DataSpecificationItemMapping>> MapUserMessageToDataSpecificationAsync(DataSpecification dataSpecification, UserMessage userMessage);
 
-	Task<List<DataSpecificationItemSuggestion>> GetSuggestedItemsAsync(DataSpecification dataSpecification, UserMessage userMessage, List<DataSpecificationItem> currentSubstructure);
+	Task<List<DataSpecificationItemMapping>> MapUserMessageToSubstructureAsync(DataSpecification dataSpecification, DataSpecificationSubstructure dataSpecificationSubstructure, UserMessage userMessage);
+
+	Task<List<DataSpecificationItemSuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage);
 
 	Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
 
-	Task<string> GenerateSuggestedMessageAsync(DataSpecification dataSpecification, UserMessage userMessage, List<DataSpecificationItem> currentSubstructure, List<DataSpecificationItem> selectedItems);
-
-	Task<List<DataSpecificationItemMapping>> MapUserMessageToConversationDataSpecSubstructureAsync(UserMessage userMessage);
+	Task<string> GenerateSuggestedMessageAsync(DataSpecification dataSpecification, UserMessage userMessage, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems);
 }

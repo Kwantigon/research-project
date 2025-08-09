@@ -9,4 +9,5 @@ public record DataSpecItemMappingJson(
 	string Domain,
 	string Range,
 	string Summary,
-	string MappedWords);
+	string MappedWords,
+	bool IsSelectTarget = false);

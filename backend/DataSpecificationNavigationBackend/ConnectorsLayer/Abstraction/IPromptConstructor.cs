@@ -4,11 +4,11 @@ namespace DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 
 public interface IPromptConstructor
 {
-	string BuildItemsMappingPrompt(DataSpecification dataSpecification, string userQuestion);
+	string BuildMapToDataSpecificationPrompt(DataSpecification dataSpecification, string userQuestion);
 
-	string BuildGetSuggestedItemsPrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> mappedItems);
+	string BuildMapToSubstructurePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure);
 
-	string BuildGenerateSuggestedMessagePrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> mappedItems, List<DataSpecificationItem> selectedItems);
+	string BuildGetSuggestedItemsPrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure);
 
-	string BuildDataSpecSubstructureItemsMappingPrompt(DataSpecification dataSpecification, string userQuestion, List<DataSpecificationItem> dataSpecificationSubstructure);
+	string BuildGenerateSuggestedMessagePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems);
 }

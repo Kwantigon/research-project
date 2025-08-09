@@ -2,11 +2,17 @@
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer.JsonDataClasses;
 
-public record ItemSuggestionJson(
+public record PropertySuggestionJson(
 	string Iri,
 	string Label,
 	ItemType Type,
-	string Comment,
 	string Summary,
 	string Reason,
-	string Expands);
+	PropertySuggestionJson.Class DomainClass,
+	PropertySuggestionJson.Class RangeClass)
+{
+	public record Class(
+		string Iri,
+		string Label,
+		string Summary);
+}
