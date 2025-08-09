@@ -86,14 +86,17 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Domain")
+                    b.Property<int?>("DomainItemDataSpecificationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DomainItemIri")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Label")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Range")
+                    b.Property<string>("RangeItemIri")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Summary")
@@ -105,6 +108,9 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.HasKey("Iri", "DataSpecificationId");
 
                     b.HasIndex("DataSpecificationId");
+
+                    b.HasIndex("DomainItemIri", "DomainItemDataSpecificationId")
+                        .IsUnique();
 
                     b.ToTable("DataSpecificationItems");
                 });
@@ -266,7 +272,13 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "DomainItem")
+                        .WithOne("RangeItem")
+                        .HasForeignKey("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "DomainItemIri", "DomainItemDataSpecificationId");
+
                     b.Navigation("DataSpecification");
+
+                    b.Navigation("DomainItem");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemMapping", b =>
@@ -344,6 +356,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Navigation("ItemMappingsTable");
 
                     b.Navigation("ItemSuggestionsTable");
+
+                    b.Navigation("RangeItem");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.ReplyMessage", b =>

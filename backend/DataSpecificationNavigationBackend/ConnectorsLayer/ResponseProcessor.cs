@@ -93,8 +93,8 @@ public class ResponseProcessor(
 					Summary = jsonItem.Summary,
 					DataSpecification = userMessage.Conversation.DataSpecification,
 					DataSpecificationId = userMessage.Conversation.DataSpecification.Id,
-					Domain = jsonItem.DomainClass.Iri,
-					Range = jsonItem.RangeClass.Iri
+					DomainItemIri = jsonItem.DomainClass.Iri,
+					RangeItemIri = jsonItem.RangeClass.Iri
 				};
 				DataSpecificationItem domainItem = new()
 				{

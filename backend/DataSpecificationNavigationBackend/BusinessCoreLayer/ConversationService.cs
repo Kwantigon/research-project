@@ -239,20 +239,20 @@ public class ConversationService(
 					break;
 				case ItemType.ObjectProperty:
 				case ItemType.DatatypeProperty:
-					if (selected.Domain is null || selected.Range is null)
+					if (selected.DomainItemIri is null || selected.RangeItemIri is null)
 					{
-						_logger.LogError("Selected item's domain: {Domain}, range: {Range}", selected.Domain, selected.Range);
+						_logger.LogError("Selected item's domain: {Domain}, range: {Range}", selected.DomainItemIri, selected.RangeItemIri);
 						throw new Exception("Selected item's domain or range is null");
 					}
 
 					conversation.UserSelectedItems.Add(selected.Iri);
-					if (!conversation.DataSpecificationSubstructure.ClassItems.Any(c => c.Iri == selected.Domain))
+					if (!conversation.DataSpecificationSubstructure.ClassItems.Any(c => c.Iri == selected.DomainItemIri))
 					{
-						conversation.UserSelectedItems.Add(selected.Domain);
+						conversation.UserSelectedItems.Add(selected.DomainItemIri);
 					}
-					if (!conversation.DataSpecificationSubstructure.ClassItems.Any(c => c.Iri == selected.Range))
+					if (!conversation.DataSpecificationSubstructure.ClassItems.Any(c => c.Iri == selected.RangeItemIri))
 					{
-						conversation.UserSelectedItems.Add(selected.Range);
+						conversation.UserSelectedItems.Add(selected.RangeItemIri);
 					}
 					break;
 			}
@@ -434,17 +434,17 @@ public class ConversationService(
 																	.Select(m => m.Item);
 		foreach (DataSpecificationItem property in mappedProperties)
 		{
-			if (property.Domain is null || property.Range is null)
+			if (property.DomainItemIri is null || property.RangeItemIri is null)
 			{
-				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.Domain, property.Range);
+				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.DomainItemIri, property.RangeItemIri);
 				continue;
 			}
-			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.Range))
+			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.RangeItemIri))
 			{
 				_logger.LogWarning("The property {PropLabel} does not have its range in the substructure.", property.Label);
 			}
 
-			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.Domain);
+			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.DomainItemIri);
 			if (domainClass is null)
 			{
 				_logger.LogError("The property {PropLabel} does not have its domain in the substructure.", property.Label);
@@ -455,8 +455,8 @@ public class ConversationService(
 			{
 				Iri = property.Iri,
 				Label = property.Label,
-				Domain = property.Domain,
-				Range = property.Range
+				Domain = property.DomainItemIri,
+				Range = property.RangeItemIri
 			};
 
 			switch (property.Type)
@@ -504,17 +504,17 @@ public class ConversationService(
 																	.Where(item => item.Type is ItemType.ObjectProperty || item.Type is ItemType.DatatypeProperty);
 		foreach (DataSpecificationItem property in mappedProperties)
 		{
-			if (property.Domain is null || property.Range is null)
+			if (property.DomainItemIri is null || property.RangeItemIri is null)
 			{
-				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.Domain, property.Range);
+				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.DomainItemIri, property.RangeItemIri);
 				continue;
 			}
-			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.Range))
+			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.RangeItemIri))
 			{
 				_logger.LogWarning("The property {PropLabel} does not have its range in the substructure.", property.Label);
 			}
 
-			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.Domain);
+			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.DomainItemIri);
 			if (domainClass is null)
 			{
 				_logger.LogError("The property {PropLabel} does not have its domain in the substructure.", property.Label);
@@ -525,8 +525,8 @@ public class ConversationService(
 			{
 				Iri = property.Iri,
 				Label = property.Label,
-				Domain = property.Domain,
-				Range = property.Range
+				Domain = property.DomainItemIri,
+				Range = property.RangeItemIri
 			};
 
 			switch (property.Type)

@@ -136,8 +136,8 @@ public class PromptConstructor : IPromptConstructor
 		{
 			item.Iri,
 			item.Label,
-			item.Domain,
-			item.Range
+			item.DomainItemIri,
+			item.RangeItemIri
 		});
 		var serializerOptions = new JsonSerializerOptions
 		{
