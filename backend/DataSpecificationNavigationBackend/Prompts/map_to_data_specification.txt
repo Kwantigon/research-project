@@ -1,4 +1,4 @@
-You are a system that maps natural language questions to items in a structured data specification represented in OWL format.
+You are an expert system designed to extract structured item mappings from user questions based on OWL data specifications.
 
 ### Data specification
 Here is the data specification given as an OWL file:
@@ -11,31 +11,40 @@ The question that user asked is:
 "{1}"
 
 ### Task
-Identify, which items from the specification are mentioned in the question.
-Map each of the identified item to the words that correspond to them in the user question.
-No more than one item can be mapped to the same words from the user question.
+Identify which items from the data specification are mentioned in the question.
+Map each of the identified items to the words that correspond to them in the user question.
+Each word or phrase from the user question may only be mapped to one item. Do not assign the same MappedWords to multiple items.
 Give a brief summary for each item.
+
+Additionally, determine which **classes** are the **select targets** of the user's question.  
+A select target class is one that should appear in the `SELECT` clause of a SPARQL query that answers this question.
+For example, in the query `SELECT ?a ?b WHERE {{ ... }}`, the variables `?a` and `?b` are select targets.
+
+Only items of type `Class` can be marked as select targets.
+If an item is not of type `Class`, set `"IsSelectTarget": false`.
+Only mark `"IsSelectTarget": true` if you are confident that the user wants instances of this class in the final output.
+If uncertain, default to `"IsSelectTarget": false`.
+
 If an item cannot be mapped to its corresponding words from the user question, do not return that item.
 
-Return a JSON array corresponding to the following schema:
-[{{
-	"Iri": "string",
-	"Label": "string",
-	"Type": "string",
-	"Domain": "string",
-	"Range": "string",
-	"Summary": "string",
-	"MappedWords": "string"
-}}]
+**Important:**
+If you return an item of type `ObjectProperty` or `DatatypeProperty`, then you must also include the corresponding `Class` items that represent:
+- The domain of the property.
+- The range of the property (if it's a class for ObjectProperty, or a datatype for DatatypeProperty).
 
-Explanation of the JSON fields:
-- Iri: The IRI of the item from the data specification.
-- Label: The label of the item from the data specification.
-- Type: The item type from the data specification. Can be Class or ObjectProperty or DatatypeProperty.
-- Domain: The IRI of the item's domain, if it's and ObjectProperty or DatatypeProperty.
-- Range: The range of the item. If the item is an ObjectProperty, then the range is an IRI. If the item is a DatatypeProperty, then the range is its data type.
-- Summary: A brief summary in 3 or 4 sentences suitable for non-technical end-users describing this item in the context of the given data specification.
-- MappedWords: The words from the user question that could be referring to this item.
+These domain and range items must also appear in the result as separate entries in the array, with their own summaries and mapped words (if mentioned).
 
+### Answer format
+Return a JSON array. Each element in the array must be an object with the following fields:
 
-If the user question is not coherent or does not relate to the data specification in any way, return an empty JSON array. Return **only JSON** with no extra commentary.
+- `Iri` (string): The IRI of the item from the data specification.
+- `Label` (string): The label of the item from the data specification.
+- `Type` (string): The type of the item. Must be one of: `"Class"`, `"ObjectProperty"`, or `"DatatypeProperty"`.
+- `Domain` (string): The IRI of the item's domain. Required if the item is an `ObjectProperty` or `DatatypeProperty`.
+- `Range` (string): The IRI or datatype of the item's range. Required if the item is an `ObjectProperty` or `DatatypeProperty`.
+- `Summary` (string): A brief, user-friendly summary (3–4 sentences) describing the item in the context of the data specification.
+- `MappedWords` (string): The exact words or phrase from the user question that refer to this item. If no words or phrase match, do not return the item at all.
+- `IsSelectTarget` (boolean): Whether this item is a select target in the SPARQL query. Only applies to items of type `Class`.
+
+If the user question is not coherent or does not relate to the data specification in any way, return an empty JSON array.
+Do not include markdown, explanation, commentary, or preambles. Return a raw JSON array, and nothing else.

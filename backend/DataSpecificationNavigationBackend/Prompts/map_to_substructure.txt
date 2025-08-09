@@ -11,21 +11,26 @@ The question that user asked is:
 "{1}"
 
 ### Current context
-The following items have been identified to match the concepts mentioned by the user question.
+The following items have been identified to match the concepts mentioned by the user question:
 {2}
 
 ### Task
 Map each of the item in the **current context** to the words that correspond to them in the user question.
-No more than one item can be mapped to the same words from the user question.
+Each word or phrase from the user question may only be mapped to one item. Do not assign the same MappedWords to multiple items.
 
-Return a JSON array corresponding to the following schema:
-[{{
-	"Iri": "string",
-	"MappedWords": "string"
-}}]
+Additionally, determine which **classes** are the **select targets** of the user's question.
+A select target class is one that should appear in the `SELECT` clause of a SPARQL query that answers this question.
+For example, in the query `SELECT ?a ?b WHERE { ... }`, the variables `?a` and `?b` are select targets.
 
-Explanation of the JSON fields:
-- Iri: The IRI of the mapped item.
-- MappedWords: The words from the user question that refer to the mapped item. If an item cannot be mapped to its corresponding words from the user question, return an empty string in this field.
+Only items of type `Class` can be marked as select targets.
+If an item is not of type `Class`, set `"IsSelectTarget": false`.
+Only mark `"IsSelectTarget": true` if you are confident that the user wants instances of this class in the final output.
+If uncertain, default to `"IsSelectTarget": false`.
 
-If the user question is not coherent or does not relate to the data specification in any way, return an empty JSON array. Return **only JSON** with no extra commentary.
+Return a JSON array. Each element in the array must be an object with the following fields:
+- `Iri` (string): The IRI of the item from the data specification.
+- `MappedWords` (string): The exact words or phrase from the user question that refer to this item. If no words match, return an empty string.
+- `IsSelectTarget` (boolean): Whether this item is a select target in the SPARQL query. Only applies to items of type `Class`.
+
+If the user question is not coherent or does not relate to the data specification in any way, return an empty JSON array.
+Do not include markdown, explanation, commentary, or preambles. Return a raw JSON array, and nothing else.
