@@ -32,8 +32,9 @@ public class DataSpecificationService(
 		_logger.LogDebug("Exported DSV:\n{Content}", dsv);
 
 		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
-		_logger.LogDebug("Converting the DSV to OWL.");
-		IGraph owlGraph = ConvertDsvToOwl(dsvGraph);
+		_logger.LogTrace("Converting the DSV to OWL.");
+		DsvToOwlConverter converter = new DsvToOwlConverter();
+		IGraph owlGraph = converter.ConvertDsvGraphToOwlGraph(dsvGraph, out List<DataSpecificationItem> extractedItems);
 		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
 
 		_logger.LogDebug(owl);
@@ -43,8 +44,24 @@ public class DataSpecificationService(
 			Name = dataspecerPackageName,
 			Owl = owl,
 		};
-
 		await _database.DataSpecifications.AddAsync(dataSpecification);
+
+		foreach (var item in extractedItems)
+		{
+			if (string.IsNullOrEmpty(item.Label))
+			{
+				// Failed to retrieve the label during DSV to OWL conversion.
+				// Use the item's iri as label (but only the fragment part).
+				string iriFragment = new Uri(item.Iri).Fragment.Substring(1); // The first character is '#' so I don't want that.
+				iriFragment = Uri.UnescapeDataString(iriFragment);
+				iriFragment.Replace('-', ' ');
+				item.Label = iriFragment;
+			}
+			item.DataSpecificationId = dataSpecification.Id;
+			item.DataSpecification = dataSpecification;
+		}
+
+		await _database.DataSpecificationItems.AddRangeAsync(extractedItems);
 		await _database.SaveChangesAsync();
 		return dataSpecification;
 	}
@@ -82,12 +99,6 @@ public class DataSpecificationService(
 			.Where(item => item.DataSpecificationId == dataSpecificationId && itemIriList.Contains(item.Iri))
 			.ToListAsync();
 	}
-
-	private IGraph ConvertDsvToOwl(IGraph dsvGraph)
-	{
-		DsvToOwlConverter converter = new DsvToOwlConverter();
-		return converter.ConvertDsvGraphToOwlGraph(dsvGraph);
-	}
 }
 
 internal class DsvToOwlConverter
@@ -109,11 +120,12 @@ internal class DsvToOwlConverter
 	private const string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
 	private const string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
 
-	internal IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph)
+	internal IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph, out List<DataSpecificationItem> extractedItems)
 	{
 		IGraph owlGraph = new Graph();
 		owlGraph.NamespaceMap.Import(dsvGraph.NamespaceMap);
 
+		Dictionary<string, DataSpecificationItem> itemsMap = new();
 		foreach (Triple dsvTriple in dsvGraph.Triples)
 		{
 			INode subjectNode = dsvTriple.Subject;
@@ -129,18 +141,51 @@ internal class DsvToOwlConverter
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
+					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					itemsMap.TryGetValue(subjectUri, out var dsi);
+					if (dsi is null)
+					{
+						dsi = new DataSpecificationItem()
+						{
+							Iri = subjectUri
+						};
+						itemsMap[dsi.Iri] = dsi;
+					}
+					dsi.Type = ItemType.Class;
 				}
 
 				if (objectUri == DSV_OBJECT_PROPERTY_PROFILE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
+					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					itemsMap.TryGetValue(subjectUri, out var dsi);
+					if (dsi is null)
+					{
+						dsi = new DataSpecificationItem()
+						{
+							Iri = subjectUri
+						};
+						itemsMap[dsi.Iri] = dsi;
+					}
+					dsi.Type = ItemType.ObjectProperty;
 				}
 
 				if (objectUri == DSV_DATATYPE_PROPERTY_PROFILE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
+					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					itemsMap.TryGetValue(subjectUri, out var dsi);
+					if (dsi is null)
+					{
+						dsi = new DataSpecificationItem()
+						{
+							Iri = subjectUri
+						};
+						itemsMap[dsi.Iri] = dsi;
+					}
+					dsi.Type = ItemType.DatatypeProperty;
 				}
 			}
 
@@ -151,17 +196,41 @@ internal class DsvToOwlConverter
 				if (predicateUri == DSV_DOMAIN)
 				{
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:domain"), objectNode));
+
+					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					itemsMap.TryGetValue(subjectUri, out var dsi);
+					if (dsi is null)
+					{
+						dsi = new DataSpecificationItem()
+						{
+							Iri = subjectUri
+						};
+						itemsMap[dsi.Iri] = dsi;
+					}
+					dsi.DomainItemIri = ((UriNode)objectNode).ToString();
 				}
 
 				if (predicateUri == DSV_DATATYPE_PROPERTY_RANGE || predicateUri == DSV_OBJECT_PROPERTY_RANGE)
 				{
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:range"), objectNode));
+
+					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					itemsMap.TryGetValue(subjectUri, out var dsi);
+					if (dsi is null)
+					{
+						dsi = new DataSpecificationItem()
+						{
+							Iri = subjectUri
+						};
+						itemsMap[dsi.Iri] = dsi;
+					}
+					dsi.RangeItemIri = ((UriNode)objectNode).ToString();
 				}
 
 				if (predicateUri == DSV_REUSES_PROPERTY_VALUE)
 				{
 					IEnumerable<Triple> reuseInfoTriples = dsvGraph.GetTriplesWithSubject(objectNode);
-					INode? reusedPropertyNode = null;
+					INode? reusedPropertyNode = null; // usually it's either skos:prefLabel or skos:definition.
 					INode? reusedFromResourceNode = null;
 					foreach (Triple reuseTriple in reuseInfoTriples)
 					{
@@ -179,28 +248,65 @@ internal class DsvToOwlConverter
 						}
 					}
 
-					// For now, throw an exception.
-					// But I will likely move this to a separate method.
-					// Then do not throw exception - assume that the reused property cannot be retrieved
-					// and continue onto the next triple in the graph.
 					if (reusedPropertyNode == null || reusedFromResourceNode == null)
 					{
-						throw new Exception("reusedPropertyNode or reusedResourceNode was null.");
+						// To do: log error.
+						continue;
+						//throw new Exception("reusedPropertyNode or reusedResourceNode was null.");
 					}
 					else if (reusedPropertyNode.NodeType != NodeType.Uri || reusedFromResourceNode.NodeType != NodeType.Uri)
 					{
+						// To do: log error.
+						continue;
 						throw new Exception("reusedPropertyNode or reusedResourceNode is not of type URI.");
 					}
 
 					IGraph reusedResourceGraph = new Graph();
-					reusedResourceGraph.LoadFromUri(((UriNode)reusedFromResourceNode).Uri);
+					string reusedResourceUri = ((UriNode)reusedFromResourceNode).Uri.ToSafeString();
+					if (reusedResourceUri.StartsWith("https://slovník.gov.cz"))
+					{
+						/*
+						 * https://slovník.gov.cz endpoint does not return turtle.
+						 * The turtle endpoint is https://xn--slovnk-7va.gov.cz/sparql?query=define%20sql%3Adescribe-mode%20%22CBD%22%20%20DESCRIBE%20%3C...........%3E&output=text%2Fturtle
+						 */
+						reusedResourceGraph.LoadFromUri(GetSlovnikGovRdfEndpointUri(reusedResourceUri));
+					}
+					else
+					{
+						reusedResourceGraph.LoadFromUri(new Uri(reusedResourceUri));
+					}
+
 					IUriNode? uriNodeToLookFor = reusedResourceGraph.GetUriNode(((UriNode)reusedPropertyNode).Uri);
 					if (uriNodeToLookFor is not null)
 					{
 						Triple? reusedPropertyTriple = reusedResourceGraph.GetTriplesWithPredicate(uriNodeToLookFor).FirstOrDefault();
 						if (reusedPropertyTriple is not null)
 						{
-							// tady zpracovani podle toho, jestli to je skos:prefLabel nebo skos:definition.
+							if (reusedPropertyTriple is not null)
+							{
+								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_LABEL)
+								{
+									string label = ((LiteralNode)reusedPropertyTriple.Object).Value;
+									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("rdfs:label"), owlGraph.CreateLiteralNode(label));
+									string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+									itemsMap.TryGetValue(subjectUri, out var dsi);
+									if (dsi is null)
+									{
+										dsi = new DataSpecificationItem()
+										{
+											Iri = subjectUri
+										};
+										itemsMap[dsi.Iri] = dsi;
+									}
+									dsi.Label = label;
+								}
+
+								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_DEFINITION)
+								{
+									string definition = ((LiteralNode)reusedPropertyTriple.Object).Value;
+									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("owl:AnnotationProperty"), owlGraph.CreateLiteralNode(definition));
+								}
+							}
 						}
 					}
 
@@ -235,6 +341,15 @@ internal class DsvToOwlConverter
 			}
 		}
 
+		extractedItems = itemsMap.Select(pair => pair.Value).ToList();
 		return owlGraph;
+	}
+
+	private Uri GetSlovnikGovRdfEndpointUri(string resourceUri)
+	{
+		//string escaped = Uri.EscapeDataString(resourceUri);
+		const string SLOVNIK_GOV_URI_TEMPLATE = "https://xn--slovnk-7va.gov.cz/sparql?query=define%20sql%3Adescribe-mode%20%22CBD%22%20%20DESCRIBE%20%3C{0}%3E&output=text%2Fturtle";
+		string uri = string.Format(SLOVNIK_GOV_URI_TEMPLATE, resourceUri);
+		return new Uri(uri);
 	}
 }

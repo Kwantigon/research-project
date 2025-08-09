@@ -6,9 +6,9 @@ namespace DataSpecificationNavigationBackend.Model;
 [PrimaryKey(nameof(Iri), nameof(DataSpecificationId))]
 public class DataSpecificationItem
 {
-	public required string Iri { get; set; }
+	public string Iri { get; set; }
 
-	public required string Label { get; set; }
+	public string Label { get; set; }
 
 	public ItemType Type { get; set; }
 
@@ -16,24 +16,19 @@ public class DataSpecificationItem
 
 	public int DataSpecificationId { get; set; }
 
-	public required virtual DataSpecification DataSpecification { get; set; }
+	public virtual DataSpecification DataSpecification { get; set; }
 
 	public virtual List<DataSpecificationItemSuggestion> ItemSuggestionsTable { get; set; } = [];
 
 	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
 
-	/// <summary>
-	/// IRI of the DataSpecificationItem that is the domain for this item.<br/>
-	/// (only if this item is of type ObjectProperty or DatatypeProperty)
-	/// </summary>
-	public string? Domain { get; set; }
+	public string? DomainItemIri { get; set; }
 
-	/// <summary>
-	/// Type of the item. It can be one of:<br/>
-	/// - IRI of a DataSpecificationItem (in case of an ObjectProperty).<br/>
-	/// - The string "rdfs:Literal" or something similar (in case of a DatatypeProperty).
-	/// </summary>
-	public string? Range { get; set; }
+	public virtual DataSpecificationItem? DomainItem { get; set; }
+
+	public string? RangeItemIri { get; set; }
+
+	public virtual DataSpecificationItem? RangeItem { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]
