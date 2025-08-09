@@ -31,7 +31,7 @@ public class DataSpecificationItem
 	/// <summary>
 	/// Type of the item. It can be one of:<br/>
 	/// - IRI of a DataSpecificationItem (in case of an ObjectProperty).<br/>
-	/// - The string "rdfs:Literal" (in case of a DatatypeProperty).
+	/// - The string "rdfs:Literal" or something similar (in case of a DatatypeProperty).
 	/// </summary>
 	public string? Range { get; set; }
 }

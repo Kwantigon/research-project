@@ -15,12 +15,12 @@ public class Conversation
 	// !Important: Always retrieve the messages sorted by their timestamps.
 	public virtual List<Message> Messages { get; set; } = [];
 
-	public virtual List<DataSpecificationItem> DataSpecificationSubstructure { get; set; } = [];
+	public virtual DataSpecificationSubstructure DataSpecificationSubstructure { get; set; } = new();
 
 	/// <summary>
 	/// IRIs of the items that user has selected for question expansion.
 	/// </summary>
-	public List<string>? UserSelectedItems { get; set; }
+	public List<string> UserSelectedItems { get; set; } = [];
 
 	public string? SuggestedMessage { get; set; }
 }
