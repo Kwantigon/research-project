@@ -1,0 +1,13 @@
+# Future work
+
+- Could add user configuration, what kind of query to translate to (Sparql or SQL etc.)
+
+- Incoming user message is processed as if it is the first message even if it differs only a slight bit from the suggested message (for example it doesn't have a comma at the end or something similarly silly). There is room for improvement here.
+
+- Specify exactly, what are "items relevant to the current question". I could use a vector database or some other techniques for calculating relevance.
+
+- I'm mapping words from user message to exactly one data specification item. But natural language is naturally ambiguous so one word could mean multiple things. I could maybe display the mapped items to the user and let them pick what they want. They could pick one or more mapped items.
+
+- Add support for data filtering in the Sparql query.
+
+- Select target is mapped only once when mapping to data specification. All suggestions later are treated as nontarget classes. There is room to think about this.

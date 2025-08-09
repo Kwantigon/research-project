@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataSpecificationNavigationBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250804065932_InitialCreate")]
+    [Migration("20250809100555_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,6 +33,10 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("DataSpecificationSubstructure")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("TEXT");
 
@@ -44,6 +48,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.PrimitiveCollection<string>("UserSelectedItems")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -84,11 +89,14 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ConversationId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Domain")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Label")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Range")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Summary")
@@ -98,8 +106,6 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Iri", "DataSpecificationId");
-
-                    b.HasIndex("ConversationId");
 
                     b.HasIndex("DataSpecificationId");
 
@@ -116,6 +122,9 @@ namespace DataSpecificationNavigationBackend.Migrations
 
                     b.Property<Guid>("UserMessageId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSelectTarget")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("MappedWords")
                         .IsRequired()
@@ -141,8 +150,14 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<Guid>("ReplyMessageId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DomainItemIri")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ExpandsItem")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RangeItemIri")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReasonForSuggestion")
@@ -153,7 +168,11 @@ namespace DataSpecificationNavigationBackend.Migrations
 
                     b.HasIndex("ReplyMessageId");
 
+                    b.HasIndex("DomainItemIri", "ItemDataSpecificationId");
+
                     b.HasIndex("ItemIri", "ItemDataSpecificationId");
+
+                    b.HasIndex("RangeItemIri", "ItemDataSpecificationId");
 
                     b.ToTable("DataSpecificationItemSuggestions");
                 });
@@ -245,10 +264,6 @@ namespace DataSpecificationNavigationBackend.Migrations
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItem", b =>
                 {
-                    b.HasOne("DataSpecificationNavigationBackend.Model.Conversation", null)
-                        .WithMany("DataSpecificationSubstructure")
-                        .HasForeignKey("ConversationId");
-
                     b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecification", "DataSpecification")
                         .WithMany()
                         .HasForeignKey("DataSpecificationId")
@@ -285,13 +300,27 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "DomainItem")
+                        .WithMany()
+                        .HasForeignKey("DomainItemIri", "ItemDataSpecificationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "Item")
                         .WithMany("ItemSuggestionsTable")
                         .HasForeignKey("ItemIri", "ItemDataSpecificationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "RangeItem")
+                        .WithMany()
+                        .HasForeignKey("RangeItemIri", "ItemDataSpecificationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("DomainItem");
+
                     b.Navigation("Item");
+
+                    b.Navigation("RangeItem");
 
                     b.Navigation("ReplyMessage");
                 });
@@ -318,8 +347,6 @@ namespace DataSpecificationNavigationBackend.Migrations
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.Conversation", b =>
                 {
-                    b.Navigation("DataSpecificationSubstructure");
-
                     b.Navigation("Messages");
                 });
 

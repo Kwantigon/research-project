@@ -151,6 +151,29 @@ app.MapDelete("/conversations/{conversationId}",
 
 
 // Test endpoints
+app.MapGet("/tests/new-conversation", async (AppDbContext database) =>
+{
+	DataSpecification ds = new()
+	{
+		DataspecerPackageUuid = "test-package",
+		Name = "Test package",
+		Owl = File.ReadAllText("C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\backend\\DataSpecificationNavigationBackend\\local\\data-specification.owl.ttl")
+	};
+
+	Conversation c = new()
+	{
+		DataSpecification = ds,
+		Title = "Conversation title",
+		DataSpecificationSubstructure = new(),
+		LastUpdated = DateTime.Now
+	};
+
+	await database.Conversations.AddAsync(c);
+	await database.SaveChangesAsync();
+
+	return Results.Created("", $"{{ DataSpecificationId = {ds.Id}, ConversationId = {c.Id} }}");
+});
+
 app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 {
 	DataSpecification ds = new()
@@ -164,7 +187,7 @@ app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 	{
 		DataSpecification = ds,
 		Title = "Conversation title",
-		DataSpecificationSubstructure = [],
+		DataSpecificationSubstructure = new(),
 		LastUpdated = DateTime.Now
 	};
 
@@ -187,28 +210,12 @@ app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 	userMessage.ReplyMessage = replyMessage;
 	userMessage.ReplyMessageId = replyMessage.Id;
 
-	List<DataSpecificationItemMapping> mappings = await llmConnector.MapUserMessageToItemsAsync(ds, userMessage);
+	List<DataSpecificationItemMapping> mappings = await llmConnector.MapUserMessageToDataSpecificationAsync(ds, userMessage);
 	return Results.Ok();
 });
 
 app.MapGet("/tests/add-user-msg", async (AppDbContext database, IConversationService service) =>
 {
-	/*DataSpecification ds = new()
-	{
-		DataspecerPackageUuid = "test-package",
-		Name = "Test package",
-		Owl = File.ReadAllText("C:\\Users\\nquoc\\MatFyz\\research-project\\repo\\research-project\\backend\\DataSpecificationNavigationBackend\\local\\data-specification.owl.ttl")
-	};
-
-	Conversation c = new()
-	{
-		DataSpecification = ds,
-		Title = "Conversation title",
-		DataSpecificationSubstructure = [],
-		LastUpdated = DateTime.Now
-	};
-
-	await database.Conversations.AddAsync(c);*/
 	Conversation? conversation = await database.Conversations.SingleOrDefaultAsync(c => c.Id == 1);
 	if (conversation is null)
 	{
@@ -234,6 +241,35 @@ app.MapGet("/tests/generate-reply", async (AppDbContext database, IConversationS
 
 	await database.SaveChangesAsync();
 	return Results.Ok();
+});
+
+app.MapGet("/tests/add-then-find", async (AppDbContext database) =>
+{
+	DataSpecification dataSpecification = await database.DataSpecifications.SingleAsync(d => d.Id == 1);
+	DataSpecificationItem item1 = new DataSpecificationItem()
+	{
+		DataSpecification = dataSpecification,
+		Iri = "abc",
+		Label = "A B C",
+		DataSpecificationId = dataSpecification.Id,
+		Type = ItemType.Class
+	};
+
+	DataSpecificationItem item2 = new DataSpecificationItem()
+	{
+		DataSpecification = dataSpecification,
+		Iri = "abc",
+		Label = "A B C",
+		DataSpecificationId = dataSpecification.Id,
+		Type = ItemType.Class
+	};
+
+	await database.DataSpecificationItems.AddAsync(item1);
+	var i = database.DataSpecificationItems.SingleOrDefault(it => it.Iri == item2.Iri && it.DataSpecificationId == item2.DataSpecificationId);
+	if (i is null)
+	{
+		i = item2;
+	}
 });
 
 app.Run();

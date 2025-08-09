@@ -1,4 +1,0 @@
-# Future work
-
-- Could add user configuration, what kind of query to translate to (Sparql or SQL etc.)
-- Incoming user message is processed as if it is the first message even if it differs only a slight bit from the suggested message (for example it doesn't have a comma at the end or something similarly silly). There is room for improvement here.

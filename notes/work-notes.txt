@@ -344,3 +344,25 @@ Jen je problém s tím, jak to vhodně nebo hezky zobrazit na front endu.
 Měl bych se ujistit, že když rozšiřuju dotaz, tak rozšiřuju o property i range nebo domain té property.
 - Tady ale narazím na ten problém, že když uživatel napíše dotaz typu "I want to see oranges and apples", tak to vlastně nevadí! Protože tam není property, který bych potřeboval přidat do substructure.
 - Prostě musí platit invariant, že rozšíření property znamená, že mám její range i domain.
+
+# 8. 8.
+
+Když mám chci přidat item do substructure, tak potřebuju vědět, jestli se jedná o target nebo non-target.
+- To asi získám jen vhodným promptem do LLM.
+Takže zkusím poslat nějaké dotazy do LLM a uvidím, jestli mi to dokáže vrátit bool flag pro target.
+Přemýšlím, že nechám target flag jen pro první mapování (do data spec). Pro suggestion a mapování do substructure nechám stejný - všechno dám jako non target. Protože jen rozšiřuju ne?
+- Trochu bych si to zjednodušil pro tuto chvíli a podle mě to bude stačit.
+- Rozšíření o více targets nechám jako future work.
+
+Vypadá to, že templates fungují.
+Teď musím jen vhodně zformátovat current context když stavím prompt v PromptConstructor.
+Pak musím vhodně zpracovat data, která LLM vrací.
+
+Musím ještě trochu vyladit prvotní mapování.
+- Říkám, že pokud MappedWords je empty, tak to nemá vracet.
+- Ale pokud to namapuje 2 Class a není mezi nimi žádný property, tak si nejsem jistý, jestli to dává smysl.
+- Možná že to actually dává? Na začátku teda budu mít jen ty 2 Class, ale postupně to doplním o properties.
+
+Když jde o datatype property, tak já vytvářím objekt pro ten typ jako data spec item. To je špatně.
+Zdá se mi, že je moc komplikací s tím s vždycky ověřit, jestli data specification item už existuje nebo ne.
+- Při zpracování data specification si všechny itemy uložím. Pak už to nebudu muset řešit.
