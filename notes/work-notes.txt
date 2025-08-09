@@ -366,3 +366,11 @@ Musím ještě trochu vyladit prvotní mapování.
 Když jde o datatype property, tak já vytvářím objekt pro ten typ jako data spec item. To je špatně.
 Zdá se mi, že je moc komplikací s tím s vždycky ověřit, jestli data specification item už existuje nebo ne.
 - Při zpracování data specification si všechny itemy uložím. Pak už to nebudu muset řešit.
+
+Kde jsem skončil:
+- Povedlo se mi uložit všechny itemy.
+
+Plán na zítra:
+- Upravit prompt templates, protože nepotřebuju už detailní informace jako label atd. Jenom iri itemu.
+- zkusit si v postman, že to funguje.
+- Zapracovat na front endu.

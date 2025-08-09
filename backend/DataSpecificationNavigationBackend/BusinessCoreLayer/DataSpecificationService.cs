@@ -142,6 +142,7 @@ internal class DsvToOwlConverter
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
 					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					subjectUri = Uri.UnescapeDataString(subjectUri);
 					itemsMap.TryGetValue(subjectUri, out var dsi);
 					if (dsi is null)
 					{
@@ -159,6 +160,7 @@ internal class DsvToOwlConverter
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
 					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					subjectUri = Uri.UnescapeDataString(subjectUri);
 					itemsMap.TryGetValue(subjectUri, out var dsi);
 					if (dsi is null)
 					{
@@ -176,6 +178,7 @@ internal class DsvToOwlConverter
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
 					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
 					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					subjectUri = Uri.UnescapeDataString(subjectUri);
 					itemsMap.TryGetValue(subjectUri, out var dsi);
 					if (dsi is null)
 					{
@@ -198,6 +201,7 @@ internal class DsvToOwlConverter
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:domain"), objectNode));
 
 					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					subjectUri = Uri.UnescapeDataString(subjectUri);
 					itemsMap.TryGetValue(subjectUri, out var dsi);
 					if (dsi is null)
 					{
@@ -207,7 +211,8 @@ internal class DsvToOwlConverter
 						};
 						itemsMap[dsi.Iri] = dsi;
 					}
-					dsi.DomainItemIri = ((UriNode)objectNode).ToString();
+					string domainIri = ((UriNode)objectNode).ToString();
+					dsi.DomainItemIri = Uri.UnescapeDataString(domainIri);
 				}
 
 				if (predicateUri == DSV_DATATYPE_PROPERTY_RANGE || predicateUri == DSV_OBJECT_PROPERTY_RANGE)
@@ -215,6 +220,7 @@ internal class DsvToOwlConverter
 					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:range"), objectNode));
 
 					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+					subjectUri = Uri.UnescapeDataString(subjectUri);
 					itemsMap.TryGetValue(subjectUri, out var dsi);
 					if (dsi is null)
 					{
@@ -224,7 +230,8 @@ internal class DsvToOwlConverter
 						};
 						itemsMap[dsi.Iri] = dsi;
 					}
-					dsi.RangeItemIri = ((UriNode)objectNode).ToString();
+					string rangeIri = ((UriNode)objectNode).ToString();
+					dsi.RangeItemIri = Uri.UnescapeDataString(rangeIri);
 				}
 
 				if (predicateUri == DSV_REUSES_PROPERTY_VALUE)
@@ -289,6 +296,7 @@ internal class DsvToOwlConverter
 									string label = ((LiteralNode)reusedPropertyTriple.Object).Value;
 									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("rdfs:label"), owlGraph.CreateLiteralNode(label));
 									string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
+									subjectUri = Uri.UnescapeDataString(subjectUri);
 									itemsMap.TryGetValue(subjectUri, out var dsi);
 									if (dsi is null)
 									{
