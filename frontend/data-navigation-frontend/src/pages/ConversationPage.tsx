@@ -77,7 +77,8 @@ function ConversationPage() {
 	const { conversationId } = useParams<{ conversationId: string }>();
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
 	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
-	const [isWaitingForBackend, setIsWaitingForBackend] = useState<boolean>(false);
+	const [isWaitingForReplyMessage, setIsWaitingForReplyMessage] = useState<boolean>(false);
+	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
 
 	const fetchMessages = async () => {
 		try {
@@ -152,7 +153,7 @@ function ConversationPage() {
 		setMostRecentUserMessage(messageToSend);
 
 		try {
-			setIsWaitingForBackend(true);
+			setIsWaitingForReplyMessage(true);
 			const requestBody = JSON.stringify(
 					{
 						textValue: userMessage.text,
@@ -205,7 +206,7 @@ function ConversationPage() {
 				}
 			]);
 		} finally {
-			setIsWaitingForBackend(false);
+			setIsWaitingForReplyMessage(false);
 		}
 	};
 
@@ -214,26 +215,34 @@ function ConversationPage() {
 		setIsSummaryDialogOpen(true);
 	};
 
-	const handleAddItemToMessage = () => {
+	const handleAddItemToMessage = async () => {
 		if (selectedItemForSummary && isSuggestedItem(selectedItemForSummary.item) && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
 			const updatedSelectedItems = [...selectedItemsForExpansion, selectedItemForSummary.item];
 			setSelectedItemsForExpansion(updatedSelectedItems);
 			setIsSummaryDialogOpen(false);
 
 			// Call back end API to get the suggested message.
-			fetch(`${BACKEND_API_URL}/conversations/${conversationId}/user-selected-items`, {
-				method: "PUT",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					itemIriList: updatedSelectedItems.map(item => item.iri)
-				})
-			})
-			.then(res => res.json())
-			.then(data => {
+			try {
+				setIsFetchingSuggestedMessage(true);
+				const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/user-selected-items`, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						itemIriList: updatedSelectedItems.map(item => item.iri)
+					})
+				});
+				if (!response.ok) {
+					throw new Error("Backend responded with an error to the suggested message request.");
+				}
+				const data = await response.json();
 				setSuggestedMessage(data.suggestedMessage);
 				setCurrentMessage(data.suggestedMessage);
-			})
-			.catch(error => console.error("Error generating suggested message:", error));
+			}
+			catch (error) {
+				console.log(error);
+			} finally {
+				setIsFetchingSuggestedMessage(false);
+			}
 		}
 	};
 
@@ -426,7 +435,7 @@ function ConversationPage() {
 						</Card>
 					</div>
 				)))}
-        {isWaitingForBackend && (
+        {isWaitingForReplyMessage && (
           <div className="flex justify-start">
             <Card className="bg-gray-100 max-w-2xl">
               <CardContent className="p-3">
@@ -439,13 +448,21 @@ function ConversationPage() {
         )}
 			</div>
 
-			{suggestedMessage && (
-				<Card className="mt-4 p-3 bg-yellow-50 border-yellow-200">
-					<CardContent className="p-0">
-						<p className="text-sm font-medium">Suggested message: {suggestedMessage}</p>
+			{/* Suggested message */}
+			{isFetchingSuggestedMessage ? (
+        <Card className="mt-4 p-3 flex justify-center items-center h-16 bg-yellow-50 border-yellow-200">
+          <CardContent>
+						<div className="h-8 w-8 rounded-full border-4 border-gray-300 border-t-yellow-500 animate-spin mr-2"></div>
+          	<p className="text-sm font-medium">Generating a suggested message...</p>
 					</CardContent>
-				</Card>
-			)}
+        </Card>
+      ) : suggestedMessage && (
+        <Card className="mt-4 p-3 bg-yellow-50 border-yellow-200">
+          <CardContent className="p-0">
+            <p className="text-sm font-medium">Suggested message: {suggestedMessage}</p>
+          </CardContent>
+        </Card>
+      )}
 
 			{mostRecentUserMessage && (
         <Card className="mt-4 p-3 bg-blue-50 border-blue-200">
@@ -466,7 +483,7 @@ function ConversationPage() {
 						}
 					}}
 				/>
-				<Button onClick={handleSendMessage} disabled={isWaitingForBackend}>SEND</Button>
+				<Button onClick={handleSendMessage} disabled={isWaitingForReplyMessage}>SEND</Button>
 			</div>
 
 			<Dialog open={isSummaryDialogOpen} onOpenChange={setIsSummaryDialogOpen}>
