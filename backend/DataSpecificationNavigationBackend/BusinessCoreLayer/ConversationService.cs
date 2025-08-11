@@ -114,7 +114,9 @@ public class ConversationService(
 			else // mappings.Count > 0
 			{
 				_logger.LogTrace("Adding mapped items to the conversation substructure.");
-				AddMappedItemsToSubstructure(conversation.DataSpecificationSubstructure, mappings);
+				var substructure = conversation.DataSpecificationSubstructure;
+				AddMappedItemsToSubstructure(substructure, mappings);
+				conversation.DataSpecificationSubstructure = substructure;
 			}
 		}
 		else // User sent the suggested message as is, without any modifications.
@@ -136,7 +138,6 @@ public class ConversationService(
 
 				// Idk why the changes to the substructure are not written to the database so I'm doing this kind of magic.
 				DataSpecificationSubstructure substr = conversation.DataSpecificationSubstructure;
-				conversation.DataSpecificationSubstructure = new();
 				AddSelectedItemsToSubstructure(substr, selectedItems);
 				conversation.DataSpecificationSubstructure = substr;
 

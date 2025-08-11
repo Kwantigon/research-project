@@ -30,11 +30,11 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DataSpecificationSubstructure")
-                        .IsRequired()
+                    b.Property<DateTime>("LastUpdated")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<string>("SubstructureJsonString")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SuggestedMessage")

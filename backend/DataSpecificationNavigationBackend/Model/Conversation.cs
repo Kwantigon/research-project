@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 
 namespace DataSpecificationNavigationBackend.Model;
 
@@ -15,7 +18,37 @@ public class Conversation
 	// !Important: Always retrieve the messages sorted by their timestamps.
 	public virtual List<Message> Messages { get; set; } = [];
 
-	public virtual DataSpecificationSubstructure DataSpecificationSubstructure { get; set; } = new();
+	public string SubstructureJsonString { get; set; } = string.Empty; // Temporary solution using an string property
+
+	[NotMapped]
+	public DataSpecificationSubstructure DataSpecificationSubstructure
+	{
+		get
+		{
+			if (string.IsNullOrEmpty(SubstructureJsonString))
+				return new DataSpecificationSubstructure();
+
+			DataSpecificationSubstructure? substructure = JsonSerializer.Deserialize<DataSpecificationSubstructure>(SubstructureJsonString);
+			if (substructure is null)
+			{
+				return new DataSpecificationSubstructure();
+			}
+			else
+			{
+				return substructure;
+			}
+		}
+
+		set
+		{
+			JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
+			{
+				Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+				WriteIndented = true
+			};
+			SubstructureJsonString = JsonSerializer.Serialize(value, serializerOptions);
+		}
+	}
 
 	/// <summary>
 	/// IRIs of the items that user has selected for question expansion.

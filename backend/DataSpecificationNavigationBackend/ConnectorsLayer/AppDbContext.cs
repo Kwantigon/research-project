@@ -26,7 +26,7 @@ public class AppDbContext : DbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
+		/*JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
 		{
 			Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
 			WriteIndented = true
@@ -38,7 +38,7 @@ public class AppDbContext : DbContext
 		modelBuilder.Entity<Conversation>()
 				.Property(c => c.DataSpecificationSubstructure)
 				.HasConversion(converter)
-				.HasColumnType("TEXT");
+				.HasColumnType("TEXT");*/
 
 		modelBuilder.Entity<DataSpecificationPropertySuggestion>()
 				.HasOne(suggestion => suggestion.Item)

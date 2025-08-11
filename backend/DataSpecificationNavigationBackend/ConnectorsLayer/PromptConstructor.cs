@@ -1,8 +1,9 @@
 ﻿using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
-using System.Text;
-using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace DataSpecificationNavigationBackend.ConnectorsLayer;
 
@@ -39,6 +40,13 @@ public class PromptConstructor : IPromptConstructor
 	/// {2} = Current substructure (a list of items that the conversation has built).
 	/// </summary>
 	private readonly string _dataSpecSubstructureItemsMappingTemplate;
+
+	private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+	{
+		Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+		WriteIndented = true,
+		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+	};
 
 	public PromptConstructor(IConfiguration appSettings)
 	{
@@ -139,24 +147,15 @@ public class PromptConstructor : IPromptConstructor
 			item.DomainItemIri,
 			item.RangeItemIri
 		});
-		var serializerOptions = new JsonSerializerOptions
-		{
-			WriteIndented = true,
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-		};
-		string selectedString = JsonSerializer.Serialize(selectedList, serializerOptions);
+
+		string selectedString = JsonSerializer.Serialize(selectedList, _jsonSerializerOptions);
 
 		return string.Format(_generateSuggestedMessageTemplate, dataSpecification.Owl, userQuestion, substructureString, selectedString);
 	}
 
 	private string SubstructureToJson(DataSpecificationSubstructure substructure)
 	{
-		var serializerOptions = new JsonSerializerOptions
-		{
-			WriteIndented = true,
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-		};
-		return JsonSerializer.Serialize(substructure, serializerOptions);
+		return JsonSerializer.Serialize(substructure, _jsonSerializerOptions);
 	}
 
 	private string SubstructureToFlattenedJson(DataSpecificationSubstructure substructure)
@@ -177,11 +176,6 @@ public class PromptConstructor : IPromptConstructor
 			flattenedSubstructure.AddRange(classItem.DatatypeProperties);
 		}
 
-		var serializerOptions = new JsonSerializerOptions
-		{
-			WriteIndented = true,
-			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-		};
-		return JsonSerializer.Serialize(flattenedSubstructure, serializerOptions);
+		return JsonSerializer.Serialize(flattenedSubstructure, _jsonSerializerOptions);
 	}
 }

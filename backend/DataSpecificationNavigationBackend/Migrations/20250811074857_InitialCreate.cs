@@ -35,7 +35,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    DataSpecificationSubstructure = table.Column<string>(type: "TEXT", nullable: false),
+                    SubstructureJsonString = table.Column<string>(type: "TEXT", nullable: false),
                     UserSelectedItems = table.Column<string>(type: "TEXT", nullable: false),
                     SuggestedMessage = table.Column<string>(type: "TEXT", nullable: true)
                 },

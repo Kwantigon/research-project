@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataSpecificationNavigationBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250810135021_InitialCreate")]
+    [Migration("20250811074857_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,11 +33,11 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DataSpecificationSubstructure")
-                        .IsRequired()
+                    b.Property<DateTime>("LastUpdated")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<string>("SubstructureJsonString")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SuggestedMessage")
