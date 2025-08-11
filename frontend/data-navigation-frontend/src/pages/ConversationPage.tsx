@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from "react-router-dom";
 
@@ -26,7 +26,7 @@ interface SystemMessage {
 	sparqlText?: string;
 	sparqlQuery?: string;
 	suggestItemsText?: string;
-	suggestedItemsGrouped?: Record<string, SuggestedItem[]>;
+	suggestions?: Suggestions;
 }
 
 interface MappedItem {
@@ -40,9 +40,20 @@ interface MappedItem {
 interface SuggestedItem {
 	iri: string;
 	label: string;
-	summary: string;
-	reason: string;
+  connection: string;
+  reason: string;
+  summary: string;
 	mappedOrSuggested: "Suggested";
+}
+
+interface GroupedSuggestions {
+  itemExpanded: string;
+  suggestions: SuggestedItem[];
+}
+
+interface Suggestions {
+  directConnections: GroupedSuggestions[];
+  indirectConnections: GroupedSuggestions[];
 }
 
 // Type guard to check if a message is a ReplyMessage
@@ -65,7 +76,6 @@ function ConversationPage() {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const { conversationId } = useParams<{ conversationId: string }>();
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
-	const [summaryError, setSummaryError] = useState<string | null>(null);
 	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
 	const [isWaitingForBackend, setIsWaitingForBackend] = useState<boolean>(false);
 
@@ -177,18 +187,6 @@ function ConversationPage() {
 			}
 			const replyMsgData = await getReplyMsgResponse.json();
 			console.log(`getReplyMsgData: ${JSON.stringify(replyMsgData)}`);
-			/*const replyMessage: SystemMessage = {
-				id: getReplyMsgData.id,
-				sender: getReplyMsgData.sender,
-				text: getReplyMsgData.text,
-				timestamp: getReplyMsgData.timestamp,
-				mappingText: getReplyMsgData.mappingText,
-				mappedItems: getReplyMsgData.mappedItems,
-				sparqlText: getReplyMsgData.sparqlText,
-				sparqlQuery: getReplyMsgData.sparqlQuery,
-				suggestItemsText: getReplyMsgData.suggestItemsText,
-				suggestedItemsGrouped: getReplyMsgData.suggestedItemsGrouped
-			};*/
 
 			setMessages((prevMessages) => [
 				...prevMessages, replyMsgData
@@ -214,11 +212,6 @@ function ConversationPage() {
 	const handleItemClick = async (item: SuggestedItem | MappedItem, parentMessageId: string) => {
 		setSelectedItemForSummary({ item, parentMessageId });
 		setIsSummaryDialogOpen(true);
-		if (item.summary) {
-			setSummaryError(null);
-		} else {
-			setSummaryError('Failed to load item summary. Please try again.');
-		}
 	};
 
 	const handleAddItemToMessage = () => {
@@ -336,46 +329,95 @@ function ConversationPage() {
 										)}
 
 										{/* Suggested items */}
-										{msg.suggestItemsText && msg.suggestedItemsGrouped && Object.keys(msg.suggestedItemsGrouped).length > 0 && (
-											<div className="mt-4">
+																				{msg.suggestions && msg.suggestions.directConnections && msg.suggestions.indirectConnections && (
+											<div className="mt-4 space-y-4">
+												{/* Direct Connections */}
+												{msg.suggestions.directConnections.length > 0 && (
+													<div>
 												<p className="font-semibold text-sm">{msg.suggestItemsText}</p>
-												{Object.entries(msg.suggestedItemsGrouped).map(([mappedWords, items]) => (
-													<div key={mappedWords} className="mt-2">
-														<p className="text-sm font-medium italic">{mappedWords === "" ? "More items to consider" : `Expand "${mappedWords}"`}:</p>
-														<ul className="list-disc list-inside ml-4 mt-1">
-															{items.map((item) => {
-																const isSelected = selectedItemsForExpansion.some(
-																	(selectedItem) => selectedItem.iri === item.iri
-																);
-																return (
-																	<li key={item.iri} className="flex items-center space-x-1">
-																		<Button
-																			variant="link"
-																			onClick={() => handleItemClick(item, msg.id)}
-																			className="p-0 h-auto text-sm text-blue-600 underline cursor-pointer"
-																		>
-																			{item.label}
-																		</Button>
-																		{isSelected && (
-																			<svg
-																				xmlns="http://www.w3.org/2000/svg"
-																				className="h-4 w-4 text-green-500"
-																				viewBox="0 0 20 20"
-																				fill="currentColor"
-																			>
-																				<path
-																					fillRule="evenodd"
-																					d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-																					clipRule="evenodd"
-																				/>
-																			</svg>
-																		)}
-																	</li>
-																);
-															})}
-														</ul>
+														{msg.suggestions.directConnections.map((group) => (
+															<div key={group.itemExpanded} className="ml-4 mt-2">
+																<p className="text-sm font-medium italic">{group.itemExpanded}:</p>
+																<ul className="list-disc list-inside ml-4 mt-1">
+																	{group.suggestions.map((item) => {
+																		const isSelected = selectedItemsForExpansion.some(
+																			(selectedItem) => selectedItem.iri === item.iri
+																		);
+																		return (
+																			<li key={item.iri} className="flex items-center space-x-1">
+																				<Button
+																					variant="link"
+																					onClick={() => handleItemClick(item, msg.id)}
+																					className="p-0 h-auto text-sm text-blue-600 underline cursor-pointer"
+																				>
+																					{item.connection}
+																				</Button>
+																				{isSelected && (
+																					<svg
+																						xmlns="http://www.w3.org/2000/svg"
+																						className="h-4 w-4 text-green-500"
+																						viewBox="0 0 20 20"
+																						fill="currentColor"
+																					>
+																						<path
+																							fillRule="evenodd"
+																							d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+																							clipRule="evenodd"
+																						/>
+																					</svg>
+																				)}
+																			</li>
+																		);
+																	})}
+																</ul>
+															</div>
+														))}
 													</div>
-												))}
+												)}
+
+												{/* Indirect Connections */}
+												{msg.suggestions.indirectConnections.length > 0 && (
+													<div className="mt-4">
+														<p className="text-sm font-medium italic">More items to consider</p>
+														{msg.suggestions.indirectConnections.map((group) => (
+															<div key={group.itemExpanded} className="ml-4 mt-2">
+																<p className="text-sm font-medium italic">{group.itemExpanded}:</p>
+																<ul className="list-disc list-inside ml-4 mt-1">
+																	{group.suggestions.map((item) => {
+																		const isSelected = selectedItemsForExpansion.some(
+																			(selectedItem) => selectedItem.iri === item.iri
+																		);
+																		return (
+																			<li key={item.iri} className="flex items-center space-x-1">
+																				<Button
+																					variant="link"
+																					onClick={() => handleItemClick(item, msg.id)}
+																					className="p-0 h-auto text-sm text-blue-600 underline cursor-pointer"
+																				>
+																					{item.connection}
+																				</Button>
+																				{isSelected && (
+																					<svg
+																						xmlns="http://www.w3.org/2000/svg"
+																						className="h-4 w-4 text-green-500"
+																						viewBox="0 0 20 20"
+																						fill="currentColor"
+																					>
+																						<path
+																							fillRule="evenodd"
+																							d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+																							clipRule="evenodd"
+																						/>
+																					</svg>
+																				)}
+																			</li>
+																		);
+																	})}
+																</ul>
+															</div>
+														))}
+													</div>
+												)}
 											</div>
 										)}
 									</>
@@ -431,14 +473,9 @@ function ConversationPage() {
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Summary of "{selectedItemForSummary?.item.label}"</DialogTitle>
-						{summaryError && (
-							<DialogDescription className="text-red-500">
-								Error: {summaryError}
-							</DialogDescription>
-						)}
 					</DialogHeader>
 					<div className="py-4">
-						{selectedItemForSummary?.item.summary && !summaryError && (
+						{selectedItemForSummary?.item.summary && (
               <>
                 <p>{selectedItemForSummary.item.summary}</p>
                 {isSuggestedItem(selectedItemForSummary.item) ? (
@@ -453,7 +490,7 @@ function ConversationPage() {
               isSuggestedItem(selectedItemForSummary.item) ? (
                 // If it's a suggested item, show the button to add it to the message
                 !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                  <Button onClick={() => handleAddItemToMessage()} className="mt-4" disabled={!!summaryError}>
+                  <Button onClick={() => handleAddItemToMessage()} className="mt-4">
                     Add item to my message
                   </Button>
                 ) : (
