@@ -367,10 +367,22 @@ Když jde o datatype property, tak já vytvářím objekt pro ten typ jako data 
 Zdá se mi, že je moc komplikací s tím s vždycky ověřit, jestli data specification item už existuje nebo ne.
 - Při zpracování data specification si všechny itemy uložím. Pak už to nebudu muset řešit.
 
-Kde jsem skončil:
-- Povedlo se mi uložit všechny itemy.
+Problém s navigací v DataSpecificationItem, když chci získat RangeItem. Někdy range je pouze datatype.
+- Momentálně to řeším tak, že pokud potřebuju RangeItem, tak ho vždycky explicitně najdu v databázi.
+- Myslím, že to vyřeším tak, že si uložím jednu instanci datových typů.
 
-Plán na zítra:
-- Upravit prompt templates, protože nepotřebuju už detailní informace jako label atd. Jenom iri itemu.
-- zkusit si v postman, že to funguje.
-- Zapracovat na front endu.
+Problémy:
+- Item je v current context, ale je nabízen pod "more items to consider".
+- Ve sparqlu chybí property?
+Protože nové itemy nejsou uloženy do substructure.
+
+To do:
+Zkontrolovat Sparql generation - myslím, že je správně, jenom nějak blbě přidávám do substructure, takže proto tam chyběly ty properties.
+Musím zkontrolovat, jak se zpracovává přidávání selected items.
+Musím se ujistit, že když user přidá property, tak
+1. Najdu v databázi property.
+2. Najdu domain i range itemy pro property.
+3. Všechny 3 přidám do substructure (pokud už něco v substructure je, tak nepřidávat).
+4. Říct si o mapping to substructure.
+5. Uložit mapping a asi se můžu vrátit.
+Ještě jednou projít zpracování suggested message.
