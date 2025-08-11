@@ -8,7 +8,7 @@ public interface ILlmConnector
 
 	Task<List<DataSpecificationItemMapping>> MapUserMessageToSubstructureAsync(DataSpecification dataSpecification, DataSpecificationSubstructure dataSpecificationSubstructure, UserMessage userMessage);
 
-	Task<List<DataSpecificationItemSuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage);
+	Task<List<DataSpecificationPropertySuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage);
 
 	Task<string> GenerateItemSummaryAsync(DataSpecificationItem dataSpecificationItem);
 

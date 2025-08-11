@@ -1,6 +1,10 @@
 ﻿using DataSpecificationNavigationBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO;
+using DataSpecificationNavigationBackend.BusinessCoreLayer.DTO.Transformer;
+using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
@@ -10,11 +14,14 @@ namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 public class ConversationController(
 	ILogger<ConversationController> logger,
 	IConversationService conversationService,
-	IDataSpecificationService dataSpecificationService) : IConversationController
+	IDataSpecificationService dataSpecificationService,
+	AppDbContext appDbContext) : IConversationController
 {
 	private readonly ILogger<ConversationController> _logger = logger;
 	private readonly IConversationService _conversationService = conversationService;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
+	private readonly AppDbContext _database = appDbContext; // To get the range object of ObjectProperties.
+	// To do: Eventually restructure the code so that I can remove the database from this controller.
 
 	public async Task<IResult> StartConversationAsync(PostConversationsDTO payload)
 	{
@@ -57,58 +64,28 @@ public class ConversationController(
 		List<ConversationMessageDTO> responseDTO = [];
 		foreach (Message msg in conversation.Messages)
 		{
-			ConversationMessageDTO messageDTO = new()
-			{
-				Id = msg.Id,
-				Sender = msg.Sender,
-				TextContent = msg.TextContent,
-				Timestamp = msg.Timestamp
-			};
-
-			if (msg is UserMessage userMessage)
-			{
-				messageDTO.ReplyMessageUri = $"/conversations/{conversationId}/messages/{userMessage.ReplyMessageId}";
-			}
+			ConversationMessageDTO messageDTO;
 
 			if (msg is ReplyMessage replyMessage)
 			{
-				messageDTO.MappingText = replyMessage.MappingText;
-
-				UserMessage precedingUserMsg = replyMessage.PrecedingUserMessage;
-				messageDTO.MappedItems = precedingUserMsg.ItemMappings
-					.Select(m => new MappedItemDTO { Iri = m.ItemIri, Label = m.Item.Label, Summary = m.Item.Summary, MappedWords = m.MappedWords })
-					.ToList();
-
-				messageDTO.SparqlText = replyMessage.SparqlText;
-				messageDTO.SparqlQuery = replyMessage.SparqlQuery;
-				messageDTO.SuggestItemsText = replyMessage.SuggestItemsText;
-
-				foreach (DataSpecificationItemSuggestion suggestion in replyMessage.ItemSuggestions)
+				messageDTO = BuildMessageDTOFromReply(replyMessage);
+			}
+			else
+			{
+				messageDTO = new()
 				{
-					DataSpecificationItemMapping? mapping = replyMessage.PrecedingUserMessage.ItemMappings
-						.Find(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == precedingUserMsg.Id);
-					if (mapping is null)
-					{
-						_logger.LogError("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", suggestion.ExpandsItem, precedingUserMsg.Id);
-					}
+					Id = msg.Id,
+					Sender = msg.Sender,
+					TextContent = msg.TextContent,
+					Timestamp = msg.Timestamp
+				};
+				if (msg is UserMessage userMessage)
+				{
 
-					string expandWords = mapping != null ? mapping.MappedWords : string.Empty;
-
-					List<SuggestedItemDTO>? items;
-					if (!messageDTO.SuggestedItems.TryGetValue(expandWords, out items))
-					{
-						items = [];
-						messageDTO.SuggestedItems[expandWords] = items;
-					}
-					items.Add(new SuggestedItemDTO()
-					{
-						Iri = suggestion.ItemIri,
-						Label = suggestion.Item.Label,
-						Summary = suggestion.Item.Summary,
-						Reason = suggestion.ReasonForSuggestion
-					});
+					messageDTO.ReplyMessageUri = $"/conversations/{conversationId}/messages/{userMessage.ReplyMessageId}";
 				}
 			}
+
 			responseDTO.Add(messageDTO);
 		}
 
@@ -159,55 +136,8 @@ public class ConversationController(
 			}
 
 			// Build the DTO to return.
-
-			List<MappedItemDTO> mappedItems = userMessage.ItemMappings
-				.Select(mapping => new MappedItemDTO
-				{
-					Iri = mapping.ItemIri,
-					Label = mapping.Item.Label,
-					Summary = mapping.Item.Summary,
-					MappedWords = mapping.MappedWords
-				}).ToList();
-
-			Dictionary<string, List<SuggestedItemDTO>> suggestedItems = [];
-			foreach (var suggestion in replyMessage.ItemSuggestions)
-			{
-				DataSpecificationItemMapping? mapping = replyMessage.PrecedingUserMessage.ItemMappings
-					.Find(m => m.ItemDataSpecificationId == conversation.DataSpecification.Id && m.ItemIri == suggestion.ExpandsItem && m.UserMessageId == userMessage.Id);
-				if (mapping is null)
-				{
-					_logger.LogInformation("Could not find the mapping between item \"{ItemIri}\" and the user message \"{UserMsgId}\"", suggestion.ExpandsItem, userMessage.Id);
-				}
-				string expandWords = mapping != null ? mapping.MappedWords : string.Empty;
-
-				List<SuggestedItemDTO>? list;
-				if (!suggestedItems.TryGetValue(expandWords, out list))
-				{
-					list = new List<SuggestedItemDTO>();
-					suggestedItems.Add(expandWords, list);
-				}
-				list.Add(new SuggestedItemDTO()
-				{
-					Iri = suggestion.ItemIri,
-					Label = suggestion.Item.Label,
-					Summary = suggestion.Item.Summary,
-					Reason = suggestion.ReasonForSuggestion
-				});
-			}
-
-			ConversationMessageDTO replyMessageDTO = new()
-			{
-				Id = replyMessage.Id,
-				Sender = replyMessage.Sender,
-				TextContent = replyMessage.TextContent,
-				Timestamp = replyMessage.Timestamp,
-				MappingText = replyMessage.MappingText,
-				MappedItems = mappedItems,
-				SparqlText = replyMessage.SparqlText,
-				SparqlQuery = replyMessage.SparqlQuery,
-				SuggestItemsText = replyMessage.SuggestItemsText,
-				SuggestedItems = suggestedItems
-			};
+			ConversationMessageDTO replyMessageDTO = BuildMessageDTOFromReply(replyMessage);
+			
 			return Results.Ok(replyMessageDTO);
 		}
 		else if (requestedMessage is UserMessage userMessage)
@@ -250,9 +180,22 @@ public class ConversationController(
 		}
 
 		_logger.LogTrace("Adding the user message to the conversation.");
-		UserMessage userMessage = await _conversationService.AddNewUserMessageAsync(conversation, payload.TextValue, DateTime.Now, payload.UserModifiedSuggestedMessage);
+		UserMessage userMessage = await _conversationService.AddNewUserMessageAsync(conversation, payload.TextValue, DateTime.Now);
 
 		// To do: Generate reply here (instead of waiting for a get message call).
+		// Todo: Guard this critical section with a semaphore.
+		/*_logger.LogTrace("Critical section start: _conversationService.GenerateReplyMessage(userMessage)");
+		ReplyMessage? reply = await _conversationService.GenerateReplyMessageAsync(userMessage);
+		_logger.LogTrace("Critical section end: _conversationService.GenerateReplyMessage(userMessage)");
+		// End of critical section.
+		if (reply is null)
+		{
+			return Results.InternalServerError(new ErrorDTO() { Reason = "An error occured while generating a reply." });
+		}
+		else
+		{
+			replyMessage = reply;
+		}*/
 
 		return Results.Created(
 			$"/conversations/{conversation.Id}/messages/{userMessage.Id}",
@@ -279,18 +222,22 @@ public class ConversationController(
 			return Results.NotFound(new ErrorDTO() { Reason = "Conversation not found" });
 		}
 
+		// Make sure the items in the payload are unique
+		HashSet<string> uniqueIris = new(payload.ItemIriList);
 		_logger.LogTrace("Searching for the selected items.");
-		List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetItemsByIriListAsync(conversation.DataSpecification.Id, payload.ItemIriList);
-		if (selectedItems.Count != payload.ItemIriList.Count)
+		List<DataSpecificationItem> selectedItems = await _database.DataSpecificationItems
+					.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id && uniqueIris.Contains(item.Iri))
+					.ToListAsync();
+
+		if (selectedItems.Count != uniqueIris.Count)
 		{
-			List<string> itemsNotFound = payload.ItemIriList.Where(iri => !selectedItems.Any(itemFound => itemFound.Iri == iri)).ToList();
+			List<string> itemsNotFound = uniqueIris.Where(iri => !selectedItems.Any(itemFound => itemFound.Iri == iri)).ToList();
 			_logger.LogError("The following item IRIs were not found: {Items}", itemsNotFound);
 			return Results.BadRequest(new ErrorDTO() { Reason = "One or more selected items are not present in the data specification." });
 		}
 
 		_logger.LogTrace("Generating a suggested message.");
-
-		string? suggestedMessage = await _conversationService.UpdateSelectedItemsAndGenerateSuggestedMessageAsync(conversation, selectedItems);
+		string? suggestedMessage = await _conversationService.UpdateSelectedItemsAndGenerateSuggestedMessageAsync(conversation, uniqueIris);
 		if (string.IsNullOrEmpty(suggestedMessage))
 		{
 			_logger.LogError("The suggested message is either null or empty.");
@@ -312,5 +259,43 @@ public class ConversationController(
 		{
 			return Results.InternalServerError(new ErrorDTO { Reason = "There was an unexpected error while deleting the conversation." });
 		}
+	}
+
+	private ConversationMessageDTO BuildMessageDTOFromReply(ReplyMessage replyMessage)
+	{
+		ConversationMessageDTO messageDTO = new();
+		messageDTO.Id = replyMessage.Id;
+		messageDTO.MappingText = replyMessage.MappingText;
+
+		UserMessage precedingUserMsg = replyMessage.PrecedingUserMessage;
+		messageDTO.MappedItems = precedingUserMsg.ItemMappings
+			.Select(m => new MappedItemDTO { Iri = m.ItemIri, Label = m.Item.Label, Summary = m.Item.Summary, MappedWords = m.MappedWords })
+			.ToList();
+
+		messageDTO.SparqlText = replyMessage.SparqlText;
+		messageDTO.SparqlQuery = replyMessage.SparqlQuery;
+		messageDTO.SuggestItemsText = replyMessage.SuggestItemsText;
+
+		foreach (DataSpecificationPropertySuggestion suggestion in replyMessage.ItemSuggestions)
+		{
+			if (suggestion.Item.Type is ItemType.ObjectProperty)
+			{
+				if (suggestion.RangeItem is null)
+				{
+					DataSpecificationItem? item = _database.DataSpecificationItems.SingleOrDefault(
+						i => i.DataSpecificationId == suggestion.ItemDataSpecificationId && i.Iri == suggestion.RangeItemIri);
+					if (item is null)
+					{
+						// Shouldn't happen but checking just in case.
+						throw new Exception("Could not find suggestion range in the database.");
+					}
+					suggestion.RangeItem = item;
+				}
+			}
+		}
+
+		SuggestionsTransformer transformer = new();
+		messageDTO.Suggestions = transformer.TransformSuggestedProperties(replyMessage.ItemSuggestions, replyMessage.Conversation.DataSpecificationSubstructure);
+		return messageDTO;
 	}
 }

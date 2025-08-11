@@ -60,15 +60,21 @@ namespace DataSpecificationNavigationBackend.Migrations
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Summary = table.Column<string>(type: "TEXT", nullable: true),
                     DomainItemIri = table.Column<string>(type: "TEXT", nullable: true),
-                    DomainItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: true),
-                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: true)
+                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: true),
+                    RangeItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DataSpecificationItems", x => new { x.Iri, x.DataSpecificationId });
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItems_DataSpecificationItems_DomainItemIri_DomainItemDataSpecificationId",
-                        columns: x => new { x.DomainItemIri, x.DomainItemDataSpecificationId },
+                        name: "FK_DataSpecificationItems_DataSpecificationItems_DomainItemIri_DataSpecificationId",
+                        columns: x => new { x.DomainItemIri, x.DataSpecificationId },
+                        principalTable: "DataSpecificationItems",
+                        principalColumns: new[] { "Iri", "DataSpecificationId" },
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_DataSpecificationItems_DataSpecificationItems_RangeItemIri_RangeItemDataSpecificationId",
+                        columns: x => new { x.RangeItemIri, x.RangeItemDataSpecificationId },
                         principalTable: "DataSpecificationItems",
                         principalColumns: new[] { "Iri", "DataSpecificationId" });
                     table.ForeignKey(
@@ -116,8 +122,8 @@ namespace DataSpecificationNavigationBackend.Migrations
                 name: "DataSpecificationItemMappings",
                 columns: table => new
                 {
-                    ItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
                     ItemIri = table.Column<string>(type: "TEXT", nullable: false),
+                    ItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
                     UserMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
                     MappedWords = table.Column<string>(type: "TEXT", nullable: false),
                     IsSelectTarget = table.Column<bool>(type: "INTEGER", nullable: false)
@@ -148,8 +154,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     ReplyMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
                     ReasonForSuggestion = table.Column<string>(type: "TEXT", nullable: false),
                     DomainItemIri = table.Column<string>(type: "TEXT", nullable: true),
-                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: false),
-                    ExpandsItem = table.Column<string>(type: "TEXT", nullable: false)
+                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,10 +200,14 @@ namespace DataSpecificationNavigationBackend.Migrations
                 column: "DataSpecificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItems_DomainItemIri_DomainItemDataSpecificationId",
+                name: "IX_DataSpecificationItems_DomainItemIri_DataSpecificationId",
                 table: "DataSpecificationItems",
-                columns: new[] { "DomainItemIri", "DomainItemDataSpecificationId" },
-                unique: true);
+                columns: new[] { "DomainItemIri", "DataSpecificationId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSpecificationItems_RangeItemIri_RangeItemDataSpecificationId",
+                table: "DataSpecificationItems",
+                columns: new[] { "RangeItemIri", "RangeItemDataSpecificationId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSpecificationItemSuggestions_DomainItemIri_ItemDataSpecificationId",

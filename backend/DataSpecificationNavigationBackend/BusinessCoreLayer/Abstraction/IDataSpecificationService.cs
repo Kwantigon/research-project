@@ -9,5 +9,4 @@ public interface IDataSpecificationService
 	Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId);
 	Task<DataSpecificationItem?> GetDataSpecificationItemAsync(int dataSpecificationId, string itemIri);
 	Task GenerateItemSummaryAsync(DataSpecificationItem item);
-	Task<List<DataSpecificationItem>> GetItemsByIriListAsync(int dataSpecificationId, List<string> itemIriList);
 }

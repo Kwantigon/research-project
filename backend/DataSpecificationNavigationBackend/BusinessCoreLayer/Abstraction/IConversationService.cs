@@ -10,11 +10,11 @@ public interface IConversationService
 
 	Task<Conversation?> GetConversationAsync(int conversationId, bool includeMessages = false);
 
-	Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp, bool userModifiedSuggestedMessage);
+	Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp);
 
 	Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage);
 
-	Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, List<DataSpecificationItem> selectedItems);
+	Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedItems);
 
 	Task<bool> DeleteConversationAndAssociatedResourcesAsync(int conversationId);
 }

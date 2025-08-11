@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataSpecificationNavigationBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250809191734_InitialCreate")]
+    [Migration("20250810135021_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -89,15 +89,15 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("DomainItemDataSpecificationId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("DomainItemIri")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Label")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("RangeItemDataSpecificationId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("RangeItemIri")
                         .HasColumnType("TEXT");
@@ -112,8 +112,9 @@ namespace DataSpecificationNavigationBackend.Migrations
 
                     b.HasIndex("DataSpecificationId");
 
-                    b.HasIndex("DomainItemIri", "DomainItemDataSpecificationId")
-                        .IsUnique();
+                    b.HasIndex("DomainItemIri", "DataSpecificationId");
+
+                    b.HasIndex("RangeItemIri", "RangeItemDataSpecificationId");
 
                     b.ToTable("DataSpecificationItems");
                 });
@@ -145,7 +146,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.ToTable("DataSpecificationItemMappings");
                 });
 
-            modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemSuggestion", b =>
+            modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationPropertySuggestion", b =>
                 {
                     b.Property<int>("ItemDataSpecificationId")
                         .HasColumnType("INTEGER");
@@ -157,10 +158,6 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DomainItemIri")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ExpandsItem")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RangeItemIri")
@@ -276,12 +273,19 @@ namespace DataSpecificationNavigationBackend.Migrations
                         .IsRequired();
 
                     b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "DomainItem")
-                        .WithOne("RangeItem")
-                        .HasForeignKey("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "DomainItemIri", "DomainItemDataSpecificationId");
+                        .WithMany()
+                        .HasForeignKey("DomainItemIri", "DataSpecificationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("DataSpecificationNavigationBackend.Model.DataSpecificationItem", "RangeItem")
+                        .WithMany()
+                        .HasForeignKey("RangeItemIri", "RangeItemDataSpecificationId");
 
                     b.Navigation("DataSpecification");
 
                     b.Navigation("DomainItem");
+
+                    b.Navigation("RangeItem");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemMapping", b =>
@@ -303,7 +307,7 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Navigation("UserMessage");
                 });
 
-            modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationItemSuggestion", b =>
+            modelBuilder.Entity("DataSpecificationNavigationBackend.Model.DataSpecificationPropertySuggestion", b =>
                 {
                     b.HasOne("DataSpecificationNavigationBackend.Model.ReplyMessage", "ReplyMessage")
                         .WithMany("ItemSuggestions")
@@ -359,8 +363,6 @@ namespace DataSpecificationNavigationBackend.Migrations
                     b.Navigation("ItemMappingsTable");
 
                     b.Navigation("ItemSuggestionsTable");
-
-                    b.Navigation("RangeItem");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigationBackend.Model.ReplyMessage", b =>

@@ -10,7 +10,7 @@ public interface ILlmResponseProcessor
 {
 	List<DataSpecificationItemMapping>? ExtractMappedItems(string llmResponse, UserMessage userMessage);
 
-	List<DataSpecificationItemSuggestion>? ExtractSuggestedItems(string llmResponse, UserMessage userMessage);
+	List<DataSpecificationPropertySuggestion>? ExtractSuggestedItems(string llmResponse, UserMessage userMessage);
 
 	string? ExtractSuggestedMessage(string llmResponse) => llmResponse;
 

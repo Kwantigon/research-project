@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataSpecificationNavigationBackend.Model;
 
 [PrimaryKey(nameof(ItemDataSpecificationId), nameof(ItemIri), nameof(ReplyMessageId))]
-public class DataSpecificationItemSuggestion
+public class DataSpecificationPropertySuggestion
 {
 	public int ItemDataSpecificationId { get; set; }
 
@@ -19,6 +19,7 @@ public class DataSpecificationItemSuggestion
 	public required string ReasonForSuggestion { get; set; }
 
 	public required string DomainItemIri { get; set; }
+
 	public virtual required DataSpecificationItem DomainItem { get; set; }
 
 	public required string RangeItemIri { get; set; }
@@ -26,6 +27,4 @@ public class DataSpecificationItemSuggestion
 	// Not mapped because RangeItemIri could just be a data type.
 	[NotMapped]
 	public DataSpecificationItem? RangeItem { get; set; }
-
-	public string ExpandsItem { get; set; } = string.Empty;
 }

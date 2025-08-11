@@ -16,6 +16,6 @@ public class ReplyMessage : Message
 
 	public string SuggestItemsText { get; set; } = string.Empty;
 
-	public virtual List<DataSpecificationItemSuggestion> ItemSuggestions { get; set; } = [];
+	public virtual List<DataSpecificationPropertySuggestion> ItemSuggestions { get; set; } = [];
 
 }

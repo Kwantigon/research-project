@@ -33,8 +33,7 @@ public class DataSpecificationService(
 
 		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
 		_logger.LogTrace("Converting the DSV to OWL.");
-		DsvToOwlConverter converter = new DsvToOwlConverter();
-		IGraph owlGraph = converter.ConvertDsvGraphToOwlGraph(dsvGraph, out List<DataSpecificationItem> extractedItems);
+		IGraph owlGraph = _rdfProcessor.ConvertDsvGraphToOwlGraph(dsvGraph, out List<DataSpecificationItem> extractedItems);
 		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
 
 		_logger.LogDebug(owl);
@@ -46,10 +45,18 @@ public class DataSpecificationService(
 		};
 		await _database.DataSpecifications.AddAsync(dataSpecification);
 
+		// Validate and store items.
 		foreach (var item in extractedItems)
 		{
+			if (string.IsNullOrEmpty(item.Iri))
+			{
+				_logger.LogError("Extracted item does not have an iri: {Item}", item);
+				continue;
+			}
+
 			if (string.IsNullOrEmpty(item.Label))
 			{
+				_logger.LogWarning("Extracted item {Iri} does not have a label.", item.Iri);
 				// Failed to retrieve the label during DSV to OWL conversion.
 				// Use the item's iri as label (but only the fragment part).
 				string iriFragment = new Uri(item.Iri).Fragment.Substring(1); // The first character is '#' so I don't want that.
@@ -59,9 +66,24 @@ public class DataSpecificationService(
 			}
 			item.DataSpecificationId = dataSpecification.Id;
 			item.DataSpecification = dataSpecification;
+
+			if (item.Type is not ItemType.Class)
+			{
+				if (item.DomainItemIri is null)
+				{
+					_logger.LogError("Extracted a property with null domain.");
+					continue;
+				}
+				if (item.RangeItemIri is null)
+				{
+					_logger.LogError("Extracted a property with null range");
+					continue;
+				}
+			}
+			await _database.DataSpecificationItems.AddAsync(item);
 		}
 
-		await _database.DataSpecificationItems.AddRangeAsync(extractedItems);
+		//await _database.DataSpecificationItems.AddRangeAsync(extractedItems);
 		await _database.SaveChangesAsync();
 		return dataSpecification;
 	}
@@ -91,13 +113,6 @@ public class DataSpecificationService(
 		_logger.LogTrace("Setting the item.Summary property and saving to database.");
 		item.Summary = summary;
 		await _database.SaveChangesAsync();
-	}
-
-	public async Task<List<DataSpecificationItem>> GetItemsByIriListAsync(int dataSpecificationId, List<string> itemIriList)
-	{
-		return await _database.DataSpecificationItems
-			.Where(item => item.DataSpecificationId == dataSpecificationId && itemIriList.Contains(item.Iri))
-			.ToListAsync();
 	}
 }
 
@@ -355,7 +370,8 @@ internal class DsvToOwlConverter
 
 	private Uri GetSlovnikGovRdfEndpointUri(string resourceUri)
 	{
-		//string escaped = Uri.EscapeDataString(resourceUri);
+		// reusedResourceUri is already escaped because the UriNode returns and escaped string.
+		// string escaped = Uri.EscapeDataString(resourceUri);
 		const string SLOVNIK_GOV_URI_TEMPLATE = "https://xn--slovnk-7va.gov.cz/sparql?query=define%20sql%3Adescribe-mode%20%22CBD%22%20%20DESCRIBE%20%3C{0}%3E&output=text%2Fturtle";
 		string uri = string.Format(SLOVNIK_GOV_URI_TEMPLATE, resourceUri);
 		return new Uri(uri);

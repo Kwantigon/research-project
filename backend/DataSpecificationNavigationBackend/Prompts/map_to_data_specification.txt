@@ -25,24 +25,13 @@ If an item is not of type `Class`, set `"IsSelectTarget": false`.
 Only mark `"IsSelectTarget": true` if you are confident that the user wants instances of this class in the final output.
 If uncertain, default to `"IsSelectTarget": false`.
 
-If an item cannot be mapped to its corresponding words from the user question, do not return that item.
-
-**Important:**
-If you return an item of type `ObjectProperty` or `DatatypeProperty`, then you must also include the corresponding `Class` items that represent:
-- The domain of the property.
-- The range of the property (if it's a class for ObjectProperty, or a datatype for DatatypeProperty).
-
-These domain and range items must also appear in the result as separate entries in the array, with their own summaries and mapped words (if mentioned).
+If an item cannot be mapped to its corresponding phrase from the user question, do not return that item.
 
 ### Answer format
 Return a JSON array. Each element in the array must be an object with the following fields:
 
 - `Iri` (string): The IRI of the item from the data specification.
-- `Label` (string): The label of the item from the data specification.
-- `Type` (string): The type of the item. Must be one of: `"Class"`, `"ObjectProperty"`, or `"DatatypeProperty"`.
-- `Domain` (string): The IRI of the item's domain. Required if the item is an `ObjectProperty` or `DatatypeProperty`.
-- `Range` (string): The IRI or datatype of the item's range. Required if the item is an `ObjectProperty` or `DatatypeProperty`.
-- `Summary` (string): A brief, user-friendly summary (3–4 sentences) describing the item in the context of the data specification.
+- `Summary` (string): A brief, user-friendly summary (3 - 4 sentences) describing the item in the context of the data specification.
 - `MappedWords` (string): The exact words or phrase from the user question that refer to this item. If no words or phrase match, do not return the item at all.
 - `IsSelectTarget` (boolean): Whether this item is a select target in the SPARQL query. Only applies to items of type `Class`.
 

@@ -18,17 +18,17 @@ public class DataSpecificationItem
 
 	public virtual DataSpecification DataSpecification { get; set; }
 
-	public virtual List<DataSpecificationItemSuggestion> ItemSuggestionsTable { get; set; } = [];
+	public virtual List<DataSpecificationPropertySuggestion> ItemSuggestionsTable { get; set; } = [];
 
 	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
 
 	public string? DomainItemIri { get; set; }
 
-	public virtual DataSpecificationItem? DomainItem { get; set; }
+	public virtual DataSpecificationItem DomainItem { get; set; }
 
 	public string? RangeItemIri { get; set; }
 
-	public virtual DataSpecificationItem? RangeItem { get; set; }
+	public virtual DataSpecificationItem? RangeItem { get; set; } // For now, If I need range, I will always need to look it up from the database.
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]

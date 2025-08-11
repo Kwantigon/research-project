@@ -10,5 +10,5 @@ public interface IRdfProcessor
 {
 	IGraph CreateGraphFromRdfString(string rdfString);
 	string WriteGraphToString(IGraph graph);
-	IGraph ConvertDsvToOwl(IGraph dsvGraph); // Could consider adding more overloads but I will leave that for later.
+	IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph, out List<DataSpecificationItem> extractedItems);
 }

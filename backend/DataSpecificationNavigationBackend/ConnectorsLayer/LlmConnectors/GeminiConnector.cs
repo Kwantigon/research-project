@@ -99,10 +99,10 @@ public class GeminiConnector : ILlmConnector
 		return mapped;
 	}
 
-	public async Task<List<DataSpecificationItemSuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage)
+	public async Task<List<DataSpecificationPropertySuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage)
 	{
 		int attempts = 0;
-		List<DataSpecificationItemSuggestion>? suggestedItems = null;
+		List<DataSpecificationPropertySuggestion>? suggestedItems = null;
 
 		_logger.LogTrace("Building a prompt for getting the related items.");
 		string prompt = _promptConstructor.BuildGetSuggestedItemsPrompt(dataSpecification, userMessage.TextContent, substructure);

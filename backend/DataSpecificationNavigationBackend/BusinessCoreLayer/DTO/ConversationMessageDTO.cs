@@ -35,12 +35,8 @@ public record ConversationMessageDTO
 	[JsonPropertyName("suggestItemsText")]
 	public string? SuggestItemsText { get; set; }
 
-	/// <summary>
-	/// Keys = Words that the suggested items would expand.<br/>
-	/// Values = The suggested items info.
-	/// </summary>
-	[JsonPropertyName("suggestedItemsGrouped")]
-	public Dictionary<string, List<SuggestedItemDTO>> SuggestedItems { get; set; } = [];
+	[JsonPropertyName("suggestions")]
+	public SuggestionsDTO Suggestions { get; set; }
 	#endregion Fields for reply messages.
 
 	#region Fields for user messages.
@@ -75,6 +71,9 @@ public record SuggestedItemDTO
 	[JsonPropertyName("label")]
 	public required string Label { get; init; }
 
+	[JsonPropertyName("connection")]
+	public required string Connection { get; init; }
+
 	[JsonPropertyName("summary")]
 	public string? Summary { get; set; }
 
@@ -83,4 +82,13 @@ public record SuggestedItemDTO
 
 	[JsonPropertyName("mappedOrSuggested")]
 	public string MappedOrSuggested => "Suggested"; // This property is purely for the front end to identify, which type of item it is.
+}
+
+public record ArrowSuggestionDto(string Iri, string Label, string Connection, string Reason, string Summary, string MappedOrSuggested = "Suggested");
+public record GroupedSuggestionsDto(string ItemExpanded, List<ArrowSuggestionDto> Suggestions);
+
+public class SuggestionsDTO
+{
+	public List<GroupedSuggestionsDto> DirectConnections { get; set; } = new();
+	public List<GroupedSuggestionsDto> IndirectConnections { get; set; } = new();
 }

@@ -20,7 +20,7 @@ Each word or phrase from the user question may only be mapped to one item. Do no
 
 Additionally, determine which **classes** are the **select targets** of the user's question.
 A select target class is one that should appear in the `SELECT` clause of a SPARQL query that answers this question.
-For example, in the query `SELECT ?a ?b WHERE { ... }`, the variables `?a` and `?b` are select targets.
+For example, in the query `SELECT ?a ?b WHERE {{ ... }}`, the variables `?a` and `?b` are select targets.
 
 Only items of type `Class` can be marked as select targets.
 If an item is not of type `Class`, set `"IsSelectTarget": false`.
