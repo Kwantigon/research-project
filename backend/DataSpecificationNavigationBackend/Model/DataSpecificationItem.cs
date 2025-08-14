@@ -3,38 +3,54 @@ using System.Text.Json.Serialization;
 
 namespace DataSpecificationNavigationBackend.Model;
 
-[PrimaryKey(nameof(Iri), nameof(DataSpecificationId))]
-public class DataSpecificationItem
+[PrimaryKey(nameof(DataSpecificationId), nameof(Iri))]
+public abstract class DataSpecificationItem
 {
-	public string Iri { get; set; }
+	public required string Iri { get; set; }
 
-	public string Label { get; set; }
+	public required string Label { get; set; }
 
-	public ItemType Type { get; set; }
+	public virtual ItemType Type { get; }
 
 	public string? Summary { get; set; }
 
-	public int DataSpecificationId { get; set; }
+	public required int DataSpecificationId { get; set; } // For Entity Framework configuration.
 
-	public virtual DataSpecification DataSpecification { get; set; }
-
-	public virtual List<DataSpecificationPropertySuggestion> ItemSuggestionsTable { get; set; } = [];
-
-	public virtual List<DataSpecificationItemMapping> ItemMappingsTable { get; set; } = [];
-
-	public string? DomainItemIri { get; set; }
-
-	public virtual DataSpecificationItem DomainItem { get; set; }
-
-	public string? RangeItemIri { get; set; }
-
-	public virtual DataSpecificationItem? RangeItem { get; set; } // For now, If I need range, I will always need to look it up from the database.
+	public virtual required DataSpecification DataSpecification { get; set; }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<ItemType>))]
 public enum ItemType
 {
 	Class,
-	ObjectProperty, // Relation between classes: class -> class.
-	DatatypeProperty // Relation between a class and a literal: class -> literal.
+	ObjectProperty,
+	DatatypeProperty
+}
+
+public class ClassItem : DataSpecificationItem
+{
+	public override ItemType Type { get => ItemType.Class; }
+}
+
+public class PropertyItem : DataSpecificationItem
+{
+	public required string DomainIri { get; set; } // For Entity Framework configuration.
+
+	public virtual required ClassItem Domain { get; set; }
+}
+
+public class ObjectPropertyItem : PropertyItem
+{
+	public override ItemType Type { get => ItemType.ObjectProperty; }
+
+	public required string RangeIri { get; set; } // For Entity Framework configuration.
+
+	public virtual required ClassItem Range { get; set; }
+}
+
+public class DatatypePropertyItem : PropertyItem
+{
+	public override ItemType Type { get => ItemType.DatatypeProperty; }
+
+	public required string RangeDatatypeIri { get; set; }
 }

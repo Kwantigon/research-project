@@ -1,9 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Unicode;
-
-namespace DataSpecificationNavigationBackend.Model;
+﻿namespace DataSpecificationNavigationBackend.Model;
 
 public class Conversation
 {
@@ -13,47 +8,38 @@ public class Conversation
 
 	public DateTime LastUpdated { get; set; }
 
-	public required virtual DataSpecification DataSpecification { get; set; }
+	public virtual required DataSpecification DataSpecification { get; set; }
 
-	// !Important: Always retrieve the messages sorted by their timestamps.
-	public virtual List<Message> Messages { get; set; } = [];
-
-	public string SubstructureJsonString { get; set; } = string.Empty; // Temporary solution using an string property
-
-	[NotMapped]
-	public DataSpecificationSubstructure DataSpecificationSubstructure
+	// Messages are ordered by Timestamp, so the most recent message is last.
+	private List<Message> _messages = [];
+	public virtual List<Message> Messages
 	{
-		get
-		{
-			if (string.IsNullOrEmpty(SubstructureJsonString))
-				return new DataSpecificationSubstructure();
-
-			DataSpecificationSubstructure? substructure = JsonSerializer.Deserialize<DataSpecificationSubstructure>(SubstructureJsonString);
-			if (substructure is null)
-			{
-				return new DataSpecificationSubstructure();
-			}
-			else
-			{
-				return substructure;
-			}
-		}
-
-		set
-		{
-			JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
-			{
-				Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-				WriteIndented = true
-			};
-			SubstructureJsonString = JsonSerializer.Serialize(value, serializerOptions);
-		}
+		get => _messages.ToList(); // Return a copy to avoid external modification.
+		set => _messages = value
+			.OrderBy(m => m.Timestamp)
+			.ToList();
 	}
 
-	/// <summary>
-	/// IRIs of the items that user has selected for question expansion.
-	/// </summary>
-	public List<string> UserSelectedItems { get; set; } = [];
+	// DataSpecificationSubstructure
+
+	public List<string> UserSelectedItems { get; set; } = []; // IRIs of items.
 
 	public string? SuggestedMessage { get; set; }
+
+	public void AddMessage(Message message)
+	{
+		ArgumentNullException.ThrowIfNull(message);
+
+		message.Conversation = this; // Ensure the message knows its conversation. But this is not strictly necessary.
+		if (_messages.Count > 0)
+		{
+			Message lastMessage = _messages.Last();
+			if (lastMessage.Timestamp > message.Timestamp)
+			{
+				throw new ArgumentException("Message timestamp must be greater than the last message's timestamp.");
+			}
+		}
+		_messages.Add(message);
+		LastUpdated = message.Timestamp;
+	}
 }
