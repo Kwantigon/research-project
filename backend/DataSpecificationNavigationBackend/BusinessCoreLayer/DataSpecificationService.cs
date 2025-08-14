@@ -3,8 +3,6 @@ using DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigationBackend.ConnectorsLayer;
 using DataSpecificationNavigationBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigationBackend.Model;
-using Microsoft.EntityFrameworkCore;
-using VDS.RDF;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer;
 
@@ -12,368 +10,193 @@ public class DataSpecificationService(
 	ILogger<DataSpecificationService> logger,
 	IDataspecerConnector dataspecerConnector,
 	IRdfProcessor rdfProcessor,
-	AppDbContext appDbContext,
-	ILlmConnector llmConnector) : IDataSpecificationService
+	AppDbContext appDbContext) : IDataSpecificationService
 {
 	private readonly ILogger<DataSpecificationService> _logger = logger;
 	private readonly IDataspecerConnector _dataspecerConnector = dataspecerConnector;
 	private readonly IRdfProcessor _rdfProcessor = rdfProcessor;
 	private readonly AppDbContext _database = appDbContext;
-	private readonly ILlmConnector _llmConnector = llmConnector;
 
 	public async Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName)
 	{
-		string? dsv = await _dataspecerConnector.ExportPackageDocumentation(dataspecerPackageUuid);
+		string? dsv = await _dataspecerConnector.ExportDsvFileFromPackage(dataspecerPackageUuid);
+		string? owl;
 		if (string.IsNullOrEmpty(dsv))
 		{
-			_logger.LogError("The exported package DSV is either null or empty.");
-			return null;
+			_logger.LogError("Failed to export the DSV file from Dataspecer.");
+			owl = await _dataspecerConnector.ExportOwlFileFromPackage(dataspecerPackageUuid);
+			if (string.IsNullOrEmpty(owl))
+			{
+				_logger.LogError("Failed to export the DSV file and the OWL file from Dataspecer.");
+				return null;
+			}
 		}
-		_logger.LogDebug("Exported DSV:\n{Content}", dsv);
+		else
+		{
+			_logger.LogTrace("Converting DSV to OWL.");
+			owl = _rdfProcessor.ConvertDsvGraphToOwlGraph(dsv);
+		}
 
-		IGraph dsvGraph = _rdfProcessor.CreateGraphFromRdfString(dsv);
-		_logger.LogTrace("Converting the DSV to OWL.");
-		IGraph owlGraph = _rdfProcessor.ConvertDsvGraphToOwlGraph(dsvGraph, out List<DataSpecificationItem> extractedItems);
-		string owl = _rdfProcessor.WriteGraphToString(owlGraph);
-
-		_logger.LogDebug(owl);
 		DataSpecification dataSpecification = new DataSpecification()
 		{
-			DataspecerPackageUuid = dataspecerPackageUuid,
 			Name = dataspecerPackageName,
-			Owl = owl,
+			DataspecerPackageUuid = dataspecerPackageUuid,
+			OwlContent = owl
 		};
-		await _database.DataSpecifications.AddAsync(dataSpecification);
-
-		// Validate and store items.
-		foreach (var item in extractedItems)
+		_logger.LogTrace("Extracting data specification items from the OWL graph.");
+		List<ItemInfoFromGraph> items = _rdfProcessor.ExtractDataSpecificationItemsFromOwl(owl);
+		if (items.Count == 0)
 		{
-			if (string.IsNullOrEmpty(item.Iri))
+			_logger.LogError("No data specification items found in the OWL graph.");
+			return null;
+		}
+		List<ItemInfoFromGraph> classes = [];
+		List<ItemInfoFromGraph> properties = [];
+		// Split items into classes and properties.
+		foreach (ItemInfoFromGraph item in items)
+		{
+			if (item.Type is ItemType.Class)
+				classes.Add(item);
+			else
+				properties.Add(item);
+		}
+
+		// Validate extracted items and create DataSpecificationItem objects from them.
+		Dictionary<string, ClassItem> classItemsMap = [];
+		List<DataSpecificationItem> itemsToAddToDb = [];
+
+		// First, create all classes.
+		// I will need them later for domain and range references of properties.
+		foreach (ItemInfoFromGraph clazz in classes)
+		{
+			if (clazz.Iri is null)
 			{
-				_logger.LogError("Extracted item does not have an iri: {Item}", item);
+				_logger.LogError("Class item from OWL graph has no IRI.");
 				continue;
 			}
 
-			if (string.IsNullOrEmpty(item.Label))
+			if (clazz.Label is null)
 			{
-				_logger.LogWarning("Extracted item {Iri} does not have a label.", item.Iri);
 				// Failed to retrieve the label during DSV to OWL conversion.
-				// Use the item's iri as label (but only the fragment part).
-				string iriFragment = new Uri(item.Iri).Fragment.Substring(1); // The first character is '#' so I don't want that.
+				// Use the iri as label (but only the fragment part).
+				_logger.LogWarning("Class item from OWL graph has no label. Using IRI fragment as label.");
+				string iriFragment = new Uri(clazz.Iri).Fragment.Substring(1); // The first character is '#' so I don't want that.
 				iriFragment = Uri.UnescapeDataString(iriFragment);
 				iriFragment.Replace('-', ' ');
-				item.Label = iriFragment;
+				clazz.Label = iriFragment;
 			}
-			item.DataSpecificationId = dataSpecification.Id;
-			item.DataSpecification = dataSpecification;
 
-			if (item.Type is not ItemType.Class)
+			if (classItemsMap.ContainsKey(clazz.Iri))
 			{
-				if (item.DomainItemIri is null)
-				{
-					_logger.LogError("Extracted a property with null domain.");
-					continue;
-				}
-				if (item.RangeItemIri is null)
-				{
-					_logger.LogError("Extracted a property with null range");
-					continue;
-				}
+				_logger.LogWarning("Class with IRI {Iri} already exists in the classItemsMap. Skipping.", clazz.Iri);
+				continue;
 			}
-			await _database.DataSpecificationItems.AddAsync(item);
+
+			ClassItem classItem = new()
+			{
+				Iri = clazz.Iri,
+				Label = clazz.Label,
+				DataSpecificationId = dataSpecification.Id,
+				DataSpecification = dataSpecification
+			};
+			classItemsMap.Add(clazz.Iri, classItem);
+			itemsToAddToDb.Add(classItem);
+			_logger.LogTrace("Added class item with IRI {Iri} and label \"{Label}\" to the items to add to the database.", clazz.Iri, clazz.Label);
 		}
 
-		//await _database.DataSpecificationItems.AddRangeAsync(extractedItems);
+		// Create properties.
+		foreach (ItemInfoFromGraph property in properties)
+		{
+			if (property.Iri is null)
+			{
+				_logger.LogError("Property item from OWL graph has no IRI.");
+				continue;
+			}
+
+			if (property.Label is null)
+			{
+				// Failed to retrieve the label during DSV to OWL conversion.
+				// Use the iri as label (but only the fragment part).
+				_logger.LogWarning("Property item from OWL graph has no label. Using IRI fragment as label.");
+				string iriFragment = new Uri(property.Iri).Fragment.Substring(1); // The first character is '#' so I don't want that.
+				iriFragment = Uri.UnescapeDataString(iriFragment);
+				iriFragment.Replace('-', ' ');
+				property.Label = iriFragment;
+			}
+
+			if (property.DomainIri is null || property.RangeIri is null)
+			{
+				// Both object and datatype properties must have domain and range.
+				_logger.LogError("Property item from OWL graph has either no domain or no range IRI.");
+				continue;
+			}
+
+			if (property.Type is ItemType.ObjectProperty)
+			{
+				if (classItemsMap.TryGetValue(property.DomainIri, out ClassItem? domainItem) &&
+						classItemsMap.TryGetValue(property.RangeIri, out ClassItem? rangeItem))
+				{
+					ObjectPropertyItem objectProperty = new()
+					{
+						Iri = property.Iri,
+						Label = property.Label,
+						DomainIri = domainItem.Iri,
+						Domain = domainItem,
+						RangeIri = rangeItem.Iri,
+						Range = rangeItem,
+						DataSpecificationId = dataSpecification.Id,
+						DataSpecification = dataSpecification
+					};
+					itemsToAddToDb.Add(objectProperty);
+				}
+				else // Domain or range (or both) not found in the classItemsMap.
+				{
+					_logger.LogError("Object property with IRI {Iri} has domain or range that is not present in the classItemsMap. Skipping.", property.Iri);
+					_logger.LogError("Domain IRI: {DomainIri}, Range IRI: {RangeIri}", property.DomainIri, property.RangeIri);
+					continue;
+				}
+			}
+
+			if (property.Type is ItemType.DatatypeProperty)
+			{
+				if (classItemsMap.TryGetValue(property.DomainIri, out ClassItem? domainItem))
+				{
+					DatatypePropertyItem datatypeProperty = new()
+					{
+						Iri = property.Iri,
+						Label = property.Label,
+						DomainIri = domainItem.Iri,
+						Domain = domainItem,
+						RangeDatatypeIri = property.RangeIri,
+						DataSpecificationId = dataSpecification.Id,
+						DataSpecification = dataSpecification
+					};
+					itemsToAddToDb.Add(datatypeProperty);
+				}
+				else // Domain item not found.
+				{
+					_logger.LogError("Datatype property with IRI {Iri} has domain that is not present in the classItemsMap. Skipping.", property.Iri);
+					continue;
+				}
+			}
+		}
+
+		await _database.DataSpecifications.AddAsync(dataSpecification);
+		await _database.DataSpecificationItems.AddRangeAsync(itemsToAddToDb);
 		await _database.SaveChangesAsync();
 		return dataSpecification;
 	}
-
-	public async Task<DataSpecification?> GetDataSpecificationAsync(int dataSpecificationId)
-	{
-		return await _database.DataSpecifications.SingleOrDefaultAsync(dataSpec => dataSpec.Id == dataSpecificationId);
-	}
-
-	public async Task<DataSpecificationItem?> GetDataSpecificationItemAsync(int dataSpecificationId, string itemIri)
-	{
-		return await _database.DataSpecificationItems.SingleOrDefaultAsync(item => item.DataSpecificationId == dataSpecificationId && item.Iri == itemIri);
-	}
-
-	public async Task GenerateItemSummaryAsync(DataSpecificationItem item)
-	{
-		if (item.Summary != null)
-		{
-			_logger.LogInformation("Item summary already exists. It will not be generated again.");
-			return;
-		}
-
-		_logger.LogTrace("Generating a summary for item [IRI={Iri}, Label={Label}].", item.Iri, item.Label);
-		string summary = await _llmConnector.GenerateItemSummaryAsync(item);
-		_logger.LogTrace("Summary generated successfully: {Summary}", summary);
-
-		_logger.LogTrace("Setting the item.Summary property and saving to database.");
-		item.Summary = summary;
-		await _database.SaveChangesAsync();
-	}
 }
 
-internal class DsvToOwlConverter
+public record ItemInfoFromGraph
 {
-	private const string DSV_CLASS_PROFILE = "https://w3id.org/dsv#ClassProfile";
-	private const string DSV_OBJECT_PROPERTY_PROFILE = "https://w3id.org/dsv#ObjectPropertyProfile";
-	private const string DSV_OBJECT_PROPERTY_RANGE = "https://w3id.org/dsv#objectPropertyRange";
-	private const string DSV_DATATYPE_PROPERTY_PROFILE = "https://w3id.org/dsv#DatatypePropertyProfile";
-	private const string DSV_DATATYPE_PROPERTY_RANGE = "https://w3id.org/dsv#datatypePropertyRange";
-	private const string DSV_DOMAIN = "https://w3id.org/dsv#domain";
-	private const string DSV_REUSES_PROPERTY_VALUE = "https://w3id.org/dsv#reusesPropertyValue";
-	private const string DSV_REUSED_PROPERTY = "https://w3id.org/dsv#reusedProperty";
-	private const string DSV_REUSED_FROM_RESOURCE = "https://w3id.org/dsv#reusedFromResource";
-	private const string DSV_CARDINALITY = "https://w3id.org/dsv#cardinality";
-	private const string SKOS_PREF_LABEL = "http://www.w3.org/2004/02/skos/core#prefLabel";
-	private const string SKOS_PREF_DEFINITION = "http://www.w3.org/2004/02/skos/core#definition";
-	private const string CARDINALITY_1N = "https://w3id.org/dsv/cardinality#1n";
-	private const string CARDINALITY_11 = "https://w3id.org/dsv/cardinality#11";
-	private const string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
-	private const string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
+	internal string? Iri { get; set; }
 
-	internal IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph, out List<DataSpecificationItem> extractedItems)
-	{
-		IGraph owlGraph = new Graph();
-		owlGraph.NamespaceMap.Import(dsvGraph.NamespaceMap);
+	internal string? Label { get; set; }
 
-		Dictionary<string, DataSpecificationItem> itemsMap = new();
-		foreach (Triple dsvTriple in dsvGraph.Triples)
-		{
-			INode subjectNode = dsvTriple.Subject;
-			INode predicateNode = dsvTriple.Predicate;
-			INode objectNode = dsvTriple.Object;
+	internal ItemType? Type { get; set; }
 
-			// Rules to transform nodes to OWL
-			if (objectNode.NodeType is NodeType.Uri)
-			{
-				string objectUri = ((UriNode)objectNode).Uri.ToSafeString();
+	internal string? DomainIri { get; set; }
 
-				if (objectUri == DSV_CLASS_PROFILE)
-				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.Class;
-				}
-
-				if (objectUri == DSV_OBJECT_PROPERTY_PROFILE)
-				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.ObjectProperty;
-				}
-
-				if (objectUri == DSV_DATATYPE_PROPERTY_PROFILE)
-				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.DatatypeProperty;
-				}
-			}
-
-			if (predicateNode.NodeType is NodeType.Uri)
-			{
-				string predicateUri = ((UriNode)predicateNode).Uri.ToSafeString();
-
-				if (predicateUri == DSV_DOMAIN)
-				{
-					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:domain"), objectNode));
-
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					string domainIri = ((UriNode)objectNode).ToString();
-					dsi.DomainItemIri = Uri.UnescapeDataString(domainIri);
-				}
-
-				if (predicateUri == DSV_DATATYPE_PROPERTY_RANGE || predicateUri == DSV_OBJECT_PROPERTY_RANGE)
-				{
-					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:range"), objectNode));
-
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					string rangeIri = ((UriNode)objectNode).ToString();
-					dsi.RangeItemIri = Uri.UnescapeDataString(rangeIri);
-				}
-
-				if (predicateUri == DSV_REUSES_PROPERTY_VALUE)
-				{
-					IEnumerable<Triple> reuseInfoTriples = dsvGraph.GetTriplesWithSubject(objectNode);
-					INode? reusedPropertyNode = null; // usually it's either skos:prefLabel or skos:definition.
-					INode? reusedFromResourceNode = null;
-					foreach (Triple reuseTriple in reuseInfoTriples)
-					{
-						if (reuseTriple.Predicate.NodeType == NodeType.Uri)
-						{
-							string uri = ((UriNode)reuseTriple.Predicate).Uri.ToSafeString();
-							if (uri == DSV_REUSED_PROPERTY)
-							{
-								reusedPropertyNode = reuseTriple.Object;
-							}
-							if (uri == DSV_REUSED_FROM_RESOURCE)
-							{
-								reusedFromResourceNode = reuseTriple.Object;
-							}
-						}
-					}
-
-					if (reusedPropertyNode == null || reusedFromResourceNode == null)
-					{
-						// To do: log error.
-						continue;
-						//throw new Exception("reusedPropertyNode or reusedResourceNode was null.");
-					}
-					else if (reusedPropertyNode.NodeType != NodeType.Uri || reusedFromResourceNode.NodeType != NodeType.Uri)
-					{
-						// To do: log error.
-						continue;
-						throw new Exception("reusedPropertyNode or reusedResourceNode is not of type URI.");
-					}
-
-					IGraph reusedResourceGraph = new Graph();
-					string reusedResourceUri = ((UriNode)reusedFromResourceNode).Uri.ToSafeString();
-					if (reusedResourceUri.StartsWith("https://slovník.gov.cz"))
-					{
-						/*
-						 * https://slovník.gov.cz endpoint does not return turtle.
-						 * The turtle endpoint is https://xn--slovnk-7va.gov.cz/sparql?query=define%20sql%3Adescribe-mode%20%22CBD%22%20%20DESCRIBE%20%3C...........%3E&output=text%2Fturtle
-						 */
-						reusedResourceGraph.LoadFromUri(GetSlovnikGovRdfEndpointUri(reusedResourceUri));
-					}
-					else
-					{
-						reusedResourceGraph.LoadFromUri(new Uri(reusedResourceUri));
-					}
-
-					IUriNode? uriNodeToLookFor = reusedResourceGraph.GetUriNode(((UriNode)reusedPropertyNode).Uri);
-					if (uriNodeToLookFor is not null)
-					{
-						Triple? reusedPropertyTriple = reusedResourceGraph.GetTriplesWithPredicate(uriNodeToLookFor).FirstOrDefault();
-						if (reusedPropertyTriple is not null)
-						{
-							if (reusedPropertyTriple is not null)
-							{
-								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_LABEL)
-								{
-									string label = ((LiteralNode)reusedPropertyTriple.Object).Value;
-									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("rdfs:label"), owlGraph.CreateLiteralNode(label));
-									string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-									subjectUri = Uri.UnescapeDataString(subjectUri);
-									itemsMap.TryGetValue(subjectUri, out var dsi);
-									if (dsi is null)
-									{
-										dsi = new DataSpecificationItem()
-										{
-											Iri = subjectUri
-										};
-										itemsMap[dsi.Iri] = dsi;
-									}
-									dsi.Label = label;
-								}
-
-								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_DEFINITION)
-								{
-									string definition = ((LiteralNode)reusedPropertyTriple.Object).Value;
-									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("owl:AnnotationProperty"), owlGraph.CreateLiteralNode(definition));
-								}
-							}
-						}
-					}
-
-				}
-
-				if (predicateUri == DSV_CARDINALITY)
-				{
-					if (objectNode.NodeType is NodeType.Uri)
-					{
-						ILiteralNode literalNode;
-						switch (((UriNode)objectNode).Uri.ToSafeString())
-						{
-							case CARDINALITY_11:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to one.", "en");
-								break;
-							case CARDINALITY_1N:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to many.", "en");
-								break;
-							case CARDINALITY_0N:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to many.", "en");
-								break;
-							case CARDINALITY_01:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to one.", "en");
-								break;
-							default:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality is not specified.", "en");
-								break;
-						}
-						owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:comment"), literalNode));
-					}
-				}
-			}
-		}
-
-		extractedItems = itemsMap.Select(pair => pair.Value).ToList();
-		return owlGraph;
-	}
-
-	private Uri GetSlovnikGovRdfEndpointUri(string resourceUri)
-	{
-		// reusedResourceUri is already escaped because the UriNode returns and escaped string.
-		// string escaped = Uri.EscapeDataString(resourceUri);
-		const string SLOVNIK_GOV_URI_TEMPLATE = "https://xn--slovnk-7va.gov.cz/sparql?query=define%20sql%3Adescribe-mode%20%22CBD%22%20%20DESCRIBE%20%3C{0}%3E&output=text%2Fturtle";
-		string uri = string.Format(SLOVNIK_GOV_URI_TEMPLATE, resourceUri);
-		return new Uri(uri);
-	}
+	internal string? RangeIri { get; set; }
 }

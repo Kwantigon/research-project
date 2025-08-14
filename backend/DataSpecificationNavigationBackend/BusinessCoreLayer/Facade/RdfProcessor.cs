@@ -1,12 +1,10 @@
 ﻿using DataSpecificationNavigationBackend.Model;
 using VDS.RDF;
-using VDS.RDF.Parsing;
 using VDS.RDF.Writing;
 
 namespace DataSpecificationNavigationBackend.BusinessCoreLayer.Facade;
 
-public class RdfProcessor(
-	ILogger<RdfProcessor> logger) : IRdfProcessor
+public class RdfProcessor : IRdfProcessor
 {
 	private const string DSV_CLASS_PROFILE = "https://w3id.org/dsv#ClassProfile";
 	private const string DSV_OBJECT_PROPERTY_PROFILE = "https://w3id.org/dsv#ObjectPropertyProfile";
@@ -25,28 +23,19 @@ public class RdfProcessor(
 	private const string CARDINALITY_0N = "https://w3id.org/dsv/cardinality#0n";
 	private const string CARDINALITY_01 = "https://w3id.org/dsv/cardinality#01";
 
-	private readonly ILogger<RdfProcessor> _logger = logger;
+	private const string RDFS_DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain";
+	private const string RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range";
+	private const string RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label";
+	private const string OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
+	private const string OWL_OBJECT_PROPERTY = "http://www.w3.org/2002/07/owl#ObjectProperty";
+	private const string OWL_DATATYPE_PROPERTY = "http://www.w3.org/2002/07/owl#DatatypeProperty";
 
-	public IGraph CreateGraphFromRdfString(string rdfString)
+	public string ConvertDsvGraphToOwlGraph(string dsv)
 	{
-		IGraph graph = new Graph();
-		StringParser.Parse(graph, rdfString);
-		return graph;
-	}
-
-	public string WriteGraphToString(IGraph graph)
-	{
-		IRdfWriter rdfWriter = new CompressingTurtleWriter();
-		string rdfTurtle = VDS.RDF.Writing.StringWriter.Write(graph, rdfWriter);
-		return rdfTurtle;
-	}
-
-	public IGraph ConvertDsvGraphToOwlGraph(IGraph dsvGraph, out List<DataSpecificationItem> extractedItems)
-	{
+		IGraph dsvGraph = ParseGraphFromString(dsv);
 		IGraph owlGraph = new Graph();
 		owlGraph.NamespaceMap.Import(dsvGraph.NamespaceMap);
 
-		Dictionary<string, DataSpecificationItem> itemsMap = new();
 		foreach (Triple dsvTriple in dsvGraph.Triples)
 		{
 			INode subjectNode = dsvTriple.Subject;
@@ -56,115 +45,51 @@ public class RdfProcessor(
 			// Rules to transform nodes to OWL
 			if (objectNode.NodeType is NodeType.Uri)
 			{
-				string objectUri = ((UriNode)objectNode).Uri.ToSafeString();
+				string objectUri = ((UriNode)objectNode).Uri.ToString();
 
 				if (objectUri == DSV_CLASS_PROFILE)
 				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdfs:Class")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:Class")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.Class;
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("rdfs:Class")));
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("owl:Class")));
 				}
 
 				if (objectUri == DSV_OBJECT_PROPERTY_PROFILE)
 				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:ObjectProperty")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.ObjectProperty;
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("rdf:Property")));
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("owl:ObjectProperty")));
 				}
 
 				if (objectUri == DSV_DATATYPE_PROPERTY_PROFILE)
 				{
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("rdf:Property")));
-					owlGraph.Assert(new Triple(subjectNode, predicateNode, dsvGraph.CreateUriNode("owl:DatatypeProperty")));
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					dsi.Type = ItemType.DatatypeProperty;
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("rdf:Property")));
+					owlGraph.Assert(new Triple(subjectNode, predicateNode, owlGraph.CreateUriNode("owl:DatatypeProperty")));
 				}
 			}
 
 			if (predicateNode.NodeType is NodeType.Uri)
 			{
-				string predicateUri = ((UriNode)predicateNode).Uri.ToSafeString();
+				string predicateUri = ((UriNode)predicateNode).Uri.ToString();
 
 				if (predicateUri == DSV_DOMAIN)
 				{
-					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:domain"), objectNode));
-
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					string domainIri = ((UriNode)objectNode).ToString();
-					dsi.DomainItemIri = Uri.UnescapeDataString(domainIri);
+					owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:domain"), objectNode));
 				}
 
 				if (predicateUri == DSV_DATATYPE_PROPERTY_RANGE || predicateUri == DSV_OBJECT_PROPERTY_RANGE)
 				{
-					owlGraph.Assert(new Triple(subjectNode, dsvGraph.CreateUriNode("rdfs:range"), objectNode));
-
-					string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-					subjectUri = Uri.UnescapeDataString(subjectUri);
-					itemsMap.TryGetValue(subjectUri, out var dsi);
-					if (dsi is null)
-					{
-						dsi = new DataSpecificationItem()
-						{
-							Iri = subjectUri
-						};
-						itemsMap[dsi.Iri] = dsi;
-					}
-					string rangeIri = ((UriNode)objectNode).ToString();
-					dsi.RangeItemIri = Uri.UnescapeDataString(rangeIri);
+					owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:range"), objectNode));
 				}
 
 				if (predicateUri == DSV_REUSES_PROPERTY_VALUE)
 				{
-					IEnumerable<Triple> reuseInfoTriples = dsvGraph.GetTriplesWithSubject(objectNode);
+					IEnumerable<Triple> reuseTriples = dsvGraph.GetTriplesWithSubject(objectNode);
 					INode? reusedPropertyNode = null; // usually it's either skos:prefLabel or skos:definition.
 					INode? reusedFromResourceNode = null;
-					foreach (Triple reuseTriple in reuseInfoTriples)
+					foreach (Triple reuseTriple in reuseTriples)
 					{
 						if (reuseTriple.Predicate.NodeType == NodeType.Uri)
 						{
-							string uri = ((UriNode)reuseTriple.Predicate).Uri.ToSafeString();
+							string uri = ((UriNode)reuseTriple.Predicate).Uri.ToString();
 							if (uri == DSV_REUSED_PROPERTY)
 							{
 								reusedPropertyNode = reuseTriple.Object;
@@ -178,17 +103,17 @@ public class RdfProcessor(
 
 					if (reusedPropertyNode == null || reusedFromResourceNode == null)
 					{
-						_logger.LogError("Either `reusedPropertyNode` or `reusedFromResourceNode` is null.");
+						//_logger.LogError("Either `reusedPropertyNode` or `reusedFromResourceNode` is null.");
 						continue;
 					}
 					else if (reusedPropertyNode.NodeType != NodeType.Uri || reusedFromResourceNode.NodeType != NodeType.Uri)
 					{
-						_logger.LogError("Either reusedPropertyNode or reusedFromResourceNode is not of NodeType.Uri");
+						//_logger.LogError("Either reusedPropertyNode or reusedFromResourceNode is not of NodeType.Uri");
 						continue;
 					}
 
 					IGraph reusedResourceGraph = new Graph();
-					string reusedResourceUri = ((UriNode)reusedFromResourceNode).Uri.ToSafeString();
+					string reusedResourceUri = ((UriNode)reusedFromResourceNode).Uri.ToString();
 					if (reusedResourceUri.StartsWith("https://slovník.gov.cz"))
 					{
 						/*
@@ -208,68 +133,175 @@ public class RdfProcessor(
 						Triple? reusedPropertyTriple = reusedResourceGraph.GetTriplesWithPredicate(uriNodeToLookFor).FirstOrDefault();
 						if (reusedPropertyTriple is not null)
 						{
-							if (reusedPropertyTriple is not null)
+							if (uriNodeToLookFor.Uri.ToString() == SKOS_PREF_LABEL)
 							{
-								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_LABEL)
-								{
-									string label = ((LiteralNode)reusedPropertyTriple.Object).Value;
-									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("rdfs:label"), owlGraph.CreateLiteralNode(label));
-									string subjectUri = ((UriNode)subjectNode).Uri.ToSafeString();
-									subjectUri = Uri.UnescapeDataString(subjectUri);
-									itemsMap.TryGetValue(subjectUri, out var dsi);
-									if (dsi is null)
-									{
-										dsi = new DataSpecificationItem()
-										{
-											Iri = subjectUri
-										};
-										itemsMap[dsi.Iri] = dsi;
-									}
-									dsi.Label = label;
-								}
-
-								if (uriNodeToLookFor.Uri.ToSafeString() == SKOS_PREF_DEFINITION)
-								{
-									string definition = ((LiteralNode)reusedPropertyTriple.Object).Value;
-									owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("owl:AnnotationProperty"), owlGraph.CreateLiteralNode(definition));
-								}
+								string label = ((LiteralNode)reusedPropertyTriple.Object).Value;
+								owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("rdfs:label"), owlGraph.CreateLiteralNode(label));
+							}
+							if (uriNodeToLookFor.Uri.ToString() == SKOS_PREF_DEFINITION)
+							{
+								string definition = ((LiteralNode)reusedPropertyTriple.Object).Value;
+								owlGraph.Assert(subjectNode, owlGraph.CreateUriNode("owl:AnnotationProperty"), owlGraph.CreateLiteralNode(definition));
 							}
 						}
 					}
 
-				}
-
-				if (predicateUri == DSV_CARDINALITY)
-				{
-					if (objectNode.NodeType is NodeType.Uri)
+					if (predicateUri == DSV_CARDINALITY)
 					{
-						ILiteralNode literalNode;
-						switch (((UriNode)objectNode).Uri.ToSafeString())
+						if (objectNode.NodeType is NodeType.Uri)
 						{
-							case CARDINALITY_11:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to one.", "en");
-								break;
-							case CARDINALITY_1N:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to many.", "en");
-								break;
-							case CARDINALITY_0N:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to many.", "en");
-								break;
-							case CARDINALITY_01:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to one.", "en");
-								break;
-							default:
-								literalNode = owlGraph.CreateLiteralNode("Cardinality is not specified.", "en");
-								break;
+							ILiteralNode literalNode;
+							switch (((UriNode)objectNode).Uri.ToString())
+							{
+								case CARDINALITY_11:
+									literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to one.", "en");
+									break;
+								case CARDINALITY_1N:
+									literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is one to many.", "en");
+									break;
+								case CARDINALITY_0N:
+									literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to many.", "en");
+									break;
+								case CARDINALITY_01:
+									literalNode = owlGraph.CreateLiteralNode("Cardinality of the property is zero to one.", "en");
+									break;
+								default:
+									literalNode = owlGraph.CreateLiteralNode("Cardinality is not specified.", "en");
+									break;
+							}
+							owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:comment"), literalNode));
 						}
-						owlGraph.Assert(new Triple(subjectNode, owlGraph.CreateUriNode("rdfs:comment"), literalNode));
 					}
 				}
 			}
 		}
 
-		extractedItems = itemsMap.Select(pair => pair.Value).ToList();
-		return owlGraph;
+		string owl = WriteGraphToString(owlGraph);
+		return owl;
+	}
+
+	public List<ItemInfoFromGraph> ExtractDataSpecificationItemsFromOwl(string owl)
+	{
+		IGraph owlGraph = ParseGraphFromString(owl);
+		Dictionary<string, ItemInfoFromGraph> itemsMap = new();
+		foreach (Triple triple in owlGraph.Triples)
+		{
+			INode subjectNode = triple.Subject;
+			INode predicateNode = triple.Predicate;
+			INode objectNode = triple.Object;
+
+			if (subjectNode.NodeType is NodeType.Uri)
+			{
+				string subjectUri = ((UriNode)subjectNode).Uri.ToString();
+
+				if (predicateNode.NodeType is NodeType.Uri)
+				{
+					string predicateUri = ((UriNode)predicateNode).Uri.ToString();
+
+					if (predicateUri == RDFS_LABEL)
+					{
+						string label = ((LiteralNode)objectNode).Value;
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.Label = label;
+					}
+
+					if (predicateUri == RDFS_DOMAIN)
+					{
+						string objectUri = ((UriNode)objectNode).Uri.ToString();
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.DomainIri = objectUri;
+					}
+
+					if (predicateUri == RDFS_RANGE)
+					{
+						string objectUri = ((UriNode)objectNode).Uri.ToString();
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.RangeIri = objectUri;
+					}
+				}
+
+				if (objectNode.NodeType is NodeType.Uri)
+				{
+					string objectUri = ((UriNode)objectNode).Uri.ToString();
+
+					if (objectUri == OWL_CLASS)
+					{
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.Type = ItemType.Class;
+					}
+
+					if (objectUri == OWL_OBJECT_PROPERTY)
+					{
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.Type = ItemType.ObjectProperty;
+					}
+
+					if (objectUri == OWL_DATATYPE_PROPERTY)
+					{
+						itemsMap.TryGetValue(subjectUri, out ItemInfoFromGraph? itemInfo);
+						if (itemInfo is null)
+						{
+							itemInfo = new ItemInfoFromGraph();
+							itemInfo.Iri = subjectUri;
+							itemsMap.Add(itemInfo.Iri, itemInfo);
+						}
+						itemInfo.Type = ItemType.DatatypeProperty;
+					}
+				}
+			}
+		}
+
+		return itemsMap.Select(pair => pair.Value).ToList();
+	}
+
+	private IGraph ParseGraphFromString(string rdfString)
+	{
+		/*
+		 * Parsing directly from string doesn't work well with the RDF files from Dataspecer.
+		 * I'll save into a file and then parse from file. That seems to always work.
+		 */
+		const string rdfFile = "./rdf-content.ttl";
+		File.WriteAllText(rdfFile, rdfString);
+		IGraph graph = new Graph();
+		graph.LoadFromFile(rdfFile);
+		return graph;
+	}
+
+	private string WriteGraphToString(IGraph graph)
+	{
+		IRdfWriter rdfWriter = new CompressingTurtleWriter();
+		string rdfTurtle = VDS.RDF.Writing.StringWriter.Write(graph, rdfWriter);
+		return rdfTurtle;
 	}
 
 	private Uri GetSlovnikGovRdfEndpointUri(string resourceUri)

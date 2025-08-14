@@ -12,41 +12,42 @@ public class DataspecerConnector(
 	private readonly HttpClient _httpClient = new HttpClient();
 	private readonly ILogger<DataspecerConnector> _logger = logger;
 
-	public async Task<string?> ExportPackageDocumentation(string packageIri)
+	public async Task<string?> ExportDsvFileFromPackage(string packageIri)
+	{
+		const string dsvPath = "en/dsv.ttl";
+		return await ExportFileFromPackage(packageIri, dsvPath);
+	}
+
+	public async Task<string?> ExportOwlFileFromPackage(string packageIri)
+	{
+		const string dsvPath = "en/model.owl.ttl";
+		return await ExportFileFromPackage(packageIri, dsvPath);
+	}
+
+	private async Task<string?> ExportFileFromPackage(string packageIri, string filePath)
 	{
 		string uri = DATASPECER_DOWNLOAD_DOCUMENTATION_ENDPOINT + packageIri;
-		_logger.LogTrace("Downloading the Dataspecer package documentation from the URI: {URI}.", uri);
 		HttpResponseMessage response = await _httpClient.GetAsync(uri);
 		if (!response.IsSuccessStatusCode)
 		{
-			_logger.LogError("Failed to download Dataspecer package documentation. Response code = {ResponseCode}", response.StatusCode);
 			string body = await response.Content.ReadAsStringAsync();
-			_logger.LogError("Response body:\n{Body}", body);
 			return null;
 		}
 		byte[] data = await response.Content.ReadAsByteArrayAsync();
 
-		/*const string zipFilePath = "./documentation.zip";
-		File.WriteAllBytes(zipFilePath, data);
-		_logger.LogTrace("Package documentation stored in the local file system.");*/
-
-		_logger.LogTrace("Opening the DSV for reading.");
-		const string dsvPath = "en/dsv.ttl";
 		using (MemoryStream zipStream = new MemoryStream(data))
 		using (ZipArchive zip = new ZipArchive(zipStream))
 		{
-			ZipArchiveEntry? dsvFile = zip.GetEntry(dsvPath);
-			if (dsvFile is null)
+			ZipArchiveEntry? file = zip.GetEntry(filePath);
+			if (file is null)
 			{
-				_logger.LogError("Could not open the DSV file with path {ZipEntryPath}.", dsvPath);
 				return null;
 			}
 
-			using (StreamReader reader = new StreamReader(dsvFile.Open()))
+			using (StreamReader reader = new StreamReader(file.Open()))
 			{
-				string dsv = reader.ReadToEnd();
-				_logger.LogTrace("Successfully read the DSV file.");
-				return dsv;
+				string fileContent = reader.ReadToEnd();
+				return fileContent;
 			}
 		}
 	}
