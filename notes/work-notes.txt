@@ -372,9 +372,7 @@ Problém s navigací v DataSpecificationItem, když chci získat RangeItem. Něk
 - Myslím, že to vyřeším tak, že si uložím jednu instanci datových typů.
 
 Problémy:
-- Item je v current context, ale je nabízen pod "more items to consider".
-- Ve sparqlu chybí property?
-Protože nové itemy nejsou uloženy do substructure.
+- Substructure se mi nepropisuje do databáze.
 
 To do:
 Zkontrolovat Sparql generation - myslím, že je správně, jenom nějak blbě přidávám do substructure, takže proto tam chyběly ty properties.
@@ -386,3 +384,54 @@ Musím se ujistit, že když user přidá property, tak
 4. Říct si o mapping to substructure.
 5. Uložit mapping a asi se můžu vrátit.
 Ještě jednou projít zpracování suggested message.
+
+To do z konzultace:
+1. Napojit zobrazení podstruktury na backend.
+2. Zkusit si to na jiné datové specifikaci.
+3. Překopat kód modelu DataSpecificationItem.
+4. Přidat primitivní filtrování - uživatel napíše ručně string, který je filtr.
+5. Pokud možno, přidat OPTIONAL filtrování.
+6. Některé packages asi nemají dsv.ttl - pak vzít owl soubor (např. 
+2997c80e-62f6-4000-ac99-95da6e2c199b). Ale musím přečíst OWL a uložit si itemy.
+
+# 14. 8.
+
+Nové stahování data specification se zdá funkční.
+- Ale pokud neexistuje dsv.tll a musím pracovat s model.owl.ttl, tak některé datatype property prostě nemají range. Nevím proč.
+- Pak ty vyhazuju a může být problém pak při práci s LLM, protože LLM mi bude vracet itemy, které nejsou v databázi.
+
+## Současné zpracování příchozí zprávy:
+1. Vytvoření user message.
+2. Vytvoření reply message.
+3. Napojení dvou zpráv na sebe.
+4. Porovnat příchozí zprávu se suggested message.
+Pokud se liší (== první zpráva nebo uživatel pozměnil zprávu)
+	5. Namapovat na data specification.
+	6. Přidat do substructure (tady se pak podívám na tu metodu, protože je taky docela dlouhá).
+Pokud se neliší
+	5. Vyhledat selected properties podle jejich iri.
+	6. Přidat properties včetně jejich domain a range do substructure.
+	7. Namapovat user message do substructure, abych měl mappings na slova.
+
+Když přijde GET request na reply, tak:
+1. Ověřit, že IsGenerated == false.
+2. Vytvořit textové zprávy pro mapping, sparql a suggested items.
+3. Přeložit substructure do Sparqlu.
+4. Získat suggestions.
+5. Controller si najde mapping a suggestions a převede do response pro front end.
+
+## Nové zpracování:
+Když rovnou nechám vygenerovat zprávu v POST nový user message, tak se nemusím starat o critical section.
+Taky to dává větší smysl než to dělat v GET.
+
+1. Vytvořit nový UserMessage.
+2. Porovnat zprávu se suggested message.
+Pokud se liší (== první zpráva nebo uživatel pozměnil zprávu):
+	5. Namapovat na data specification.
+	6. Vytvořit nový prázdný substructure.
+	7. Přidat itemy do nového substructure.
+Pokud se neliší:
+	5. Vyhledat selected properties podle jejich iri.
+	6. Říct si o mapping a předat (substructure + selected properties + domains + ranges), aby LLM mapoval jen na ty předané itemy.
+	7. Přidat itemy do současného substructure.
+

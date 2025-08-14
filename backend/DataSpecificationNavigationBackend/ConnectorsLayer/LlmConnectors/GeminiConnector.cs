@@ -46,7 +46,7 @@ public class GeminiConnector : ILlmConnector
 
 		_logger.LogTrace("Building a prompt for mapping the question to items.");
 		string prompt = _promptConstructor.BuildMapToDataSpecificationPrompt(dataSpecification, userMessage.TextContent);
-		_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
+		//_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && mapped is null)
 		{
@@ -76,7 +76,7 @@ public class GeminiConnector : ILlmConnector
 
 		_logger.LogTrace("Building a prompt for mapping the question to items.");
 		string prompt = _promptConstructor.BuildMapToSubstructurePrompt(dataSpecification, userMessage.TextContent, substructure);
-		_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
+		//_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && mapped is null)
 		{
@@ -106,7 +106,7 @@ public class GeminiConnector : ILlmConnector
 
 		_logger.LogTrace("Building a prompt for getting the related items.");
 		string prompt = _promptConstructor.BuildGetSuggestedItemsPrompt(dataSpecification, userMessage.TextContent, substructure);
-		_logger.LogDebug("Get related items prompt:\n{Prompt}", prompt);
+		//_logger.LogDebug("Get related items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && suggestedItems is null)
 		{
@@ -136,7 +136,7 @@ public class GeminiConnector : ILlmConnector
 	{
 		_logger.LogTrace("Building a prompt for the suggested message.");
 		string prompt = _promptConstructor.BuildGenerateSuggestedMessagePrompt(dataSpecification, userMessage.TextContent, substructure, selectedItems);
-		_logger.LogDebug("Generate suggested message:\n{Prompt}", prompt);
+		//_logger.LogDebug("Generate suggested message:\n{Prompt}", prompt);
 
 		_logger.LogTrace("Prompting the LLM.");
 		string response = await SendPromptAsync(prompt);

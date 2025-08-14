@@ -438,11 +438,13 @@ function ConversationPageMock() {
 	const [mostRecentReplyMessageId, setMostRecentReplyMessageId] = useState<string | null>(null);
 	const [summaryError, setSummaryError] = useState<string | null>(null);
 	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
-	const [isWaitingForBackend, setIsWaitingForBackend] = useState<boolean>(false);
+	const [isWaitingForReplyMessage, setIsWaitingForReplyMessage] = useState<boolean>(false);
 	const [isSubstructureDialogOpen, setIsSubstructureDialogOpen] = useState<boolean>(false);
   const [dataSubstructure, setDataSubstructure] = useState<DataSpecificationSubstructure | null>(mockSubstructure);
   const [isSubstructureLoading, setIsSubstructureLoading] = useState<boolean>(false);
   const [substructureError, setSubstructureError] = useState<string | null>(null);
+
+	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
 
 	const fetchMessages = async () => {
 		setIsFetchingMessages(false);
@@ -484,7 +486,7 @@ function ConversationPageMock() {
 		setMostRecentUserMessage(messageToSend);
 
 		try {
-			setIsWaitingForBackend(true);
+			setIsWaitingForReplyMessage(true);
 			const requestBody = JSON.stringify(
 					{
 						textValue: userMessage.text,
@@ -537,7 +539,7 @@ function ConversationPageMock() {
 				}
 			]);
 		} finally {
-			setIsWaitingForBackend(false);
+			setIsWaitingForReplyMessage(false);
 		}
 	};
 
@@ -580,6 +582,8 @@ function ConversationPageMock() {
 			const updatedSelectedItems = [...selectedItemsForExpansion, selectedItemForSummary.item];
 			setSelectedItemsForExpansion(updatedSelectedItems);
 			setIsSummaryDialogOpen(false);
+
+			//setIsFetchingSuggestedMessage(true);
 
 			// Call back end API to get the suggested message.
 			/*fetch(`${BACKEND_API_URL}/conversations/${conversationId}/user-selected-items`, {
@@ -787,7 +791,7 @@ function ConversationPageMock() {
 						</Card>
 					</div>
 				)))}
-        {isWaitingForBackend && (
+        {isWaitingForReplyMessage && (
           <div className="flex justify-start">
             <Card className="bg-gray-100 max-w-2xl">
               <CardContent className="p-3">
@@ -800,13 +804,28 @@ function ConversationPageMock() {
         )}
 			</div>
 
-			{suggestedMessage && (
+			{isFetchingSuggestedMessage ? (
+        <Card className="mt-4 p-3 flex justify-center items-center h-16 bg-yellow-50 border-yellow-200">
+          <CardContent>
+						<div className="h-8 w-8 rounded-full border-4 border-gray-300 border-t-yellow-500 animate-spin mr-2"></div>
+          	<p className="text-sm font-medium">Generating a suggested message...</p>
+					</CardContent>
+        </Card>
+      ) : suggestedMessage && (
+        <Card className="mt-4 p-3 bg-yellow-50 border-yellow-200">
+          <CardContent className="p-0">
+            <p className="text-sm font-medium">Suggested message: {suggestedMessage}</p>
+          </CardContent>
+        </Card>
+      )}
+
+			{/*suggestedMessage && (
 				<Card className="mt-4 p-3 bg-yellow-50 border-yellow-200">
 					<CardContent className="p-0">
 						<p className="text-sm font-medium">Suggested message: {suggestedMessage}</p>
 					</CardContent>
 				</Card>
-			)}
+			)*/}
 
 			{mostRecentUserMessage && (
         <Card className="mt-4 p-3 bg-blue-50 border-blue-200">
@@ -827,10 +846,10 @@ function ConversationPageMock() {
 						}
 					}}
 				/>
-				<Button onClick={handleSendMessage} disabled={isWaitingForBackend}>SEND</Button>
+				<Button onClick={handleSendMessage} disabled={isWaitingForReplyMessage}>SEND</Button>
 				<Button 
           onClick={() => setIsSubstructureDialogOpen(true)} 
-          disabled={isFetchingMessages || isWaitingForBackend}
+          disabled={isFetchingMessages || isWaitingForReplyMessage}
         >
           Show Substructure
         </Button>

@@ -11,3 +11,5 @@
 - Add support for data filtering in the Sparql query.
 
 - Select target is mapped only once when mapping to data specification. All suggestions later are treated as nontarget classes. There is room to think about this.
+
+- I could add a more user-friendly way of filtering. When the user adds an item, have checkboxes for "type of addition". Add as optional, add as select target, add with filtering.
