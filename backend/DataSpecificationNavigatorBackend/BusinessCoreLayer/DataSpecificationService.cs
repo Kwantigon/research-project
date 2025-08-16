@@ -3,6 +3,7 @@ using DataSpecificationNavigatorBackend.BusinessCoreLayer.Facade;
 using DataSpecificationNavigatorBackend.ConnectorsLayer;
 using DataSpecificationNavigatorBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigatorBackend.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer;
 
@@ -19,12 +20,12 @@ public class DataSpecificationService(
 
 	public async Task<DataSpecification?> ExportDataSpecificationFromDataspecerAsync(string dataspecerPackageUuid, string dataspecerPackageName)
 	{
-		string? dsv = await _dataspecerConnector.ExportDsvFileFromPackage(dataspecerPackageUuid);
+		string? dsv = await _dataspecerConnector.ExportDsvFileFromPackageAsync(dataspecerPackageUuid);
 		string? owl;
 		if (string.IsNullOrEmpty(dsv))
 		{
 			_logger.LogError("Failed to export the DSV file from Dataspecer.");
-			owl = await _dataspecerConnector.ExportOwlFileFromPackage(dataspecerPackageUuid);
+			owl = await _dataspecerConnector.ExportOwlFileFromPackageAsync(dataspecerPackageUuid);
 			if (string.IsNullOrEmpty(owl))
 			{
 				_logger.LogError("Failed to export the DSV file and the OWL file from Dataspecer.");
@@ -185,6 +186,13 @@ public class DataSpecificationService(
 		await _database.DataSpecificationItems.AddRangeAsync(itemsToAddToDb);
 		await _database.SaveChangesAsync();
 		return dataSpecification;
+	}
+
+	public async Task<List<DataSpecificationItem>> GetDataSpecificationItemsAsync(int dataSpecificationId, List<string> itemIriList)
+	{
+		return await _database.DataSpecificationItems
+					.Where(item => item.DataSpecificationId == dataSpecificationId && itemIriList.Contains(item.Iri))
+					.ToListAsync();
 	}
 }
 

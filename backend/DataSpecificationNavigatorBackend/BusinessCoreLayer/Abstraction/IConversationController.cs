@@ -18,9 +18,9 @@ public interface IConversationController
 
 	Task<IResult> GetMessageAsync(int conversationId, Guid messageId);
 
-	Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload);
+	Task<IResult> ProcessIncomingUserMessage(int conversationId, PostConversationMessagesDTO payload);
 
 	Task<IResult> DeleteConversationAsync(int conversationId);
 
-	Task<IResult> AddSelectedItemsAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload);
+	Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload);
 }

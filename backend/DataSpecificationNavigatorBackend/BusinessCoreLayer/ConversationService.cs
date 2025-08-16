@@ -10,18 +10,15 @@ public class ConversationService(
 	ILogger<ConversationService> logger,
 	AppDbContext appDbContext,
 	ILlmConnector llmConnector,
-	IDataSpecificationService dataSpecificationService,
 	ISparqlTranslationService sparqlTranslationService) : IConversationService
 {
 	#region Private fields
 	private readonly ILogger<ConversationService> _logger = logger;
 	private readonly AppDbContext _database = appDbContext;
 	private readonly ILlmConnector _llmConnector = llmConnector;
-	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
 	private readonly ISparqlTranslationService _sparqlTranslationService = sparqlTranslationService;
 	#endregion Private fields
 
-	// ok
 	public async Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification)
 	{
 		Conversation conversation = new()
@@ -44,22 +41,18 @@ public class ConversationService(
 		return conversation;
 	}
 
-	// ok
 	public async Task<IReadOnlyList<Conversation>> GetAllConversationsAsync()
 	{
 		return await _database.Conversations.ToListAsync();
 	}
 
-	// ok
 	public async Task<Conversation?> GetConversationAsync(int conversationId)
 	{
 		return await _database.Conversations.SingleOrDefaultAsync(conv => conv.Id == conversationId);
 	}
 
-
 	public async Task<UserMessage> AddUserMessageAndGenerateReplyAsync(Conversation conversation, string messageContent, DateTime timestamp)
 	{
-		// New way of doing this.
 		if (string.IsNullOrWhiteSpace(messageContent))
 		{
 			throw new ArgumentException("Message content cannot be null or empty.", nameof(messageContent));
@@ -164,6 +157,10 @@ public class ConversationService(
 			}
 		}
 
+		// Get suggestions for the user message.
+		List<DataSpecificationPropertySuggestion> suggestions = await GetSuggestionsAsync(
+			conversation.DataSpecification, conversation.DataSpecificationSubstructure, userMessage);
+
 		ReplyMessage? replyMessage = await GenerateReplyMessageAsync(userMessage);
 		if (replyMessage is not null)
 		{
@@ -256,58 +253,15 @@ public class ConversationService(
 		return replyMessage;
 	}
 
-	public async Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedItems)
+	public async Task<string?> UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedPropertiesIri)
 	{
 		_logger.LogDebug("Searching for the selected items.");
-		IEnumerable<DataSpecificationItem> propertyItems = _database.DataSpecificationItems
-					.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id && selectedItems.Contains(item.Iri));
-
-		// Add all selected properties.
-		// If their domain and range is not already in the substructure, add those aswell.
-		List<DataSpecificationItem> itemsToAdd = new();
-		HashSet<string> conversationSelectedItems = new HashSet<string>(selectedItems);
-		foreach (DataSpecificationItem property in propertyItems)
-		{
-			if (property.Type is ItemType.Class)
-			{
-				// The selected items coming from the user are never classes. Always properties.
-				_logger.LogError("Selected item is a class.");
-				continue;
-			}
-			if (property.DomainItemIri is null || property.RangeItemIri is null)
-			{
-				_logger.LogError("Selected property's domain iri or range ir is null.");
-				continue;
-			}
-
-			itemsToAdd.Add(property);
-			// Also add domain and possibly range.
-			if (!conversation.DataSpecificationSubstructure.ClassItems.Any(i => i.Iri == property.DomainItemIri) &&
-					!conversationSelectedItems.Contains(property.DomainItemIri))
-			{
-				conversationSelectedItems.Add(property.DomainItemIri);
-				itemsToAdd.Add(property.DomainItem);
-			}
-			if (property.Type is ItemType.ObjectProperty)
-			{
-				// Get the range object.
-				// I have to manually retrieve from the database because
-				// I haven't configured it as a navigation property.
-				DataSpecificationItem? rangeItem = _database.DataSpecificationItems.SingleOrDefault(
-					i => i.DataSpecificationId == property.DataSpecificationId && i.Iri == property.RangeItemIri);
-				if (rangeItem is null)
-				{
-					_logger.LogError("Range item of property to be added is null");
-				}
-				else if (!conversation.DataSpecificationSubstructure.ClassItems.Any(i => i.Iri == rangeItem.Iri) &&
-									!conversationSelectedItems.Contains(rangeItem.Iri))
-				{
-					conversationSelectedItems.Add(rangeItem.Iri);
-					itemsToAdd.Add(rangeItem);
-				}
-			}
-		}
-		conversation.UserSelectedProperties = conversationSelectedItems.ToList();
+		IEnumerable<PropertyItem> selectedProperties = await _database.DataSpecificationItems
+						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
+								&& item.DataSpecificationId == conversation.DataSpecification.Id
+								&& selectedPropertiesIri.Contains(item.Iri))
+						.Select(item => (PropertyItem)item)
+						.ToListAsync();
 
 		_logger.LogDebug("Searching for the most recent user message.");
 		UserMessage? userMessage = null;
@@ -326,8 +280,28 @@ public class ConversationService(
 			return null;
 		}
 
+		// To generate a suggested message, we need to pass all the selected properties
+		// and their domains and ranges to the LLM.
+		// So we need to get the domains and ranges.
+		List<DataSpecificationItem> itemsToAdd = [];
+		foreach (PropertyItem property in selectedProperties)
+		{
+			itemsToAdd.Add(property);
+			if (!itemsToAdd.Any(item => item.Iri == property.DomainIri))
+			{
+				itemsToAdd.Add(property.Domain);
+			}
+
+			if (property is ObjectPropertyItem objectProperty &&
+					!itemsToAdd.Any(item => item.Iri == objectProperty.RangeIri))
+			{
+				itemsToAdd.Add(objectProperty.Range);
+			}
+		}
+
 		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(conversation.DataSpecification, userMessage, conversation.DataSpecificationSubstructure, itemsToAdd);
 		conversation.SuggestedMessage = suggestedMessage;
+		conversation.UserSelectedProperties = selectedPropertiesIri.ToList();
 
 		await _database.SaveChangesAsync();
 		return suggestedMessage;
@@ -354,6 +328,20 @@ public class ConversationService(
 			_logger.LogError("An exception occured while saving to the database: {Ex}", e);
 			return false;
 		}
+	}
+
+	public async Task<List<DataSpecificationItemMapping>> GetMappingsOfReplyMessage(ReplyMessage replyMessage)
+	{
+		return await _database.ItemMappings
+			.Where(mapping => mapping.UserMessageId == replyMessage.PrecedingUserMessageId)
+			.ToListAsync();
+	}
+
+	public async Task<List<DataSpecificationPropertySuggestion>> GetSuggestedPropertiesOfReplyMessage(ReplyMessage replyMessage)
+	{
+		return await _database.PropertySuggestions
+			.Where(suggestion => suggestion.UserMessageId == replyMessage.PrecedingUserMessageId)
+			.ToListAsync();
 	}
 
 	#region Private methods

@@ -1,10 +1,7 @@
 ﻿using DataSpecificationNavigatorBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigatorBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigatorBackend.BusinessCoreLayer.DTO.Transformer;
-using DataSpecificationNavigatorBackend.ConnectorsLayer;
 using DataSpecificationNavigatorBackend.Model;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer;
 
@@ -14,14 +11,13 @@ namespace DataSpecificationNavigatorBackend.BusinessCoreLayer;
 public class ConversationController(
 	ILogger<ConversationController> logger,
 	IConversationService conversationService,
-	IDataSpecificationService dataSpecificationService,
-	AppDbContext appDbContext) : IConversationController
+	IDataSpecificationService dataSpecificationService) : IConversationController
 {
+	#region Private fields
 	private readonly ILogger<ConversationController> _logger = logger;
 	private readonly IConversationService _conversationService = conversationService;
 	private readonly IDataSpecificationService _dataSpecificationService = dataSpecificationService;
-	private readonly AppDbContext _database = appDbContext; // To get the range object of ObjectProperties.
-	// To do: Eventually restructure the code so that I can remove the database from this controller.
+	#endregion Private fields
 
 	public async Task<IResult> StartConversationAsync(PostConversationsDTO payload)
 	{
@@ -55,7 +51,7 @@ public class ConversationController(
 
 	public async Task<IResult> GetConversationMessagesAsync(int conversationId)
 	{
-		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation == null)
 		{
 			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
@@ -64,28 +60,7 @@ public class ConversationController(
 		List<ConversationMessageDTO> responseDTO = [];
 		foreach (Message msg in conversation.Messages)
 		{
-			ConversationMessageDTO messageDTO;
-
-			if (msg is ReplyMessage replyMessage)
-			{
-				messageDTO = BuildMessageDTOFromReply(replyMessage);
-			}
-			else
-			{
-				messageDTO = new()
-				{
-					Id = msg.Id,
-					Sender = msg.Sender,
-					TextContent = msg.TextContent,
-					Timestamp = msg.Timestamp
-				};
-				if (msg is UserMessage userMessage)
-				{
-
-					messageDTO.ReplyMessageUri = $"/conversations/{conversationId}/messages/{userMessage.ReplyMessageId}";
-				}
-			}
-
+			ConversationMessageDTO messageDTO = await BuildMessageDTO(msg);
 			responseDTO.Add(messageDTO);
 		}
 
@@ -94,15 +69,13 @@ public class ConversationController(
 
 	public async Task<IResult> GetMessageAsync(int conversationId, Guid messageId)
 	{
-		_logger.LogTrace("Retrieving the conversation with ID {Id}.", conversationId);
-		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation is null)
 		{
 			_logger.LogError("Conversation with Id {Id} not found.", conversationId);
 			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
 		}
 
-		_logger.LogTrace("Searching for the message with ID {Id} in the conversation.", messageId);
 		Message? requestedMessage = conversation.Messages.Find(msg => msg.Id == messageId);
 		if (requestedMessage is null)
 		{
@@ -111,67 +84,17 @@ public class ConversationController(
 			return Results.NotFound(new ErrorDTO { Reason = $"Message with ID {messageId} not found." });
 		}
 
-		_logger.LogTrace("Found the requested message in conversation [Title={ConvTitle}, Id={ConvId}]", conversation.Title, conversation.Id);
-		if (requestedMessage is ReplyMessage replyMessage)
-		{
-			UserMessage userMessage = replyMessage.PrecedingUserMessage;
-
-			if (replyMessage.IsGenerated is false)
-			{
-				_logger.LogTrace("The reply message has not yet been generated. Will do so now.");
-
-				// Todo: Guard this critical section with a semaphore.
-				_logger.LogTrace("Critical section start: _conversationService.GenerateReplyMessage(userMessage)");
-				ReplyMessage? reply = await _conversationService.GenerateReplyMessageAsync(userMessage);
-				_logger.LogTrace("Critical section end: _conversationService.GenerateReplyMessage(userMessage)");
-				// End of critical section.
-				if (reply is null)
-				{
-					return Results.InternalServerError(new ErrorDTO() { Reason = "An error occured while generating a reply." });
-				}
-				else
-				{
-					replyMessage = reply;
-				}
-			}
-
-			// Build the DTO to return.
-			ConversationMessageDTO replyMessageDTO = BuildMessageDTOFromReply(replyMessage);
-			
-			return Results.Ok(replyMessageDTO);
-		}
-		else if (requestedMessage is UserMessage userMessage)
-		{
-			return Results.Ok(new ConversationMessageDTO
-			{
-				Id = userMessage.Id,
-				Sender = userMessage.Sender,
-				TextContent = userMessage.TextContent,
-				Timestamp = userMessage.Timestamp,
-				ReplyMessageUri = $"/conversations/{conversation.Id}/messages/{userMessage.ReplyMessageId}"
-			});
-		}
-		else
-		{
-			return Results.Ok(new ConversationMessageDTO
-			{
-				Id = requestedMessage.Id,
-				Sender = requestedMessage.Sender,
-				TextContent = requestedMessage.TextContent,
-				Timestamp = requestedMessage.Timestamp,
-			});
-		}
+		ConversationMessageDTO messageDTO = await BuildMessageDTO(requestedMessage);
+		return Results.Ok(messageDTO);
 	}
 
-	public async Task<IResult> ProcessUserMessageAsync(int conversationId, PostConversationMessagesDTO payload)
+	public async Task<IResult> ProcessIncomingUserMessage(int conversationId, PostConversationMessagesDTO payload)
 	{
-		_logger.LogInformation("Processing incoming user message. ConversationId = {ConvId}, payload = {Payload}", conversationId, payload);
 		if (string.IsNullOrWhiteSpace(payload.TextValue))
 		{
 			return Results.BadRequest(new ErrorDTO { Reason = "The user message does not contain any text." });
 		}
 
-		_logger.LogTrace("Searching for the conversation.");
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation == null)
 		{
@@ -179,23 +102,8 @@ public class ConversationController(
 			return Results.NotFound(new ErrorDTO { Reason = "Conversation not found." });
 		}
 
-		_logger.LogTrace("Adding the user message to the conversation.");
-		UserMessage userMessage = await _conversationService.AddNewUserMessageAsync(conversation, payload.TextValue, DateTime.Now);
-
-		// To do: Generate reply here (instead of waiting for a get message call).
-		// Todo: Guard this critical section with a semaphore.
-		/*_logger.LogTrace("Critical section start: _conversationService.GenerateReplyMessage(userMessage)");
-		ReplyMessage? reply = await _conversationService.GenerateReplyMessageAsync(userMessage);
-		_logger.LogTrace("Critical section end: _conversationService.GenerateReplyMessage(userMessage)");
-		// End of critical section.
-		if (reply is null)
-		{
-			return Results.InternalServerError(new ErrorDTO() { Reason = "An error occured while generating a reply." });
-		}
-		else
-		{
-			replyMessage = reply;
-		}*/
+		_logger.LogDebug("Adding the user message to the conversation.");
+		UserMessage userMessage = await _conversationService.AddUserMessageAndGenerateReplyAsync(conversation, payload.TextValue, DateTime.Now);
 
 		return Results.Created(
 			$"/conversations/{conversation.Id}/messages/{userMessage.Id}",
@@ -210,12 +118,10 @@ public class ConversationController(
 		);
 	}
 
-	public async Task<IResult> AddSelectedItemsAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload)
+	public async Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload)
 	{
-		_logger.LogTrace("Items selected by the user for conversation with ID {Id}: {ItemIris}", conversationId, payload.ItemIriList);
-
-		_logger.LogTrace("Searching for the conversation with ID={Id}", conversationId);
-		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId, includeMessages: true);
+		_logger.LogDebug("Searching for the conversation with ID={Id}", conversationId);
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
 		if (conversation is null)
 		{
 			_logger.LogError("Conversation with ID={Id} not found.", conversationId);
@@ -223,11 +129,10 @@ public class ConversationController(
 		}
 
 		// Make sure the items in the payload are unique
-		HashSet<string> uniqueIris = new(payload.ItemIriList);
-		_logger.LogTrace("Searching for the selected items.");
-		List<DataSpecificationItem> selectedItems = await _database.DataSpecificationItems
-					.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id && uniqueIris.Contains(item.Iri))
-					.ToListAsync();
+		HashSet<string> uniqueIris = [.. payload.ItemIriList];
+		_logger.LogDebug("Searching for the selected items.");
+		List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetDataSpecificationItemsAsync(
+			conversation.DataSpecification.Id, uniqueIris.ToList());
 
 		if (selectedItems.Count != uniqueIris.Count)
 		{
@@ -236,21 +141,19 @@ public class ConversationController(
 			return Results.BadRequest(new ErrorDTO() { Reason = "One or more selected items are not present in the data specification." });
 		}
 
-		_logger.LogTrace("Generating a suggested message.");
-		string? suggestedMessage = await _conversationService.UpdateSelectedItemsAndGenerateSuggestedMessageAsync(conversation, uniqueIris);
+		string? suggestedMessage = await _conversationService.UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(conversation, uniqueIris);
 		if (string.IsNullOrEmpty(suggestedMessage))
 		{
 			_logger.LogError("The suggested message is either null or empty.");
 			return Results.InternalServerError(new ErrorDTO() { Reason = "There was an error while generating the suggested message." });
 		}
 
-		_logger.LogTrace("Returning the suggested message: {SuggestedMessage}", suggestedMessage);
 		return Results.Ok(new SuggestedMessageDTO(suggestedMessage));
 	}
 
 	public async Task<IResult> DeleteConversationAsync(int conversationId)
 	{
-		bool result = await _conversationService.DeleteConversationAndAssociatedResourcesAsync(conversationId);
+		bool result = await _conversationService.DeleteConversationAndAssociatedDataSpecificationAsync(conversationId);
 		if (result)
 		{
 			return Results.Ok();
@@ -261,41 +164,65 @@ public class ConversationController(
 		}
 	}
 
-	private ConversationMessageDTO BuildMessageDTOFromReply(ReplyMessage replyMessage)
+
+	private async Task<ConversationMessageDTO> BuildMessageDTO(Message message)
+	{
+		ConversationMessageDTO messageDTO;
+		if (message is UserMessage userMessage)
+		{
+			messageDTO = new()
+			{
+				Id = message.Id,
+				Sender = message.Sender,
+				TextContent = message.TextContent,
+				Timestamp = message.Timestamp,
+				ReplyMessageUri = $"/conversations/{message.Conversation.Id}/messages/{userMessage.ReplyMessageId}"
+			};
+		}
+		else if (message is ReplyMessage replyMessage)
+		{
+			messageDTO = await BuildMessageDTOFromReplyAsync(replyMessage);
+		}
+		else // This is a WelcomeMessage.
+		{
+			messageDTO = new()
+			{
+				Id = message.Id,
+				Sender = message.Sender,
+				TextContent = message.TextContent,
+				Timestamp = message.Timestamp
+			};
+		}
+
+		return messageDTO;
+	}
+
+	private async Task<ConversationMessageDTO> BuildMessageDTOFromReplyAsync(ReplyMessage replyMessage)
 	{
 		ConversationMessageDTO messageDTO = new();
 		messageDTO.Id = replyMessage.Id;
 		messageDTO.MappingText = replyMessage.MappingText;
 
-		UserMessage precedingUserMsg = replyMessage.PrecedingUserMessage;
-		messageDTO.MappedItems = precedingUserMsg.ItemMappings
-			.Select(m => new MappedItemDTO { Iri = m.ItemIri, Label = m.Item.Label, Summary = m.Item.Summary, MappedWords = m.MappedWords })
+		List<DataSpecificationItemMapping> itemMappings =
+			await _conversationService.GetMappingsOfReplyMessage(replyMessage);
+		messageDTO.MappedItems = itemMappings
+			.Select(m => new MappedItemDTO
+			{
+				Iri = m.ItemIri,
+				Label = m.Item.Label,
+				Summary = m.Item.Summary,
+				MappedWords = m.MappedWords
+			})
 			.ToList();
 
 		messageDTO.SparqlText = replyMessage.SparqlText;
 		messageDTO.SparqlQuery = replyMessage.SparqlQuery;
-		messageDTO.SuggestItemsText = replyMessage.SuggestItemsText;
+		messageDTO.SuggestItemsText = replyMessage.SuggestPropertiesText;
 
-		foreach (DataSpecificationPropertySuggestion suggestion in replyMessage.ItemSuggestions)
-		{
-			if (suggestion.Item.Type is ItemType.ObjectProperty)
-			{
-				if (suggestion.RangeItem is null)
-				{
-					DataSpecificationItem? item = _database.DataSpecificationItems.SingleOrDefault(
-						i => i.DataSpecificationId == suggestion.ItemDataSpecificationId && i.Iri == suggestion.RangeItemIri);
-					if (item is null)
-					{
-						// Shouldn't happen but checking just in case.
-						throw new Exception("Could not find suggestion range in the database.");
-					}
-					suggestion.RangeItem = item;
-				}
-			}
-		}
-
+		List<DataSpecificationPropertySuggestion> itemSuggestions =
+			await _conversationService.GetSuggestedPropertiesOfReplyMessage(replyMessage);
 		SuggestionsTransformer transformer = new();
-		messageDTO.Suggestions = transformer.TransformSuggestedProperties(replyMessage.ItemSuggestions, replyMessage.Conversation.DataSpecificationSubstructure);
+		messageDTO.Suggestions = transformer.TransformSuggestedProperties(itemSuggestions, replyMessage.Conversation.DataSpecificationSubstructure);
 		return messageDTO;
 	}
 }
