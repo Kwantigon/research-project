@@ -249,9 +249,8 @@ public class ConversationService(
 	{
 		_logger.LogDebug("Searching for the selected items.");
 		IEnumerable<PropertyItem> selectedProperties = await _database.DataSpecificationItems
-						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
-								&& item.DataSpecificationId == conversation.DataSpecification.Id
-								&& selectedPropertiesIri.Contains(item.Iri))
+						.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id
+														&& selectedPropertiesIri.Contains(item.Iri))
 						.Select(item => (PropertyItem)item)
 						.ToListAsync();
 
@@ -279,13 +278,15 @@ public class ConversationService(
 		foreach (PropertyItem property in selectedProperties)
 		{
 			itemsToAdd.Add(property);
-			if (!itemsToAdd.Any(item => item.Iri == property.DomainIri))
+			if (!conversation.DataSpecificationSubstructure.ClassItems.Any(item => item.Iri == property.DomainIri)
+					&& !itemsToAdd.Any(item => item.Iri == property.DomainIri))
 			{
 				itemsToAdd.Add(property.Domain);
 			}
 
-			if (property is ObjectPropertyItem objectProperty &&
-					!itemsToAdd.Any(item => item.Iri == objectProperty.RangeIri))
+			if (property is ObjectPropertyItem objectProperty
+				&& !conversation.DataSpecificationSubstructure.ClassItems.Any(item => item.Iri == objectProperty.RangeIri)
+				&& !itemsToAdd.Any(item => item.Iri == objectProperty.RangeIri))
 			{
 				itemsToAdd.Add(objectProperty.Range);
 			}

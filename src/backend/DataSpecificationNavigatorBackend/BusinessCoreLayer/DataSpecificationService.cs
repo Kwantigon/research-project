@@ -97,6 +97,7 @@ public class DataSpecificationService(
 			{
 				Iri = clazz.Iri,
 				Label = clazz.Label,
+				Type = ItemType.Class,
 				DataSpecificationId = dataSpecification.Id,
 				DataSpecification = dataSpecification
 			};
@@ -141,6 +142,7 @@ public class DataSpecificationService(
 					{
 						Iri = property.Iri,
 						Label = property.Label,
+						Type = ItemType.ObjectProperty,
 						DomainIri = domainItem.Iri,
 						Domain = domainItem,
 						RangeIri = rangeItem.Iri,
@@ -166,6 +168,7 @@ public class DataSpecificationService(
 					{
 						Iri = property.Iri,
 						Label = property.Label,
+						Type = ItemType.DatatypeProperty,
 						DomainIri = domainItem.Iri,
 						Domain = domainItem,
 						RangeDatatypeIri = property.RangeIri,
