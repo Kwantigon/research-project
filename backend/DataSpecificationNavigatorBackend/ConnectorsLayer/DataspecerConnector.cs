@@ -12,13 +12,13 @@ public class DataspecerConnector(
 	private readonly HttpClient _httpClient = new HttpClient();
 	private readonly ILogger<DataspecerConnector> _logger = logger;
 
-	public async Task<string?> ExportDsvFileFromPackage(string packageIri)
+	public async Task<string?> ExportDsvFileFromPackageAsync(string packageIri)
 	{
 		const string dsvPath = "en/dsv.ttl";
 		return await ExportFileFromPackage(packageIri, dsvPath);
 	}
 
-	public async Task<string?> ExportOwlFileFromPackage(string packageIri)
+	public async Task<string?> ExportOwlFileFromPackageAsync(string packageIri)
 	{
 		const string dsvPath = "en/model.owl.ttl";
 		return await ExportFileFromPackage(packageIri, dsvPath);

@@ -2,6 +2,6 @@
 
 public interface IDataspecerConnector
 {
-	Task<string?> ExportDsvFileFromPackage(string packageIri);
-	Task<string?> ExportOwlFileFromPackage(string packageIri);
+	Task<string?> ExportDsvFileFromPackageAsync(string packageIri);
+	Task<string?> ExportOwlFileFromPackageAsync(string packageIri);
 }
