@@ -133,7 +133,8 @@ public class PromptConstructor : IPromptConstructor
 		return string.Format(_itemsMappingTemplate, dataSpecification.OwlContent, userQuestion);
 	}
 
-	public string BuildMapToSubstructurePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
+	public string BuildMapToSubstructurePrompt(
+		DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
 	{
 		_logger.LogDebug("Map to substructure template:\n{Template}", _dataSpecSubstructureItemsMappingTemplate);
 		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
@@ -144,7 +145,8 @@ public class PromptConstructor : IPromptConstructor
 		return string.Format(_dataSpecSubstructureItemsMappingTemplate, dataSpecification.OwlContent, userQuestion, substructureString);
 	}
 
-	public string BuildGetSuggestedItemsPrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
+	public string BuildGetSuggestedItemsPrompt(
+		DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
 	{
 		_logger.LogDebug("Prompt template:\n{Template}", _getRelatedItemsTemplate);
 		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
@@ -155,9 +157,11 @@ public class PromptConstructor : IPromptConstructor
 		return string.Format(_getRelatedItemsTemplate, dataSpecification.OwlContent, userQuestion, substructureString);
 	}
 
-	public string BuildGenerateSuggestedMessagePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems)
+	public string BuildGenerateSuggestedMessagePrompt(
+		DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems)
 	{
 		_logger.LogDebug("Prompt template:\n{Template}", _generateSuggestedMessageTemplate);
+		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
 		string substructureString = SubstructureToFlattenedJson(substructure);
 		_logger.LogDebug("Substructure:\n{Substructure}", substructureString);
 
