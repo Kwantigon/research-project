@@ -27,7 +27,9 @@ public class ResponseProcessor(
 			List<DataSpecificationItemMapping> result = [];
 			foreach (DataSpecItemMappingJson jsonItem in jsonData)
 			{
-				DataSpecificationItem? dataSpecItem = _database.DataSpecificationItems.SingleOrDefault(item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id && item.Iri == jsonItem.Iri);
+				DataSpecificationItem? dataSpecItem = _database.DataSpecificationItems.SingleOrDefault(
+					item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id
+								&& item.Iri == jsonItem.Iri);
 				if (dataSpecItem is null)
 				{
 					_logger.LogError("Could not find the item for the phrase \"{MappedWords}\" in the database. Item iri: {Iri}", jsonItem.MappedWords, jsonItem.Iri);
@@ -48,9 +50,51 @@ public class ResponseProcessor(
 					Item = dataSpecItem,
 					UserMessage = userMessage,
 				};
+				result.Add(mapping);
+			}
+			return result;
+		}
+		catch (Exception e)
+		{
+			_logger.LogError("An exception occured while deserializing the mapped items from JSON: {Exception}", e);
+			return null;
+		}
+	}
 
-				mapping.Item.ItemMappingsTable.Add(mapping);
-				mapping.UserMessage.ItemMappings.Add(mapping);
+	public List<DataSpecificationItemMapping>? ExtractSubstructureMapping(string llmResponse, UserMessage userMessage)
+	{
+		llmResponse = RemoveBackticks(llmResponse.Trim());
+		try
+		{
+			List<SubstructureItemMappingJson>? jsonData = JsonSerializer.Deserialize<List<SubstructureItemMappingJson>>(llmResponse);
+			if (jsonData is null)
+			{
+				_logger.LogError("The result of the JSON deserialization is null.");
+				return null;
+			}
+
+			List<DataSpecificationItemMapping> result = [];
+			foreach (SubstructureItemMappingJson jsonItem in jsonData)
+			{
+				DataSpecificationItem? dataSpecItem = _database.DataSpecificationItems.SingleOrDefault(
+					item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id
+								&& item.Iri == jsonItem.Iri);
+				if (dataSpecItem is null)
+				{
+					_logger.LogError("Could not find the item for the phrase \"{MappedWords}\" in the database. Item iri: {Iri}", jsonItem.MappedWords, jsonItem.Iri);
+					continue;
+				}
+
+				DataSpecificationItemMapping mapping = new()
+				{
+					ItemIri = dataSpecItem.Iri,
+					MappedWords = jsonItem.MappedWords,
+					IsSelectTarget = jsonItem.IsSelectTarget,
+					ItemDataSpecificationId = dataSpecItem.DataSpecificationId,
+					UserMessageId = userMessage.Id,
+					Item = dataSpecItem,
+					UserMessage = userMessage,
+				};
 				result.Add(mapping);
 			}
 			return result;
@@ -84,7 +128,9 @@ public class ResponseProcessor(
 			List<DataSpecificationPropertySuggestion> result = [];
 			foreach (PropertySuggestionJson jsonItem in jsonData)
 			{
-				DataSpecificationItem? suggestedProperty = _database.DataSpecificationItems.SingleOrDefault(item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id && item.Iri == jsonItem.Iri);
+				DataSpecificationItem? suggestedProperty = _database.DataSpecificationItems.SingleOrDefault(
+					item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id
+								&& item.Iri == jsonItem.Iri);
 				if (suggestedProperty is null)
 				{
 					_logger.LogError("Could not find the suggested property \"{Iri}\" in the database.", jsonItem.Iri);
@@ -96,51 +142,25 @@ public class ResponseProcessor(
 					suggestedProperty.Summary = jsonItem.Summary;
 				}
 
-				if (suggestedProperty.Type is ItemType.Class)
+				if (suggestedProperty is PropertyItem property)
 				{
-					_logger.LogError("LLM response contains a suggested item of type Class: {Label}.", suggestedProperty.Label);
+					DataSpecificationPropertySuggestion suggestion = new()
+					{
+						PropertyDataSpecificationId = suggestedProperty.DataSpecificationId,
+						SuggestedPropertyIri = suggestedProperty.Iri,
+						UserMessageId = userMessage.Id,
+						SuggestedProperty = property,
+						UserMessage = userMessage,
+						ReasonForSuggestion = jsonItem.Reason
+					};
+					result.Add(suggestion);
+				}
+				else
+				{
+					_logger.LogError("The suggested item with label {Label} and Iri {IRI} is not a property.",
+																						suggestedProperty.Label, suggestedProperty.Iri);
 					continue;
 				}
-
-				DataSpecificationItem domain = suggestedProperty.DomainItem;
-				if (domain is not null)
-				{
-					if (domain.Iri != jsonItem.DomainClass.Iri)
-						_logger.LogError("jsonItem.DomainClass.Iri == {DomainIri} but the actual item has domain == {ActualDomainIri}", jsonItem.DomainClass.Iri, suggestedProperty.DomainItemIri);
-
-					if (string.IsNullOrEmpty(domain.Summary))
-						domain.Summary = jsonItem.DomainClass.Summary;
-				}
-
-				DataSpecificationItem? range = _database.DataSpecificationItems.SingleOrDefault(item =>
-					item.DataSpecificationId == suggestedProperty.DataSpecificationId &&
-					item.Iri == suggestedProperty.RangeItemIri);
-				if (range is not null)
-				{
-					if (range.Iri != jsonItem.RangeClass.Iri)
-						_logger.LogError("jsonItem.RangeClass.Iri == {RangeIri} but the actual item has range == {ActualRangeIri}", jsonItem.RangeClass.Iri, range.Iri);
-
-					if (string.IsNullOrEmpty(range.Summary))
-						range.Summary = jsonItem.RangeClass.Summary;
-				}
-
-				DataSpecificationPropertySuggestion suggestion = new()
-				{
-					ItemDataSpecificationId = suggestedProperty.DataSpecificationId,
-					ItemIri = suggestedProperty.Iri,
-					ReplyMessageId = (Guid)userMessage.ReplyMessageId, // Explicit conversion because the compiler says "cannot implicitly convert from Guid? to Guid".
-					Item = suggestedProperty,
-					ReplyMessage = userMessage.ReplyMessage,
-					ReasonForSuggestion = jsonItem.Reason,
-					DomainItemIri = domain!.Iri,
-					DomainItem = domain!,
-					RangeItemIri = range != null ? range.Iri : jsonItem.RangeClass.Iri, // range object can be null if the property is a DatatypeProperty.
-					RangeItem = range
-				};
-
-				suggestion.Item.ItemSuggestionsTable.Add(suggestion);
-				suggestion.ReplyMessage.ItemSuggestions.Add(suggestion);
-				result.Add(suggestion);
 			}
 			return result;
 		}
@@ -151,52 +171,6 @@ public class ResponseProcessor(
 		}
 	}
 
-	public List<DataSpecificationItemMapping>? ExtractSubstructureMapping(string llmResponse, UserMessage userMessage)
-	{
-		llmResponse = RemoveBackticks(llmResponse.Trim());
-		try
-		{
-			List<SubstructureItemMappingJson>? jsonData = JsonSerializer.Deserialize<List<SubstructureItemMappingJson>>(llmResponse);
-			if (jsonData is null)
-			{
-				_logger.LogError("The result of the JSON deserialization is null.");
-				return null;
-			}
-
-			List<DataSpecificationItemMapping> result = [];
-			foreach (SubstructureItemMappingJson jsonItem in jsonData)
-			{
-				DataSpecificationItem? dataSpecItem = _database.DataSpecificationItems.SingleOrDefault(
-					item => item.DataSpecificationId == userMessage.Conversation.DataSpecification.Id && item.Iri == jsonItem.Iri);
-				if (dataSpecItem is null)
-				{
-					_logger.LogError("Could not find the item for the phrase \"{MappedWords}\" in the database. Item iri: {Iri}", jsonItem.MappedWords, jsonItem.Iri);
-					continue;
-				}
-
-				DataSpecificationItemMapping mapping = new()
-				{
-					ItemIri = dataSpecItem.Iri,
-					MappedWords = jsonItem.MappedWords,
-					IsSelectTarget = jsonItem.IsSelectTarget,
-					ItemDataSpecificationId = dataSpecItem.DataSpecificationId,
-					UserMessageId = userMessage.Id,
-					Item = dataSpecItem,
-					UserMessage = userMessage,
-				};
-
-				mapping.Item.ItemMappingsTable.Add(mapping);
-				mapping.UserMessage.ItemMappings.Add(mapping);
-				result.Add(mapping);
-			}
-			return result;
-		}
-		catch (Exception e)
-		{
-			_logger.LogError("An exception occured while deserializing the mapped items from JSON: {Exception}", e);
-			return null;
-		}
-	}
 
 	private string RemoveBackticks(string llmResponse)
 	{

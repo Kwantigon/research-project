@@ -9,6 +9,8 @@ namespace DataSpecificationNavigatorBackend.ConnectorsLayer;
 
 public class PromptConstructor : IPromptConstructor
 {
+	private readonly ILogger<PromptConstructor> _logger;
+
 	/// <summary>
 	/// Has the following parameters:<br/>
 	/// {0} = Data specification (OWL file).<br/>
@@ -41,15 +43,21 @@ public class PromptConstructor : IPromptConstructor
 	/// </summary>
 	private readonly string _dataSpecSubstructureItemsMappingTemplate;
 
-	private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-	{
-		Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-		WriteIndented = true,
-		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-	};
+	private readonly JsonSerializerOptions _jsonSerializerOptions;
 
-	public PromptConstructor(IConfiguration appSettings)
+	public PromptConstructor(
+		ILogger<PromptConstructor> logger,
+		IConfiguration appSettings)
 	{
+		_logger = logger;
+		_jsonSerializerOptions = new JsonSerializerOptions
+		{
+			Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+			WriteIndented = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+		};
+
+		#region Load templates from files
 		string? baseDirectory = appSettings["Prompts:BaseDirectory"];
 		if (baseDirectory is null)
 		{
@@ -115,40 +123,52 @@ public class PromptConstructor : IPromptConstructor
 		{
 			_dataSpecSubstructureItemsMappingTemplate = File.ReadAllText(file);
 		}
+		#endregion Load templates from files
 	}
 
 	public string BuildMapToDataSpecificationPrompt(DataSpecification dataSpecification, string userQuestion)
 	{
+		_logger.LogDebug("Map to data specification template:\n{Template}", _itemsMappingTemplate);
+		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
 		return string.Format(_itemsMappingTemplate, dataSpecification.OwlContent, userQuestion);
 	}
 
 	public string BuildMapToSubstructurePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
 	{
+		_logger.LogDebug("Map to substructure template:\n{Template}", _dataSpecSubstructureItemsMappingTemplate);
+		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
+
 		// For mapping prompt, give the full nested structure so that the LLM sees exactly what each class owns.
 		string substructureString = SubstructureToJson(substructure);
+		_logger.LogDebug("Substructure:\n{Substructure}", substructureString);
 		return string.Format(_dataSpecSubstructureItemsMappingTemplate, dataSpecification.OwlContent, userQuestion, substructureString);
 	}
 
 	public string BuildGetSuggestedItemsPrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure)
 	{
+		_logger.LogDebug("Prompt template:\n{Template}", _getRelatedItemsTemplate);
+		_logger.LogDebug("User question: {UserQuestion}", userQuestion);
+
 		// For suggestion prompt, give the substructure as a flattened JSON array so the LLM can more easily scan for candidate properties.
 		string substructureString = SubstructureToFlattenedJson(substructure);
+		_logger.LogDebug("Substructure:\n{Substructure}", substructureString);
 		return string.Format(_getRelatedItemsTemplate, dataSpecification.OwlContent, userQuestion, substructureString);
 	}
 
 	public string BuildGenerateSuggestedMessagePrompt(DataSpecification dataSpecification, string userQuestion, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems)
 	{
+		_logger.LogDebug("Prompt template:\n{Template}", _generateSuggestedMessageTemplate);
 		string substructureString = SubstructureToFlattenedJson(substructure);
+		_logger.LogDebug("Substructure:\n{Substructure}", substructureString);
 
 		var selectedList = selectedItems.Select(item => new
 		{
 			item.Iri,
-			item.Label,
-			item.DomainItemIri,
-			item.RangeItemIri
+			item.Label
 		});
 
 		string selectedString = JsonSerializer.Serialize(selectedList, _jsonSerializerOptions);
+		_logger.LogDebug("Items to add to substructure:\n{SelectedItems}", selectedString);
 
 		return string.Format(_generateSuggestedMessageTemplate, dataSpecification.OwlContent, userQuestion, substructureString, selectedString);
 	}

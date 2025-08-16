@@ -41,20 +41,17 @@ public class GeminiConnector : ILlmConnector
 
 	public async Task<List<DataSpecificationItemMapping>> MapUserMessageToDataSpecificationAsync(DataSpecification dataSpecification, UserMessage userMessage)
 	{
+		_logger.LogDebug("Mapping message \"{UserMessageText}\" to data specification items.", userMessage.TextContent);
+
 		int attempts = 0;
 		List<DataSpecificationItemMapping>? mapped = null;
-
-		_logger.LogTrace("Building a prompt for mapping the question to items.");
 		string prompt = _promptConstructor.BuildMapToDataSpecificationPrompt(dataSpecification, userMessage.TextContent);
-		//_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
-
 		while (attempts < _retryAttempts && mapped is null)
 		{
-			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
+			_logger.LogDebug("Prompt attempt number {AttemptCount}", attempts + 1);
 			string response = await SendPromptAsync(prompt);
 			_logger.LogDebug("LLM response: {Response}", response);
 
-			_logger.LogTrace("Extracting the mapped items from the LLM response.");
 			mapped = _responseProcessor.ExtractMappedItems(response, userMessage);
 			attempts++;
 		}
@@ -65,26 +62,23 @@ public class GeminiConnector : ILlmConnector
 			return [];
 		}
 
-		_logger.LogTrace("Returning the mapped items.");
 		return mapped;
 	}
 
 	public async Task<List<DataSpecificationItemMapping>> MapUserMessageToSubstructureAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage)
 	{
+		_logger.LogDebug("Mapping message \"{UserMessageText}\" to substructure items.", userMessage.TextContent);
+
 		int attempts = 0;
 		List<DataSpecificationItemMapping>? mapped = null;
-
-		_logger.LogTrace("Building a prompt for mapping the question to items.");
 		string prompt = _promptConstructor.BuildMapToSubstructurePrompt(dataSpecification, userMessage.TextContent, substructure);
-		//_logger.LogDebug("Map question to items prompt:\n{Prompt}", prompt);
 
 		while (attempts < _retryAttempts && mapped is null)
 		{
-			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
+			_logger.LogDebug("Prompt attempt number {AttemptCount}", attempts + 1);
 			string response = await SendPromptAsync(prompt);
 			_logger.LogDebug("LLM response: {Response}", response);
 
-			_logger.LogTrace("Extracting the mapped items from the LLM response.");
 			mapped = _responseProcessor.ExtractSubstructureMapping(response, userMessage);
 			attempts++;
 		}
@@ -95,29 +89,22 @@ public class GeminiConnector : ILlmConnector
 			return [];
 		}
 
-		_logger.LogTrace("Returning the mapped items.");
 		return mapped;
 	}
 
 	public async Task<List<DataSpecificationPropertySuggestion>> GetSuggestedPropertiesAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage)
 	{
+		_logger.LogDebug("Getting suggested properties for the user message: {UserMessageText}", userMessage.TextContent);
+
 		int attempts = 0;
 		List<DataSpecificationPropertySuggestion>? suggestedItems = null;
-
-		_logger.LogTrace("Building a prompt for getting the related items.");
 		string prompt = _promptConstructor.BuildGetSuggestedItemsPrompt(dataSpecification, userMessage.TextContent, substructure);
-		//_logger.LogDebug("Get related items prompt:\n{Prompt}", prompt);
-
 		while (attempts < _retryAttempts && suggestedItems is null)
 		{
-			_logger.LogTrace("Prompt attempt number {AttemptCount}", attempts + 1);
-
-			_logger.LogTrace("Prompting the LLM.");
+			_logger.LogDebug("Prompt attempt number {AttemptCount}", attempts + 1);
 			string response = await SendPromptAsync(prompt);
-
 			_logger.LogDebug("LLM response: {Response}", response);
 
-			_logger.LogTrace("Extracting the related items from the LLM response.");
 			suggestedItems = _responseProcessor.ExtractSuggestedItems(response, userMessage);
 			attempts++;
 		}
@@ -128,21 +115,19 @@ public class GeminiConnector : ILlmConnector
 			return [];
 		}
 
-		_logger.LogTrace("Returning the related items.");
 		return suggestedItems;
 	}
 
 	public async Task<string> GenerateSuggestedMessageAsync(DataSpecification dataSpecification, UserMessage userMessage, DataSpecificationSubstructure substructure, List<DataSpecificationItem> selectedItems)
 	{
-		_logger.LogTrace("Building a prompt for the suggested message.");
-		string prompt = _promptConstructor.BuildGenerateSuggestedMessagePrompt(dataSpecification, userMessage.TextContent, substructure, selectedItems);
-		//_logger.LogDebug("Generate suggested message:\n{Prompt}", prompt);
+		_logger.LogDebug("Generating a suggested message for the user message: {UserMessageText}", userMessage.TextContent);
+		string prompt = _promptConstructor.BuildGenerateSuggestedMessagePrompt(
+			dataSpecification, userMessage.TextContent, substructure, selectedItems);
 
-		_logger.LogTrace("Prompting the LLM.");
+		_logger.LogDebug("Prompting the LLM.");
 		string response = await SendPromptAsync(prompt);
 		_logger.LogDebug("LLM response: {Response}", response);
 
-		_logger.LogTrace("Extracting the suggested message from the LLM response.");
 		string? itemSummary = _responseProcessor.ExtractSuggestedMessage(response);
 		if (itemSummary is null)
 		{
@@ -150,7 +135,6 @@ public class GeminiConnector : ILlmConnector
 			return string.Empty;
 		}
 
-		_logger.LogTrace("Returning the suggested message.");
 		return itemSummary;
 	}
 

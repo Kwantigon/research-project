@@ -69,10 +69,6 @@ public class ConversationService(
 		conversation.AddMessage(userMessage);
 		await _database.UserMessages.AddAsync(userMessage);
 
-		// Generate a reply message for the user message.
-		// That means mapping the user message to the data specification items
-		// and generating suggestions for the user.
-
 		// Map the user message to the data specification items.
 		if (string.IsNullOrWhiteSpace(conversation.SuggestedMessage) ||
 				userMessage.TextContent.ToLower() != conversation.SuggestedMessage.ToLower())
