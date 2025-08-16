@@ -8,13 +8,13 @@ public interface IConversationService
 
 	Task<IReadOnlyList<Conversation>> GetAllConversationsAsync();
 
-	Task<Conversation?> GetConversationAsync(int conversationId, bool includeMessages = false);
+	Task<Conversation?> GetConversationAsync(int conversationId);
 
-	Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp);
+	Task<UserMessage> AddUserMessageAndGenerateReplyAsync(Conversation conversation, string messageText, DateTime timestamp);
 
 	Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage);
 
 	Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedItems);
 
-	Task<bool> DeleteConversationAndAssociatedResourcesAsync(int conversationId);
+	Task<bool> DeleteConversationAndAssociatedDataSpecificationAsync(int conversationId);
 }

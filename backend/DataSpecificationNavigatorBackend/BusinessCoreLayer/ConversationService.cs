@@ -21,6 +21,7 @@ public class ConversationService(
 	private readonly ISparqlTranslationService _sparqlTranslationService = sparqlTranslationService;
 	#endregion Private fields
 
+	// ok
 	public async Task<Conversation> StartNewConversationAsync(string conversationTitle, DataSpecification dataSpecification)
 	{
 		Conversation conversation = new()
@@ -29,190 +30,235 @@ public class ConversationService(
 			DataSpecification = dataSpecification
 		};
 
-		Message welcomeMsg = new Message()
+		WelcomeMessage welcomeMessage = new()
 		{
-			Sender = Message.Source.System,
 			TextContent = "Your data specification has been loaded. What would you like to know?",
 			Timestamp = DateTime.Now,
 			Conversation = conversation
 		};
-		conversation.Messages.Add(welcomeMsg);
-		conversation.LastUpdated = welcomeMsg.Timestamp;
+		conversation.AddMessage(welcomeMessage);
 
-		await _database.Messages.AddAsync(welcomeMsg);
-		await _database.Conversations.AddAsync(conversation);
+		_database.Conversations.Add(conversation);
+		_database.WelcomeMessages.Add(welcomeMessage);
 		await _database.SaveChangesAsync();
-		_logger.LogDebug("New conversation created and stored successfully.");
 		return conversation;
 	}
 
+	// ok
 	public async Task<IReadOnlyList<Conversation>> GetAllConversationsAsync()
 	{
-		_logger.LogDebug("Getting all conversations from the database.");
-		return await _database.Conversations
-			.Include(c => c.DataSpecification) // Eager load the data specifications because I know they will be needed.
-			.ToListAsync();
+		return await _database.Conversations.ToListAsync();
 	}
 
-	public async Task<Conversation?> GetConversationAsync(int conversationId, bool includeMessages = false)
+	// ok
+	public async Task<Conversation?> GetConversationAsync(int conversationId)
 	{
-		_logger.LogDebug($"Getting conversation with ID={conversationId} from the database.");
-		if (includeMessages)
-		{
-			return await _database.Conversations
-				.Include(conversation => conversation.Messages.OrderBy(message => message.Timestamp))
-				.SingleOrDefaultAsync(conv => conv.Id == conversationId);
-		}
-		else
-		{
-			return await _database.Conversations.SingleOrDefaultAsync(conv => conv.Id == conversationId);
-		}
+		return await _database.Conversations.SingleOrDefaultAsync(conv => conv.Id == conversationId);
 	}
 
-	public async Task<UserMessage> AddNewUserMessageAsync(Conversation conversation, string messageText, DateTime timestamp)
+
+	public async Task<UserMessage> AddUserMessageAndGenerateReplyAsync(Conversation conversation, string messageContent, DateTime timestamp)
 	{
-		_logger.LogTrace("Creating a new user message object.");
+		// New way of doing this.
+		if (string.IsNullOrWhiteSpace(messageContent))
+		{
+			throw new ArgumentException("Message content cannot be null or empty.", nameof(messageContent));
+		}
+
+		// Create the new user message object.
 		UserMessage userMessage = new()
 		{
-			Sender = Message.Source.User,
-			TextContent = messageText,
+			TextContent = messageContent,
 			Timestamp = timestamp,
 			Conversation = conversation
 		};
 
-		_logger.LogTrace("Creating a new reply message associated with the user message.");
-		ReplyMessage replyMessage = new()
-		{
-			Sender = Message.Source.System,
-			Timestamp = (DateTime.Now > userMessage.Timestamp) ? DateTime.Now : userMessage.Timestamp.AddSeconds(1),
-			Conversation = conversation,
-			PrecedingUserMessage = userMessage
-		};
-
-		// Calling AddAsync explicitly so that I get generated IDs for the messages.
-		_logger.LogTrace("Adding messages to the database to retrieve their IDs.");
+		conversation.AddMessage(userMessage);
 		await _database.UserMessages.AddAsync(userMessage);
-		await _database.ReplyMessages.AddAsync(replyMessage);
-		conversation.Messages.Add(userMessage);
-		conversation.Messages.Add(replyMessage);
 
-		_logger.LogTrace("Setting the reply message and its ID to the user message.");
-		userMessage.ReplyMessageId = replyMessage.Id;
-		userMessage.ReplyMessage = replyMessage;
+		// Generate a reply message for the user message.
+		// That means mapping the user message to the data specification items
+		// and generating suggestions for the user.
 
-		if (string.IsNullOrEmpty(conversation.SuggestedMessage) || userMessage.TextContent.ToLower() != conversation.SuggestedMessage.ToLower())
+		// Map the user message to the data specification items.
+		if (string.IsNullOrWhiteSpace(conversation.SuggestedMessage) ||
+				userMessage.TextContent.ToLower() != conversation.SuggestedMessage.ToLower())
 		{
-			_logger.LogTrace("User has modified the suggested message (or this is the first user message in the conversation).");
-
-			_logger.LogTrace("Mapping the question to data specification items.");
+			// If suggested message is null or whitespace, it means that the user has not selected any of the suggested properties.
+			// If the user message is not the same as the suggested message, then the user has modified the suggested message.
+			// In both cases, we need treat the user message as a completely new mesage and map it to the data specification items.
 			List<DataSpecificationItemMapping> mappings = await MapToDataSpecificationAsync(conversation.DataSpecification, userMessage);
-			conversation.DataSpecificationSubstructure = new();
 			if (mappings.Count == 0)
 			{
 				_logger.LogError("No suitable data specification items found for the question mapping.");
 			}
-			else // mappings.Count > 0
+			else
 			{
-				_logger.LogTrace("Adding mapped items to the conversation substructure.");
-				var substructure = conversation.DataSpecificationSubstructure;
-				AddMappedItemsToSubstructure(substructure, mappings);
-				conversation.DataSpecificationSubstructure = substructure;
+				_logger.LogDebug("Mapped the user question to the following items: [{MappedItems}]", string.Join(", ", mappings.Select(m => m.Item.Label)));
+				// Create a new data specification substructure with the newly mapped items.
+				conversation.DataSpecificationSubstructure = new DataSpecificationSubstructure();
+				List<DataSpecificationItem> itemsToAdd = mappings.Select(m => m.Item).ToList();
+				AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd);
 			}
 		}
 		else // User sent the suggested message as is, without any modifications.
 		{
-			_logger.LogTrace("User did not modify the suggested message.");
-			if (conversation.UserSelectedItems.Count == 0)
+			_logger.LogDebug("User did not modify the suggested message.");
+			if (conversation.UserSelectedProperties.Count == 0)
 			{
 				_logger.LogError("User sent the suggested message but there are no items for expansion selected by the user in the conversation.");
 				// Just do nothing, I think.
+				// To do: Return or throw an exception?
 			}
 			else
 			{
-				List<DataSpecificationItem> selectedItems = _database.DataSpecificationItems
-					.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id && conversation.UserSelectedItems.Contains(item.Iri))
+				_logger.LogDebug("User selected properties: [{SelectedProperties}]", string.Join(", ", conversation.UserSelectedProperties));
+				List<PropertyItem> selectedProperties = await _database.DataSpecificationItems
+						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
+								&& item.DataSpecificationId == conversation.DataSpecification.Id
+								&& conversation.UserSelectedProperties.Contains(item.Iri))
+						.Select(item => (PropertyItem)item)
+						.ToListAsync();
+				_logger.LogDebug("Found the following selected properties in the database: {PropertyLabels}", selectedProperties.Select(p => p.Label));
+
+				var foundProperties = selectedProperties.Select(p => p.Iri).ToHashSet();
+				var missingProperties = conversation.UserSelectedProperties
+					.Where(iri => !foundProperties.Contains(iri))
 					.ToList();
+				if (missingProperties.Count > 0)
+				{
+					_logger.LogWarning("The following UserSelectedItems were not found in the database: {MissingIris}", missingProperties);
+				}
 
+				if (selectedProperties.Count == 0)
+				{
+					_logger.LogError("No selected properties found in the database for the conversation.");
+				}
+				else
+				{
+					_logger.LogDebug("Creating a list with the selected properties, their domains and ranges.");
+					List<DataSpecificationItem> itemsToAdd = [];
+					foreach (PropertyItem property in selectedProperties)
+					{
+						itemsToAdd.Add(property);
+						if (!itemsToAdd.Any(item => item.Iri == property.DomainIri))
+						{
+							itemsToAdd.Add(property.Domain);
+						}
 
-				_logger.LogTrace("Adding the selected items to the conversation.");
+						if (property is ObjectPropertyItem objectProperty &&
+								!itemsToAdd.Any(item => item.Iri == objectProperty.RangeIri))
+						{
+							itemsToAdd.Add(objectProperty.Range);
+						}
+					}
 
-				// Idk why the changes to the substructure are not written to the database so I'm doing this kind of magic.
-				DataSpecificationSubstructure substr = conversation.DataSpecificationSubstructure;
-				AddSelectedItemsToSubstructure(substr, selectedItems);
-				conversation.DataSpecificationSubstructure = substr;
+					_logger.LogDebug("Adding the selected properties and their domains and ranges to the conversation substructure.");
+					AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd);
 
-				// Do the mapping for items.
-				//List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToConversationDataSpecSubstructureAsync(userMessage);
-				List<DataSpecificationItemMapping> mappings = await MapToSubstructureAsync(conversation.DataSpecification, conversation.DataSpecificationSubstructure, userMessage);
-
-				// To do: Stejne dostanu mappings kdyz volam MapToSubstructureAsync.
-				// Mohl bych udelat mapping a pak volat stejnou metodu jako predtim, tedy AddMappedItemsToSubstructure
-				// Jen se mi nelibi, ze nazev neni tolik vypovidajici.
-				// Tady je jasne videt, ze nejdriv pridam do substructure a potom jen ziskam mapping pro slova.
-				// Funguje to, takze to zatim necham. Az budu delat code polish, tak se k tomu to vratim.
-				// To, ze map to substructure vraci ItemMapping se i hodi na to, abych si tam ulozil, jestli novy class item je select target nebo ne.
+					// Doing this mapping so that the frontend can show which words or phrases in the user message correspond to which items.
+					_logger.LogDebug("Mapping the user message to the conversation data specification substructure.");
+					List<DataSpecificationItemMapping> mappings = await MapToSubstructureAsync(
+						conversation.DataSpecification, conversation.DataSpecificationSubstructure, userMessage);
+				}
 			}
 		}
 
-		conversation.UserSelectedItems?.Clear();
+		ReplyMessage? replyMessage = await GenerateReplyMessageAsync(userMessage);
+		if (replyMessage is not null)
+		{
+			userMessage.ReplyMessageId = replyMessage.Id;
+			userMessage.ReplyMessage = replyMessage;
+			conversation.AddMessage(replyMessage);
+			await _database.ReplyMessages.AddAsync(replyMessage);
+		}
+		else
+		{
+			_logger.LogError("Failed to generate a reply message for the user message: \"{MessageText}\"", userMessage.TextContent);
+		}
+
+		conversation.UserSelectedProperties?.Clear();
 		conversation.SuggestedMessage = null;
-		_logger.LogTrace("Saving changes to the database and returning.");
 		await _database.SaveChangesAsync();
 		return userMessage;
 	}
 
 	public async Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage)
 	{
-		_logger.LogTrace("Getting the reply message associated to the user message.");
-		ReplyMessage? replyMessage = userMessage.ReplyMessage;
-		if (replyMessage is null)
+		ReplyMessage? replyMessage;
+		List<DataSpecificationItemMapping> itemMappings = await _database.ItemMappings
+			.Where(mapping => mapping.UserMessageId == userMessage.Id)
+			.ToListAsync();
+		if (itemMappings.Count > 0)
 		{
-			_logger.LogError("User message with text \"{UserMsgText}\" does not have an associated reply message.", userMessage.TextContent);
-			return null;
-		}
+			string mappingText = "I have identified the following items from your data specification which play a role in your message.";
+			List<string> mappedIris = itemMappings
+				.Select(mapping => mapping.Item.Iri)
+				.ToList();
 
-		if (replyMessage.IsGenerated)
-		{
-			_logger.LogInformation("The reply message was previously generated already - returning it.");
-			return replyMessage;
-		}
+			string sparqlText = "I have formulated a Sparql query for you:";
+			string sparqlQuery = _sparqlTranslationService.TranslateSubstructure(userMessage.Conversation.DataSpecificationSubstructure);
 
-		if (userMessage.ItemMappings.Count > 0)
-		{
-			replyMessage.MappingText = "I have identified the following items from your data specification which play a role in your question.";
-			replyMessage.SparqlText = "I have formulated a Sparql query for your question:";
-			// I assume that userMessage is the most recent user message in the conversation.
-			_logger.LogTrace("Generating a Sparql query.");
-			replyMessage.SparqlQuery = _sparqlTranslationService.TranslateSubstructure(userMessage.Conversation.DataSpecificationSubstructure);
+			List<DataSpecificationPropertySuggestion> suggestions = await _database.PropertySuggestions
+				.Where(suggestion => suggestion.UserMessageId == userMessage.Id)
+				.ToListAsync();
 
-			_logger.LogTrace("Getting item suggestions.");
-			List<DataSpecificationPropertySuggestion> suggestions = await GetSuggestionsAsync(
-				userMessage.Conversation.DataSpecification, userMessage.Conversation.DataSpecificationSubstructure, userMessage);
-			_logger.LogTrace("The LLM suggested {ItemsCount} items.", suggestions.Count);
-
+			List<string> suggestedIris = [];
+			string? suggestPropertiesText;
 			if (suggestions.Count == 0)
 			{
-				replyMessage.SuggestItemsText = "Unfortunately, I did not manage to find any suitable items to suggest to you to further expand your question.";
+				suggestPropertiesText = "Unfortunately, I did not manage to find any suitable items to suggest to you to further expand your message.";
 			}
 			else
 			{
-				replyMessage.SuggestItemsText = "I found some items which could expand your question.";
+				suggestPropertiesText = "I found some items in the data specification which could be of interest to you.";
+				suggestedIris = suggestions
+					.Select(suggestion => suggestion.SuggestedPropertyIri)
+					.ToList();
 			}
-			replyMessage.IsGenerated = true;
+
+			replyMessage = new()
+			{
+				Timestamp = DateTime.Now,
+				Conversation = userMessage.Conversation,
+				PrecedingUserMessageId = userMessage.Id,
+				PrecedingUserMessage = userMessage,
+				TextContent = "I have processed your message and found some relevant information.",
+				MappingText = mappingText,
+				MappedItemsIri = mappedIris,
+				SuggestPropertiesText = suggestPropertiesText,
+				SparqlText = sparqlText,
+				SparqlQuery = sparqlQuery
+			};
 		}
 		else
 		{
-			replyMessage.TextContent = "Sorry, I did not manage to find anything from the data specification that matches your question.";
-			replyMessage.IsGenerated = true;
+			replyMessage = new()
+			{
+				Timestamp = DateTime.Now,
+				Conversation = userMessage.Conversation,
+				PrecedingUserMessageId = userMessage.Id,
+				PrecedingUserMessage = userMessage,
+				TextContent = "I could not find any relevant information in the data specification for your message.",
+				MappingText = "No items were mapped from your message.",
+				SuggestPropertiesText = "No suggestions could be made.",
+				SparqlText = "No Sparql query was generated.",
+				SparqlQuery = string.Empty
+			};
 		}
-		_logger.LogTrace("Saving changes to the database and returning.");
+
+		if (replyMessage is not null)
+		{
+			await _database.ReplyMessages.AddAsync(replyMessage);
+		}
+
 		await _database.SaveChangesAsync();
 		return replyMessage;
 	}
 
 	public async Task<string?> UpdateSelectedItemsAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedItems)
 	{
-		_logger.LogTrace("Searching for the selected items.");
+		_logger.LogDebug("Searching for the selected items.");
 		IEnumerable<DataSpecificationItem> propertyItems = _database.DataSpecificationItems
 					.Where(item => item.DataSpecificationId == conversation.DataSpecification.Id && selectedItems.Contains(item.Iri));
 
@@ -261,9 +307,9 @@ public class ConversationService(
 				}
 			}
 		}
-		conversation.UserSelectedItems = conversationSelectedItems.ToList();
+		conversation.UserSelectedProperties = conversationSelectedItems.ToList();
 
-		_logger.LogTrace("Searching for the most recent user message.");
+		_logger.LogDebug("Searching for the most recent user message.");
 		UserMessage? userMessage = null;
 		for (int i = conversation.Messages.Count - 1; i >= 0; i--)
 		{
@@ -276,7 +322,7 @@ public class ConversationService(
 		if (userMessage is null)
 		{
 			_logger.LogError("The conversation does not contain any user messages.");
-			conversation.UserSelectedItems?.Clear();
+			conversation.UserSelectedProperties?.Clear();
 			return null;
 		}
 
@@ -287,28 +333,27 @@ public class ConversationService(
 		return suggestedMessage;
 	}
 
-	public async Task<bool> DeleteConversationAndAssociatedResourcesAsync(int conversationId)
+	public async Task<bool> DeleteConversationAndAssociatedDataSpecificationAsync(int conversationId)
 	{
 		Conversation? conversation = await _database.Conversations.SingleOrDefaultAsync(c => c.Id == conversationId);
 		if (conversation is null)
 		{
-			_logger.LogError("Conversation with ID {Id} not found. But it's OK because there is nothing to delete.", conversationId);
+			_logger.LogWarning("Conversation with ID {Id} not found. There is nothing to delete.", conversationId);
 			return true;
 		}
 
-		_database.Messages.RemoveRange(conversation.Messages);
-		_database.DataSpecifications.Remove(conversation.DataSpecification);
 		_database.Conversations.Remove(conversation);
+		_database.DataSpecifications.Remove(conversation.DataSpecification);
 		try
 		{
 			await _database.SaveChangesAsync();
+			return true;
 		}
 		catch (Exception e)
 		{
 			_logger.LogError("An exception occured while saving to the database: {Ex}", e);
 			return false;
 		}
-		return true;
 	}
 
 	#region Private methods
@@ -316,14 +361,28 @@ public class ConversationService(
 	private async Task<List<DataSpecificationItemMapping>> MapToDataSpecificationAsync(DataSpecification dataSpecification, UserMessage userMessage)
 	{
 		List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToDataSpecificationAsync(dataSpecification, userMessage);
-		await _database.DataSpecificationItemMappings.AddRangeAsync(mappings);
+		if (mappings.Count > 0)
+		{
+			await _database.ItemMappings.AddRangeAsync(mappings);
+		}
+		else
+		{
+			_logger.LogWarning("Failed to map the data specification items for the user message: \"{MessageText}\"", userMessage.TextContent);
+		}
 		return mappings;
 	}
 
 	private async Task<List<DataSpecificationItemMapping>> MapToSubstructureAsync(DataSpecification dataSpecification, DataSpecificationSubstructure substructure, UserMessage userMessage)
 	{
 		List<DataSpecificationItemMapping> mappings = await _llmConnector.MapUserMessageToSubstructureAsync(dataSpecification, substructure, userMessage);
-		await _database.DataSpecificationItemMappings.AddRangeAsync(mappings);
+		if (mappings.Count > 0)
+		{
+			await _database.ItemMappings.AddRangeAsync(mappings);
+		}
+		else
+		{
+			_logger.LogWarning("Failed to map the substructure items for the user message: \"{MessageText}\"", userMessage.TextContent);
+		}
 		return mappings;
 	}
 
@@ -331,110 +390,28 @@ public class ConversationService(
 	{
 		List<DataSpecificationPropertySuggestion> suggestedProperties = await _llmConnector.GetSuggestedPropertiesAsync(
 				userMessage.Conversation.DataSpecification, substructure, userMessage);
-
-		foreach (DataSpecificationPropertySuggestion suggestion in suggestedProperties)
+		if (suggestedProperties.Count > 0)
 		{
-			if (suggestion.Item.Type is ItemType.ObjectProperty)
-			{
-				if (suggestion.RangeItemIri is null)
-				{
-					_logger.LogError("Suggestion is an ObjectProperty but range iri is null.");
-				}
-				else
-				{
-					suggestion.RangeItem = await _database.DataSpecificationItems.SingleOrDefaultAsync(
-						item => item.DataSpecificationId == suggestion.ItemDataSpecificationId && item.Iri == suggestion.RangeItemIri);
-				}
-			}
+			await _database.PropertySuggestions.AddRangeAsync(suggestedProperties);
 		}
-
-		await _database.DataSpecificationItemSuggestions.AddRangeAsync(suggestedProperties);
+		else
+		{
+			_logger.LogWarning("Failed to get property suggestions for the user message: \"{MessageText}\"", userMessage.TextContent);
+		}
 		return suggestedProperties;
 	}
 
-	// To do: Methods AddMappedItemsToSubstructure and AddSelectedItemsToSubstructure could probably be somehow compressed into 1 method. There are duplicated parts.
-	// The only difference is the add mappings has one additional info: whether or not the class is select target.
-
-	private void AddMappedItemsToSubstructure(DataSpecificationSubstructure substructure, IReadOnlyCollection<DataSpecificationItemMapping> mappings)
+	private void AddDataSpecItemsToConversationSubstructure(Conversation conversation, IReadOnlyCollection<DataSpecificationItem> itemsToAdd)
 	{
-		// Add all classes to the substructure.
-		IEnumerable<DataSpecificationItemMapping> classMappings = mappings.Where(m => m.Item.Type is ItemType.Class);
-		foreach (var classMapping in classMappings)
-		{
-			if (substructure.ClassItems.Any(c => c.Iri == classMapping.Item.Iri))
-			{
-				// This should never happen.
-				// But check just in case.
-				_logger.LogWarning("Class \"{Label}\" is already in the substructure.", classMapping.Item.Label);
-				continue;
-			}
-			else
-			{
-				DataSpecificationSubstructure.ClassItem classItem = new()
-				{
-					Iri = classMapping.Item.Iri,
-					Label = classMapping.Item.Label,
-					IsSelectTarget = classMapping.IsSelectTarget
-				};
-				substructure.ClassItems.Add(classItem);
-			}
-		}
+		DataSpecificationSubstructure substructure = conversation.DataSpecificationSubstructure;
 
-		// Add properties to the substructure.
-		IEnumerable<DataSpecificationItem> mappedProperties = mappings
-																	.Where(m => m.Item.Type is ItemType.ObjectProperty || m.Item.Type is ItemType.DatatypeProperty)
-																	.Select(m => m.Item);
-		foreach (DataSpecificationItem property in mappedProperties)
-		{
-			if (property.DomainItemIri is null || property.RangeItemIri is null)
-			{
-				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.DomainItemIri, property.RangeItemIri);
-				continue;
-			}
-			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.RangeItemIri))
-			{
-				_logger.LogWarning("The property {PropLabel} does not have its range in the substructure.", property.Label);
-			}
-
-			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.DomainItemIri);
-			if (domainClass is null)
-			{
-				_logger.LogError("The property {PropLabel} does not have its domain in the substructure.", property.Label);
-				continue;
-			}
-
-			DataSpecificationSubstructure.PropertyItem propertyItem = new()
-			{
-				Iri = property.Iri,
-				Label = property.Label,
-				Domain = property.DomainItemIri,
-				Range = property.RangeItemIri
-			};
-
-			switch (property.Type)
-			{
-				case ItemType.Class:
-					_logger.LogError("Expected only properties in the mappedProperties collection. Found a class instead.");
-					break;
-				case ItemType.ObjectProperty:
-					domainClass.ObjectProperties.Add(propertyItem);
-					break;
-				case ItemType.DatatypeProperty:
-					domainClass.DatatypeProperties.Add(propertyItem);
-					break;
-			}
-		}
-	}
-
-	private void AddSelectedItemsToSubstructure(DataSpecificationSubstructure substructure, IReadOnlyCollection<DataSpecificationItem> itemsToAdd)
-	{
 		// Add all classes to the substructure.
 		IEnumerable<DataSpecificationItem> classesToAdd = itemsToAdd.Where(item => item.Type is ItemType.Class);
 		foreach (var classToAdd in classesToAdd)
 		{
 			if (substructure.ClassItems.Any(c => c.Iri == classToAdd.Iri))
 			{
-				_logger.LogWarning("Class \"{Label}\" is already in the substructure.", classToAdd.Label);
+				// The class is already in the substructure. Skip it.
 				continue;
 			}
 			else
@@ -443,49 +420,37 @@ public class ConversationService(
 				{
 					Iri = classToAdd.Iri,
 					Label = classToAdd.Label,
-					IsSelectTarget = false // I have left this for future work. In this version, add all user selected items as non-select target.
+					IsSelectTarget = true
 				};
 				substructure.ClassItems.Add(classItem);
 			}
 		}
 
 		// Add properties to the substructure.
-		IEnumerable<DataSpecificationItem> mappedProperties = itemsToAdd
+		IEnumerable<DataSpecificationItem> propertiesToAdd = itemsToAdd
 																	.Where(item => item.Type is ItemType.ObjectProperty || item.Type is ItemType.DatatypeProperty);
-		foreach (DataSpecificationItem property in mappedProperties)
+		foreach (PropertyItem property in propertiesToAdd)
 		{
-			if (property.Type is ItemType.ObjectProperty && property.RangeItem is null)
+			DataSpecificationSubstructure.ClassItem? domainInSubstructure = substructure.ClassItems.Find(c => c.Iri == property.DomainIri);
+			if (domainInSubstructure is null)
 			{
-				// Get the range object.
-				// I have to manually retrieve from the database because
-				// I haven't configured it as a navigation property.
-				DataSpecificationItem? rangeItem = _database.DataSpecificationItems.SingleOrDefault(
-					i => i.DataSpecificationId == property.DataSpecificationId && i.Iri == property.RangeItemIri);
-				if (rangeItem is null)
-				{
-					_logger.LogError("Range item of property to be added is null");
-				}
-				else
-				{
-					property.RangeItem = rangeItem;
-				}
-			}
-
-			if (property.DomainItemIri is null || property.RangeItemIri is null)
-			{
-				_logger.LogError("Property domain or range is null. Domain: {Domain}, Range: {Range}", property.DomainItemIri, property.RangeItemIri);
+				// At this point, all properties to be added should have their domains and range in the substructure.
+				// Because we added them earlier at the beginning of the method.
+				_logger.LogError("The property {PropertyLabel} does not have its domain in the substructure.", property.Label);
 				continue;
 			}
-			if (property.Type is ItemType.ObjectProperty && !substructure.ClassItems.Any(c => c.Iri == property.RangeItemIri))
+			string? rangeIri;
+			if (property is ObjectPropertyItem objectProperty)
 			{
-				_logger.LogWarning("The property {PropLabel} does not have its range in the substructure.", property.Label);
+				rangeIri = objectProperty.RangeIri;
 			}
-
-			DataSpecificationSubstructure.ClassItem? domainClass = substructure.ClassItems.Find(c => c.Iri == property.DomainItemIri);
-			if (domainClass is null)
+			else if (property is DatatypePropertyItem datatypeProperty)
 			{
-				// This should not happen because I already added all the selected properties along with their domains into the substructure.
-				_logger.LogError("The property {PropLabel} does not have its domain in the substructure.", property.Label);
+				rangeIri = datatypeProperty.RangeDatatypeIri;
+			}
+			else
+			{
+				_logger.LogError("Property has unexpected type: {PropertyType}.", property.GetType().Name);
 				continue;
 			}
 
@@ -493,8 +458,8 @@ public class ConversationService(
 			{
 				Iri = property.Iri,
 				Label = property.Label,
-				Domain = property.DomainItemIri,
-				Range = property.RangeItemIri
+				Domain = property.DomainIri,
+				Range = rangeIri
 			};
 
 			switch (property.Type)
@@ -503,13 +468,17 @@ public class ConversationService(
 					_logger.LogError("Expected only properties in the mappedProperties collection. Found a class instead.");
 					break;
 				case ItemType.ObjectProperty:
-					domainClass.ObjectProperties.Add(propertyItem);
+					domainInSubstructure.ObjectProperties.Add(propertyItem);
 					break;
 				case ItemType.DatatypeProperty:
-					domainClass.DatatypeProperties.Add(propertyItem);
+					domainInSubstructure.DatatypeProperties.Add(propertyItem);
 					break;
 			}
 		}
+
+		_database.Entry(conversation)
+			.Property(c => c.DataSpecificationSubstructure)
+			.IsModified = true; // This triggers an update to the JSON column.
 	}
 
 	#endregion Private methods

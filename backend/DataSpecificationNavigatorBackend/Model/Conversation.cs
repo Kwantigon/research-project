@@ -6,7 +6,7 @@ public class Conversation
 
 	public required string Title { get; set; }
 
-	public DateTime LastUpdated { get; set; }
+	public DateTime LastUpdated { get; set; } = DateTime.Now;
 
 	public virtual required DataSpecification DataSpecification { get; set; }
 
@@ -20,9 +20,9 @@ public class Conversation
 			.ToList();
 	}
 
-	// DataSpecificationSubstructure
+	public virtual DataSpecificationSubstructure DataSpecificationSubstructure { get; set; } = new();
 
-	public List<string> UserSelectedItems { get; set; } = []; // IRIs of items.
+	public List<string> UserSelectedProperties { get; set; } = []; // IRIs of items.
 
 	public string? SuggestedMessage { get; set; }
 

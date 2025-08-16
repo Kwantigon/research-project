@@ -5,8 +5,7 @@ public class DataSpecificationSubstructure
 	public List<ClassItem> ClassItems { get; set; } = [];
 	/*
 	 * Each ClassItem in this list should have unique IRI, meaning each item is in there only once.
-	 * I'm not using a HashSet because the uniqueness is not bound to the instance of the ClassItem,
-	 * but rather to its IRI.
+	 * I'm not using a HashSet because the uniqueness is not bound to the instance of the ClassItem, but rather to its IRI.
 	 * HashSet does not help if I create two instances with identical values and add them.
 	 */
 
