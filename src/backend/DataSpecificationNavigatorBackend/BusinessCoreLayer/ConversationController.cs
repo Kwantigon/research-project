@@ -103,7 +103,8 @@ public class ConversationController(
 		}
 
 		_logger.LogDebug("Adding the user message to the conversation.");
-		UserMessage userMessage = await _conversationService.AddUserMessageAndGenerateReplyAsync(conversation, payload.TextValue, DateTime.Now);
+		UserMessage userMessage = await _conversationService.AddUserMessageAsync(conversation, payload.TextValue, DateTime.Now);
+		ReplyMessage? replyMessage = await _conversationService.GenerateReplyMessageAsync(userMessage);
 
 		return Results.Created(
 			$"/conversations/{conversation.Id}/messages/{userMessage.Id}",

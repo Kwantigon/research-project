@@ -11,7 +11,7 @@ public interface IConversationService
 
 	Task<Conversation?> GetConversationAsync(int conversationId);
 
-	Task<UserMessage> AddUserMessageAndGenerateReplyAsync(
+	Task<UserMessage> AddUserMessageAsync(
 		Conversation conversation, string messageText, DateTime timestamp);
 
 	Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage);

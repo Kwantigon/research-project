@@ -51,7 +51,7 @@ public class ConversationService(
 		return await _database.Conversations.SingleOrDefaultAsync(conv => conv.Id == conversationId);
 	}
 
-	public async Task<UserMessage> AddUserMessageAndGenerateReplyAsync(Conversation conversation, string messageContent, DateTime timestamp)
+	public async Task<UserMessage> AddUserMessageAsync(Conversation conversation, string messageContent, DateTime timestamp)
 	{
 		if (string.IsNullOrWhiteSpace(messageContent))
 		{
@@ -101,7 +101,7 @@ public class ConversationService(
 			}
 			else
 			{
-				_logger.LogDebug("User selected properties: [{SelectedProperties}]", string.Join(", ", conversation.UserSelectedProperties));
+				_logger.LogInformation("User selected properties: [{SelectedProperties}]", string.Join(", ", conversation.UserSelectedProperties));
 				List<PropertyItem> selectedProperties = await _database.DataSpecificationItems
 						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
 								&& item.DataSpecificationId == conversation.DataSpecification.Id
@@ -156,19 +156,8 @@ public class ConversationService(
 		// Get suggestions for the user message.
 		List<DataSpecificationPropertySuggestion> suggestions = await GetSuggestionsAsync(
 			conversation.DataSpecification, conversation.DataSpecificationSubstructure, userMessage);
-
-		ReplyMessage? replyMessage = await GenerateReplyMessageAsync(userMessage);
-		if (replyMessage is not null)
-		{
-			userMessage.ReplyMessageId = replyMessage.Id;
-			userMessage.ReplyMessage = replyMessage;
-			conversation.AddMessage(replyMessage);
-			await _database.ReplyMessages.AddAsync(replyMessage);
-		}
-		else
-		{
-			_logger.LogError("Failed to generate a reply message for the user message: \"{MessageText}\"", userMessage.TextContent);
-		}
+		_logger.LogInformation("The LLM suggested the following properties: [{SuggestedProperties}]",
+			suggestions.Select(s => s.SuggestedProperty.Label));
 
 		conversation.UserSelectedProperties?.Clear();
 		conversation.SuggestedMessage = null;
@@ -178,7 +167,7 @@ public class ConversationService(
 
 	public async Task<ReplyMessage?> GenerateReplyMessageAsync(UserMessage userMessage)
 	{
-		ReplyMessage? replyMessage;
+		ReplyMessage? replyMessage = null;
 		List<DataSpecificationItemMapping> itemMappings = await _database.ItemMappings
 			.Where(mapping => mapping.UserMessageId == userMessage.Id)
 			.ToListAsync();
@@ -242,7 +231,14 @@ public class ConversationService(
 
 		if (replyMessage is not null)
 		{
+			userMessage.ReplyMessageId = replyMessage.Id;
+			userMessage.ReplyMessage = replyMessage;
+			userMessage.Conversation.AddMessage(replyMessage);
 			await _database.ReplyMessages.AddAsync(replyMessage);
+		}
+		else
+		{
+			_logger.LogError("Failed to generate a reply message for the user message: \"{MessageText}\"", userMessage.TextContent);
 		}
 
 		await _database.SaveChangesAsync();
