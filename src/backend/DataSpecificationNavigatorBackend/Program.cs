@@ -206,22 +206,7 @@ app.MapGet("/tests/add-user-msg", async (AppDbContext database, IConversationSer
 		return Results.NotFound();
 	}
 
-	UserMessage userMessage = await service.AddUserMessageAndGenerateReplyAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
-
-	await database.SaveChangesAsync();
-	return Results.Ok();
-});
-
-app.MapGet("/tests/generate-reply", async (AppDbContext database, IConversationService service) =>
-{
-	Conversation? conversation = await database.Conversations.SingleOrDefaultAsync(c => c.Id == 1);
-	if (conversation is null)
-	{
-		return Results.NotFound();
-	}
-
-	UserMessage userMessage = await service.AddUserMessageAndGenerateReplyAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
-	ReplyMessage? replyMessage = await service.GenerateReplyMessageAsync(userMessage);
+	UserMessage userMessage = await service.AddUserMessageAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
 
 	await database.SaveChangesAsync();
 	return Results.Ok();

@@ -108,13 +108,6 @@ public class ResponseProcessor(
 
 	public List<DataSpecificationPropertySuggestion>? ExtractSuggestedItems(string llmResponse, UserMessage userMessage)
 	{
-		if (userMessage.ReplyMessageId is null || userMessage.ReplyMessage is null)
-		{
-			// Will need these values later so no point doing anything if they are null.
-			_logger.LogError("There is no reply message associated with the user message.");
-			return null;
-		}
-
 		llmResponse = RemoveBackticks(llmResponse.Trim());
 		try
 		{
