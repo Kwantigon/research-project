@@ -90,7 +90,7 @@ public class SuggestionsTransformer
 					// and range is also not in the substructure, then it is an indirect connection.
 					return true;
 				})
-				.GroupBy(s => s.SuggestedProperty.Label)
+				.GroupBy(s => s.SuggestedProperty.Domain.Label)
 				.Select(group => new GroupedSuggestionsDto(
 						group.Key,
 						group.Select(suggestion =>

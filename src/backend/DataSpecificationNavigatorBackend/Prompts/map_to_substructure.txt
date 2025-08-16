@@ -16,7 +16,7 @@ The following items have been identified to match the concepts mentioned by the 
 
 ### Task
 Map each of the item in the **current context** to the words that correspond to them in the user question.
-Each word or phrase from the user question may only be mapped to one item. Do not assign the same MappedWords to multiple items.
+You must map the question to **all** items in the current context.
 
 Additionally, determine which **classes** are the **select targets** of the user's question.
 A select target class is one that should appear in the `SELECT` clause of a SPARQL query that answers this question.

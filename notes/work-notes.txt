@@ -435,3 +435,46 @@ Pokud se neliší:
 	6. Říct si o mapping a předat (substructure + selected properties + domains + ranges), aby LLM mapoval jen na ty předané itemy.
 	7. Přidat itemy do současného substructure.
 
+Ukládání data specification item funguje.
+Ukládání zpráv funguje.
+
+Přemýšlím, jestli ItemMapping a SuggestedProperties by se měly vázat na UserMessage.
+- ItemMapping určitě, to dává smysl.
+- SuggestedProperties asi taky. Ale co by teda ReplyMessage měl obsahovat, případně vlastnit?
+
+Kde jsem skončil:
+- Aktualizoval jsem model v hlavním projektu.
+- Aktualizoval jsem data specification service, dataspecer connector atd. v hlavním projektu.
+
+Plán na zítra:
+- Chtěl bych zkusit přidat unit tests pro data specification service.
+- Vytvořit DSV soubor, který obsahuje pár itemů.
+- Namockovat DataspecerConnector, aby vrátil obsah toho DSV souboru.
+- Ověřit, že mám všechny itemy.
+
+- Mock vrací null DSV.
+- Vytvořit OWL soubor s několika itemy.
+- Ověřit, že když DSV není, tak to použije OWL a bude vracet správné itemy.
+
+Apparently nemá smysl pouštět testy když se mi projekt stejně nezbuildí.
+Nejdřív dám všechno zpracování do pořádku.
+
+AddMappedItemsToSubstructure(DataSpecificationSubstructure substructure, IReadOnlyCollection<DataSpecificationItemMapping> mappings)
+- Proč vlastně přidávám "mappings".
+- Proč nepřidávám přímo "data specification items"?
+- Jediná výhoda je, že v mapping mám "IsSelectTarget".
+- Mapping komplikuje přidání selected items.
+
+Došel jsem k generování ReplyMessage. Otázka je, co všechno by ReplyMessage měl obsahovat?
+- Myslím, že to nechám tak, jak to do teď bylo.
+- Mapping text, Sparql text, atd.
+- Myslím, že přidám i mapped items a suggestions, ale označím jako not mapped?
+
+Přidání nové zprávy a generování odpovědi funguje.
+Suggested message funguje.
+Nefunguje mi add suggested property.
+
+!!!To do: Když uživatel přidá pouze item v "more to consider", tak se mi to nenapojí správně na substructure. Nemám tam hranu do substructure.
+- Vypadá to, že se to trochu rozbije.
+- Summary je prázdný.
+Databáze mi špatně vrací ItemType. I property má type class.
