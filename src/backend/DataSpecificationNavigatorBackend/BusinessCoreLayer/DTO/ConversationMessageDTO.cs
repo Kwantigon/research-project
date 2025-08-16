@@ -10,7 +10,7 @@ public record ConversationMessageDTO
 	public Guid Id { get; set; }
 
 	[JsonPropertyName("sender")]
-	public Message.Source Sender { get; set; }
+	public MessageSource Sender { get; set; }
 
 	[JsonPropertyName("text")]
 	public string? TextContent { get; set; }
