@@ -46,8 +46,12 @@ builder.Services.AddCors(options =>
 	);
 });*/
 
-var connectionString = builder.Configuration.GetConnectionString("Chatbot") ?? "Data Source=Chatbot.db";
-builder.Services.AddDbContext<AppDbContext>(b => b.UseSqlite(connectionString).UseLazyLoadingProxies());
+var connectionString =
+	builder.Configuration.GetConnectionString("DataSpecificationNavigatorDB")
+	?? "Data Source=DataSpecificationNavigatorDB.db";
+builder.Services
+	.AddDbContext<AppDbContext>(b => b.UseSqlite(connectionString)
+	.UseLazyLoadingProxies());
 
 var app = builder.Build();
 app.UseCors();
@@ -59,6 +63,9 @@ app.UseCors();
 		c.SwaggerEndpoint("/swagger/v1/swagger.json", "Data specification helper API");
 	});
 }*/
+
+// To do: Log payloads and responses in each endpoint.
+// To do: Update OpenAPI documentation.
 
 // Sanity check.
 app.MapGet("/", () => "Hello there!");
@@ -100,20 +107,10 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 		return endpoint;
 	});
 
-app.MapGet("/data-specifications/{dataSpecificationId}/items/summary",
-			async ([FromRoute] int dataSpecificationId, [FromQuery] string itemIri,
-						IDataSpecificationController controller) => await controller.GetItemSummaryAsync(dataSpecificationId, itemIri))
-	.WithOpenApi(endpoint =>
-	{
-		endpoint.Summary = "";
-		endpoint.Description = "";
-		return endpoint;
-	});
-
 app.MapPost("/conversations/{conversationId}/messages",
 				async ([FromRoute] int conversationId,
 							[FromBody] PostConversationMessagesDTO payload,
-							IConversationController controller) => await controller.ProcessUserMessageAsync(conversationId, payload))
+							IConversationController controller) => await controller.ProcessIncomingUserMessage(conversationId, payload))
 	.WithOpenApi(endpoint =>
 	{
 		endpoint.Summary = "Add a message to the conversation.";
@@ -143,7 +140,7 @@ app.MapPost("/conversations",
 
 app.MapPut("/conversations/{conversationId}/user-selected-items",
 	async ([FromRoute] int conversationId, [FromBody] PutDataSpecItemsDTO payload,
-				IConversationController controller) => await controller.AddSelectedItemsAndGetSuggestedMessage(conversationId, payload));
+				IConversationController controller) => await controller.StoreUserSelectionAndGetSuggestedMessage(conversationId, payload));
 
 app.MapDelete("/conversations/{conversationId}",
 				async ([FromRoute] int conversationId,
@@ -174,7 +171,7 @@ app.MapGet("/tests/new-conversation", async (AppDbContext database) =>
 	return Results.Created("", $"{{ DataSpecificationId = {ds.Id}, ConversationId = {c.Id} }}");
 });
 
-app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
+app.MapGet("/tests/mapping-prompt", async (ILlmConnector llmConnector) =>
 {
 	DataSpecification ds = new()
 	{
@@ -193,22 +190,9 @@ app.MapGet("/tests/llm/mapping-prompt", async (ILlmConnector llmConnector) =>
 
 	UserMessage userMessage = new()
 	{
-		Id = Guid.NewGuid(),
 		Conversation = c,
-		Sender = Message.Source.User,
 		TextContent = "I want to see public services providing electronic signatures.",
 	};
-
-	ReplyMessage replyMessage = new()
-	{
-		Id = Guid.NewGuid(),
-		Conversation = c,
-		Sender = Message.Source.System,
-		PrecedingUserMessage = userMessage
-	};
-
-	userMessage.ReplyMessage = replyMessage;
-	userMessage.ReplyMessageId = replyMessage.Id;
 
 	List<DataSpecificationItemMapping> mappings = await llmConnector.MapUserMessageToDataSpecificationAsync(ds, userMessage);
 	return Results.Ok();
@@ -222,7 +206,7 @@ app.MapGet("/tests/add-user-msg", async (AppDbContext database, IConversationSer
 		return Results.NotFound();
 	}
 
-	UserMessage userMessage = await service.AddNewUserMessageAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
+	UserMessage userMessage = await service.AddUserMessageAndGenerateReplyAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
 
 	await database.SaveChangesAsync();
 	return Results.Ok();
@@ -236,40 +220,11 @@ app.MapGet("/tests/generate-reply", async (AppDbContext database, IConversationS
 		return Results.NotFound();
 	}
 
-	UserMessage userMessage = await service.AddNewUserMessageAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
+	UserMessage userMessage = await service.AddUserMessageAndGenerateReplyAsync(conversation, "I want public services that provide electronic signatures.", DateTime.Now);
 	ReplyMessage? replyMessage = await service.GenerateReplyMessageAsync(userMessage);
 
 	await database.SaveChangesAsync();
 	return Results.Ok();
-});
-
-app.MapGet("/tests/add-then-find", async (AppDbContext database) =>
-{
-	DataSpecification dataSpecification = await database.DataSpecifications.SingleAsync(d => d.Id == 1);
-	DataSpecificationItem item1 = new DataSpecificationItem()
-	{
-		DataSpecification = dataSpecification,
-		Iri = "abc",
-		Label = "A B C",
-		DataSpecificationId = dataSpecification.Id,
-		Type = ItemType.Class
-	};
-
-	DataSpecificationItem item2 = new DataSpecificationItem()
-	{
-		DataSpecification = dataSpecification,
-		Iri = "abc",
-		Label = "A B C",
-		DataSpecificationId = dataSpecification.Id,
-		Type = ItemType.Class
-	};
-
-	await database.DataSpecificationItems.AddAsync(item1);
-	var i = database.DataSpecificationItems.SingleOrDefault(it => it.Iri == item2.Iri && it.DataSpecificationId == item2.DataSpecificationId);
-	if (i is null)
-	{
-		i = item2;
-	}
 });
 
 app.Run();
