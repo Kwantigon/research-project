@@ -100,5 +100,21 @@ public class AppDbContext : DbContext
 			.HasForeignKey(suggestion => suggestion.UserMessageId)
 			.OnDelete(DeleteBehavior.Cascade);
 		#endregion DataSpecificationPropertySuggestion
+
+		#region Conversation
+		// Configure the conversation's data specification substructure to be stored as a JSON column.
+		JsonSerializerOptions serializerOptions = new()
+		{
+			Encoder = JavaScriptEncoder.Create(UnicodeRanges.All), // To properly store non-ASCII characters.
+			WriteIndented = true // For better readability in the database.
+		};
+		modelBuilder.Entity<Conversation>()
+			.Property(c => c.DataSpecificationSubstructure)
+			.HasConversion(
+				substructure => JsonSerializer.Serialize(substructure, serializerOptions),
+				substructureString => JsonSerializer.Deserialize<DataSpecificationSubstructure>(substructureString, serializerOptions)!)
+				// Not handling the possible null value because I want to throw an exception if the deserialization fails.
+			.HasColumnType("json");
+		#endregion Conversation
 	}
 }
