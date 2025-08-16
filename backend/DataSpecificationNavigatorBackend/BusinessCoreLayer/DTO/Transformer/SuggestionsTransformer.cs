@@ -14,32 +14,51 @@ public class SuggestionsTransformer
 		foreach (var classItem in substructure.ClassItems)
 		{
 			List<ArrowSuggestionDto> relevant = suggestions
-				.Where(suggestion => suggestion.DomainItemIri == classItem.Iri || suggestion.RangeItemIri == classItem.Iri)
+				.Where(suggestion =>
+				{
+					if (suggestion.SuggestedProperty.DomainIri == classItem.Iri)
+						return true;
+					else if (suggestion.SuggestedProperty is ObjectPropertyItem objectProperty)
+						return objectProperty.RangeIri == classItem.Iri;
+					else
+						return false;
+				})
 				.Select(suggestion =>
 				{
-					bool directionForward = suggestion.DomainItemIri == classItem.Iri;
+					bool directionForward = suggestion.SuggestedProperty.DomainIri == classItem.Iri;
 					string otherClass;
 					if (directionForward)
 					{
-						if (suggestion.RangeItem is null)
+						if (suggestion.SuggestedProperty is ObjectPropertyItem objectProperty)
 						{
-							otherClass = suggestion.RangeItemIri;
+							otherClass = objectProperty.Range.Label;
+						}
+						else if (suggestion.SuggestedProperty is DatatypePropertyItem datatypeProperty)
+						{
+							otherClass = datatypeProperty.RangeDatatypeIri;
 						}
 						else
 						{
-							otherClass = suggestion.RangeItem.Label;
+							// This should never happen.
+							// But handle it just in case.
+							otherClass = "[Unknown range]";
 						}
 					}
 					else
 					{
-						otherClass = suggestion.DomainItem.Label;
+						otherClass = suggestion.SuggestedProperty.Domain.Label;
 					}
 
 					string connection = directionForward
-						? $"→ {suggestion.Item.Label} → {otherClass}"
-						: $"← {suggestion.Item.Label} ← {otherClass}";
+						? $"→ {suggestion.SuggestedProperty.Label} → {otherClass}"
+						: $"← {suggestion.SuggestedProperty.Label} ← {otherClass}";
 
-					return new ArrowSuggestionDto(suggestion.ItemIri, suggestion.Item.Label, connection, suggestion.ReasonForSuggestion, suggestion.Item.Summary);
+					return new ArrowSuggestionDto(
+						suggestion.SuggestedPropertyIri,
+						suggestion.SuggestedProperty.Label,
+						connection,
+						suggestion.ReasonForSuggestion,
+						suggestion.SuggestedProperty.Summary ?? string.Empty);
 				})
 				.ToList();
 
@@ -50,20 +69,56 @@ public class SuggestionsTransformer
 		}
 
 		indirectConnections = suggestions
-				.Where(s => !substructure.ClassItems.Any(item => s.DomainItemIri == item.Iri)
-								 && !substructure.ClassItems.Any(item => s.RangeItemIri == item.Iri))
-				.GroupBy(s => s.DomainItem.Label)
+				.Where(suggestion =>
+				{
+					if (substructure.ClassItems.Any(item => suggestion.SuggestedProperty.DomainIri == item.Iri))
+					{
+						// Domain is in the substructure, so this is a direct connection.
+						return false;
+					}
+					if (suggestion.SuggestedProperty is ObjectPropertyItem objectProperty)
+					{
+						if (substructure.ClassItems.Any(item => objectProperty.RangeIri == item.Iri)) {
+							// Range is in the substructure, so this is a direct connection.
+							return false;
+						}
+					}
+
+					// If suggestion is a datatype property and domain is not in the substructure,
+					// then it is an indirect connection.
+					// If suggestion is an object property and domain is not in the substructure,
+					// and range is also not in the substructure, then it is an indirect connection.
+					return true;
+				})
+				.GroupBy(s => s.SuggestedProperty.Label)
 				.Select(group => new GroupedSuggestionsDto(
 						group.Key,
-						group.Select(s =>
-								new ArrowSuggestionDto(
-										s.ItemIri,
-										s.Item.Label,
-										$"→ {s.Item.Label} → {(s.RangeItem != null ? s.RangeItem.Label : s.RangeItemIri)}",
-										s.ReasonForSuggestion,
-										s.Item.Summary
-								)
-						).ToList()
+						group.Select(suggestion =>
+						{
+							string? range = null;
+							if (suggestion.SuggestedProperty is ObjectPropertyItem objectProperty)
+							{
+								range = objectProperty.Range.Label;
+							}
+							else if (suggestion.SuggestedProperty is DatatypePropertyItem datatypeProperty)
+							{
+								range = datatypeProperty.RangeDatatypeIri;
+							}
+							else
+							{
+								// This should never happen.
+								// But handle it just in case.
+								range = "[Unknown range]";
+							}
+
+								return new ArrowSuggestionDto(
+											suggestion.SuggestedProperty.Iri,
+											suggestion.SuggestedProperty.Label,
+											$"→ {suggestion.SuggestedProperty.Label} → {range}",
+											suggestion.ReasonForSuggestion,
+											suggestion.SuggestedProperty.Summary
+									);
+						}).ToList()
 				))
 				.ToList();
 
