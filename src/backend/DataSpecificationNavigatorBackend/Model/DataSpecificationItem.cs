@@ -10,7 +10,7 @@ public abstract class DataSpecificationItem
 
 	public required string Label { get; set; }
 
-	public virtual ItemType Type { get; }
+	public ItemType Type { get; }
 
 	public string? Summary { get; set; }
 
@@ -29,7 +29,7 @@ public enum ItemType
 
 public class ClassItem : DataSpecificationItem
 {
-	public override ItemType Type { get => ItemType.Class; }
+	public new ItemType Type { get => ItemType.Class; }
 }
 
 public class PropertyItem : DataSpecificationItem
@@ -41,7 +41,7 @@ public class PropertyItem : DataSpecificationItem
 
 public class ObjectPropertyItem : PropertyItem
 {
-	public override ItemType Type { get => ItemType.ObjectProperty; }
+	public new ItemType Type { get => ItemType.ObjectProperty; }
 
 	public required string RangeIri { get; set; } // For Entity Framework configuration.
 
@@ -50,7 +50,7 @@ public class ObjectPropertyItem : PropertyItem
 
 public class DatatypePropertyItem : PropertyItem
 {
-	public override ItemType Type { get => ItemType.DatatypeProperty; }
+	public new ItemType Type { get => ItemType.DatatypeProperty; }
 
 	public required string RangeDatatypeIri { get; set; }
 }
