@@ -31,5 +31,7 @@ public class DataSpecificationSubstructure
 		public required string Domain { get; set; }
 					 
 		public required string Range { get; set; }
+
+		public bool IsOptional { get; set; } = false;
 	}
 }
