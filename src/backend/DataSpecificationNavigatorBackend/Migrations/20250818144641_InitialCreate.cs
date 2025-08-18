@@ -17,9 +17,9 @@ namespace DataSpecificationNavigatorBackend.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    DataspecerPackageUuid = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Owl = table.Column<string>(type: "TEXT", nullable: false)
+                    OwlContent = table.Column<string>(type: "TEXT", nullable: false),
+                    DataspecerPackageUuid = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,8 +35,7 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "TEXT", nullable: false),
                     DataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SubstructureJsonString = table.Column<string>(type: "TEXT", nullable: false),
-                    UserSelectedItems = table.Column<string>(type: "TEXT", nullable: false),
+                    DataSpecificationSubstructure = table.Column<string>(type: "json", nullable: false),
                     SuggestedMessage = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -59,24 +58,26 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     Label = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Summary = table.Column<string>(type: "TEXT", nullable: true),
-                    DomainItemIri = table.Column<string>(type: "TEXT", nullable: true),
-                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: true),
-                    RangeItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false),
+                    DomainIri = table.Column<string>(type: "TEXT", nullable: true),
+                    RangeDatatypeIri = table.Column<string>(type: "TEXT", nullable: true),
+                    RangeIri = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSpecificationItems", x => new { x.Iri, x.DataSpecificationId });
+                    table.PrimaryKey("PK_DataSpecificationItems", x => new { x.DataSpecificationId, x.Iri });
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItems_DataSpecificationItems_DomainItemIri_DataSpecificationId",
-                        columns: x => new { x.DomainItemIri, x.DataSpecificationId },
+                        name: "FK_DataSpecificationItems_DataSpecificationItems_DataSpecificationId_DomainIri",
+                        columns: x => new { x.DataSpecificationId, x.DomainIri },
                         principalTable: "DataSpecificationItems",
-                        principalColumns: new[] { "Iri", "DataSpecificationId" },
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumns: new[] { "DataSpecificationId", "Iri" },
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItems_DataSpecificationItems_RangeItemIri_RangeItemDataSpecificationId",
-                        columns: x => new { x.RangeItemIri, x.RangeItemDataSpecificationId },
+                        name: "FK_DataSpecificationItems_DataSpecificationItems_DataSpecificationId_RangeIri",
+                        columns: x => new { x.DataSpecificationId, x.RangeIri },
                         principalTable: "DataSpecificationItems",
-                        principalColumns: new[] { "Iri", "DataSpecificationId" });
+                        principalColumns: new[] { "DataSpecificationId", "Iri" },
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DataSpecificationItems_DataSpecifications_DataSpecificationId",
                         column: x => x.DataSpecificationId,
@@ -94,12 +95,14 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     TextContent = table.Column<string>(type: "TEXT", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ConversationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
-                    IsGenerated = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 21, nullable: false),
+                    PrecedingUserMessageId = table.Column<Guid>(type: "TEXT", nullable: true),
                     MappingText = table.Column<string>(type: "TEXT", nullable: true),
+                    MappedItemsIri = table.Column<string>(type: "TEXT", nullable: true),
+                    SuggestPropertiesText = table.Column<string>(type: "TEXT", nullable: true),
+                    SuggestedPropertiesIri = table.Column<string>(type: "TEXT", nullable: true),
                     SparqlText = table.Column<string>(type: "TEXT", nullable: true),
                     SparqlQuery = table.Column<string>(type: "TEXT", nullable: true),
-                    SuggestItemsText = table.Column<string>(type: "TEXT", nullable: true),
                     ReplyMessageId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -112,33 +115,63 @@ namespace DataSpecificationNavigatorBackend.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Messages_Messages_PrecedingUserMessageId",
+                        column: x => x.PrecedingUserMessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Messages_Messages_ReplyMessageId",
                         column: x => x.ReplyMessageId,
                         principalTable: "Messages",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSpecificationItemMappings",
+                name: "UserSelections",
                 columns: table => new
                 {
-                    ItemIri = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ConversationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SelectedPropertyIri = table.Column<string>(type: "TEXT", nullable: false),
+                    IsOptional = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsSelectTarget = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FilterExpression = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSelections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSelections_Conversations_ConversationId",
+                        column: x => x.ConversationId,
+                        principalTable: "Conversations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItemMappings",
+                columns: table => new
+                {
                     ItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ItemIri = table.Column<string>(type: "TEXT", nullable: false),
                     UserMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
                     MappedWords = table.Column<string>(type: "TEXT", nullable: false),
                     IsSelectTarget = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSpecificationItemMappings", x => new { x.ItemDataSpecificationId, x.ItemIri, x.UserMessageId });
+                    table.PrimaryKey("PK_ItemMappings", x => new { x.ItemDataSpecificationId, x.ItemIri, x.UserMessageId });
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItemMappings_DataSpecificationItems_ItemIri_ItemDataSpecificationId",
-                        columns: x => new { x.ItemIri, x.ItemDataSpecificationId },
+                        name: "FK_ItemMappings_DataSpecificationItems_ItemDataSpecificationId_ItemIri",
+                        columns: x => new { x.ItemDataSpecificationId, x.ItemIri },
                         principalTable: "DataSpecificationItems",
-                        principalColumns: new[] { "Iri", "DataSpecificationId" },
+                        principalColumns: new[] { "DataSpecificationId", "Iri" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItemMappings_Messages_UserMessageId",
+                        name: "FK_ItemMappings_Messages_UserMessageId",
                         column: x => x.UserMessageId,
                         principalTable: "Messages",
                         principalColumn: "Id",
@@ -146,34 +179,26 @@ namespace DataSpecificationNavigatorBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSpecificationItemSuggestions",
+                name: "PropertySuggestions",
                 columns: table => new
                 {
-                    ItemDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ItemIri = table.Column<string>(type: "TEXT", nullable: false),
-                    ReplyMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ReasonForSuggestion = table.Column<string>(type: "TEXT", nullable: false),
-                    DomainItemIri = table.Column<string>(type: "TEXT", nullable: true),
-                    RangeItemIri = table.Column<string>(type: "TEXT", nullable: false)
+                    PropertyDataSpecificationId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SuggestedPropertyIri = table.Column<string>(type: "TEXT", nullable: false),
+                    UserMessageId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ReasonForSuggestion = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSpecificationItemSuggestions", x => new { x.ItemDataSpecificationId, x.ItemIri, x.ReplyMessageId });
+                    table.PrimaryKey("PK_PropertySuggestions", x => new { x.PropertyDataSpecificationId, x.SuggestedPropertyIri, x.UserMessageId });
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItemSuggestions_DataSpecificationItems_DomainItemIri_ItemDataSpecificationId",
-                        columns: x => new { x.DomainItemIri, x.ItemDataSpecificationId },
+                        name: "FK_PropertySuggestions_DataSpecificationItems_PropertyDataSpecificationId_SuggestedPropertyIri",
+                        columns: x => new { x.PropertyDataSpecificationId, x.SuggestedPropertyIri },
                         principalTable: "DataSpecificationItems",
-                        principalColumns: new[] { "Iri", "DataSpecificationId" },
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_DataSpecificationItemSuggestions_DataSpecificationItems_ItemIri_ItemDataSpecificationId",
-                        columns: x => new { x.ItemIri, x.ItemDataSpecificationId },
-                        principalTable: "DataSpecificationItems",
-                        principalColumns: new[] { "Iri", "DataSpecificationId" },
+                        principalColumns: new[] { "DataSpecificationId", "Iri" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DataSpecificationItemSuggestions_Messages_ReplyMessageId",
-                        column: x => x.ReplyMessageId,
+                        name: "FK_PropertySuggestions_Messages_UserMessageId",
+                        column: x => x.UserMessageId,
                         principalTable: "Messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -185,44 +210,19 @@ namespace DataSpecificationNavigatorBackend.Migrations
                 column: "DataSpecificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItemMappings_ItemIri_ItemDataSpecificationId",
-                table: "DataSpecificationItemMappings",
-                columns: new[] { "ItemIri", "ItemDataSpecificationId" });
+                name: "IX_DataSpecificationItems_DataSpecificationId_DomainIri",
+                table: "DataSpecificationItems",
+                columns: new[] { "DataSpecificationId", "DomainIri" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItemMappings_UserMessageId",
-                table: "DataSpecificationItemMappings",
+                name: "IX_DataSpecificationItems_DataSpecificationId_RangeIri",
+                table: "DataSpecificationItems",
+                columns: new[] { "DataSpecificationId", "RangeIri" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItemMappings_UserMessageId",
+                table: "ItemMappings",
                 column: "UserMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItems_DataSpecificationId",
-                table: "DataSpecificationItems",
-                column: "DataSpecificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItems_DomainItemIri_DataSpecificationId",
-                table: "DataSpecificationItems",
-                columns: new[] { "DomainItemIri", "DataSpecificationId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItems_RangeItemIri_RangeItemDataSpecificationId",
-                table: "DataSpecificationItems",
-                columns: new[] { "RangeItemIri", "RangeItemDataSpecificationId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItemSuggestions_DomainItemIri_ItemDataSpecificationId",
-                table: "DataSpecificationItemSuggestions",
-                columns: new[] { "DomainItemIri", "ItemDataSpecificationId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItemSuggestions_ItemIri_ItemDataSpecificationId",
-                table: "DataSpecificationItemSuggestions",
-                columns: new[] { "ItemIri", "ItemDataSpecificationId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DataSpecificationItemSuggestions_ReplyMessageId",
-                table: "DataSpecificationItemSuggestions",
-                column: "ReplyMessageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",
@@ -230,20 +230,39 @@ namespace DataSpecificationNavigatorBackend.Migrations
                 column: "ConversationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Messages_PrecedingUserMessageId",
+                table: "Messages",
+                column: "PrecedingUserMessageId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReplyMessageId",
                 table: "Messages",
                 column: "ReplyMessageId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PropertySuggestions_UserMessageId",
+                table: "PropertySuggestions",
+                column: "UserMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSelections_ConversationId",
+                table: "UserSelections",
+                column: "ConversationId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DataSpecificationItemMappings");
+                name: "ItemMappings");
 
             migrationBuilder.DropTable(
-                name: "DataSpecificationItemSuggestions");
+                name: "PropertySuggestions");
+
+            migrationBuilder.DropTable(
+                name: "UserSelections");
 
             migrationBuilder.DropTable(
                 name: "DataSpecificationItems");

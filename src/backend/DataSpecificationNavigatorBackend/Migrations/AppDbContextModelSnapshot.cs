@@ -16,7 +16,7 @@ namespace DataSpecificationNavigatorBackend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Proxies:ChangeTracking", false)
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true);
@@ -30,21 +30,17 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("LastUpdated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SubstructureJsonString")
+                    b.Property<string>("DataSpecificationSubstructure")
                         .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<DateTime>("LastUpdated")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SuggestedMessage")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.PrimitiveCollection<string>("UserSelectedItems")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -69,7 +65,7 @@ namespace DataSpecificationNavigatorBackend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Owl")
+                    b.Property<string>("OwlContent")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -80,23 +76,19 @@ namespace DataSpecificationNavigatorBackend.Migrations
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", b =>
                 {
-                    b.Property<string>("Iri")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("DataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DomainItemIri")
+                    b.Property<string>("Iri")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Label")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("RangeItemDataSpecificationId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RangeItemIri")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Summary")
@@ -105,15 +97,13 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Iri", "DataSpecificationId");
-
-                    b.HasIndex("DataSpecificationId");
-
-                    b.HasIndex("DomainItemIri", "DataSpecificationId");
-
-                    b.HasIndex("RangeItemIri", "RangeItemDataSpecificationId");
+                    b.HasKey("DataSpecificationId", "Iri");
 
                     b.ToTable("DataSpecificationItems");
+
+                    b.HasDiscriminator().HasValue("DataSpecificationItem");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationItemMapping", b =>
@@ -138,42 +128,29 @@ namespace DataSpecificationNavigatorBackend.Migrations
 
                     b.HasIndex("UserMessageId");
 
-                    b.HasIndex("ItemIri", "ItemDataSpecificationId");
-
-                    b.ToTable("DataSpecificationItemMappings");
+                    b.ToTable("ItemMappings");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationPropertySuggestion", b =>
                 {
-                    b.Property<int>("ItemDataSpecificationId")
+                    b.Property<int>("PropertyDataSpecificationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ItemIri")
+                    b.Property<string>("SuggestedPropertyIri")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ReplyMessageId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DomainItemIri")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RangeItemIri")
-                        .IsRequired()
+                    b.Property<Guid>("UserMessageId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReasonForSuggestion")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ItemDataSpecificationId", "ItemIri", "ReplyMessageId");
+                    b.HasKey("PropertyDataSpecificationId", "SuggestedPropertyIri", "UserMessageId");
 
-                    b.HasIndex("ReplyMessageId");
+                    b.HasIndex("UserMessageId");
 
-                    b.HasIndex("DomainItemIri", "ItemDataSpecificationId");
-
-                    b.HasIndex("ItemIri", "ItemDataSpecificationId");
-
-                    b.ToTable("DataSpecificationItemSuggestions");
+                    b.ToTable("PropertySuggestions");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.Message", b =>
@@ -187,7 +164,7 @@ namespace DataSpecificationNavigatorBackend.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(13)
+                        .HasMaxLength(21)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Sender")
@@ -211,28 +188,87 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.UserSelection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FilterExpression")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsOptional")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSelectTarget")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SelectedPropertyIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("UserSelections");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ClassItem", b =>
+                {
+                    b.HasBaseType("DataSpecificationNavigatorBackend.Model.DataSpecificationItem");
+
+                    b.HasDiscriminator().HasValue("ClassItem");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.PropertyItem", b =>
+                {
+                    b.HasBaseType("DataSpecificationNavigatorBackend.Model.DataSpecificationItem");
+
+                    b.Property<string>("DomainIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("DataSpecificationId", "DomainIri");
+
+                    b.HasDiscriminator().HasValue("PropertyItem");
+                });
+
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ReplyMessage", b =>
                 {
                     b.HasBaseType("DataSpecificationNavigatorBackend.Model.Message");
 
-                    b.Property<bool>("IsGenerated")
-                        .HasColumnType("INTEGER");
+                    b.PrimitiveCollection<string>("MappedItemsIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("MappingText")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("PrecedingUserMessageId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SparqlQuery")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SparqlText")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SuggestItemsText")
+                    b.Property<string>("SuggestPropertiesText")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.PrimitiveCollection<string>("SuggestedPropertiesIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("PrecedingUserMessageId")
+                        .IsUnique();
 
                     b.HasDiscriminator().HasValue("ReplyMessage");
                 });
@@ -250,6 +286,37 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     b.HasDiscriminator().HasValue("UserMessage");
                 });
 
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.WelcomeMessage", b =>
+                {
+                    b.HasBaseType("DataSpecificationNavigatorBackend.Model.Message");
+
+                    b.HasDiscriminator().HasValue("WelcomeMessage");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DatatypePropertyItem", b =>
+                {
+                    b.HasBaseType("DataSpecificationNavigatorBackend.Model.PropertyItem");
+
+                    b.Property<string>("RangeDatatypeIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("DatatypePropertyItem");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ObjectPropertyItem", b =>
+                {
+                    b.HasBaseType("DataSpecificationNavigatorBackend.Model.PropertyItem");
+
+                    b.Property<string>("RangeIri")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("DataSpecificationId", "RangeIri");
+
+                    b.HasDiscriminator().HasValue("ObjectPropertyItem");
+                });
+
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.Conversation", b =>
                 {
                     b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecification", "DataSpecification")
@@ -269,33 +336,20 @@ namespace DataSpecificationNavigatorBackend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", "DomainItem")
-                        .WithMany()
-                        .HasForeignKey("DomainItemIri", "DataSpecificationId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", "RangeItem")
-                        .WithMany()
-                        .HasForeignKey("RangeItemIri", "RangeItemDataSpecificationId");
-
                     b.Navigation("DataSpecification");
-
-                    b.Navigation("DomainItem");
-
-                    b.Navigation("RangeItem");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationItemMapping", b =>
                 {
                     b.HasOne("DataSpecificationNavigatorBackend.Model.UserMessage", "UserMessage")
-                        .WithMany("ItemMappings")
+                        .WithMany()
                         .HasForeignKey("UserMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", "Item")
-                        .WithMany("ItemMappingsTable")
-                        .HasForeignKey("ItemIri", "ItemDataSpecificationId")
+                        .WithMany()
+                        .HasForeignKey("ItemDataSpecificationId", "ItemIri")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -306,28 +360,21 @@ namespace DataSpecificationNavigatorBackend.Migrations
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationPropertySuggestion", b =>
                 {
-                    b.HasOne("DataSpecificationNavigatorBackend.Model.ReplyMessage", "ReplyMessage")
-                        .WithMany("ItemSuggestions")
-                        .HasForeignKey("ReplyMessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", "DomainItem")
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.UserMessage", "UserMessage")
                         .WithMany()
-                        .HasForeignKey("DomainItemIri", "ItemDataSpecificationId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", "Item")
-                        .WithMany("ItemSuggestionsTable")
-                        .HasForeignKey("ItemIri", "ItemDataSpecificationId")
+                        .HasForeignKey("UserMessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DomainItem");
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.PropertyItem", "SuggestedProperty")
+                        .WithMany()
+                        .HasForeignKey("PropertyDataSpecificationId", "SuggestedPropertyIri")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Item");
+                    b.Navigation("SuggestedProperty");
 
-                    b.Navigation("ReplyMessage");
+                    b.Navigation("UserMessage");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.Message", b =>
@@ -341,38 +388,65 @@ namespace DataSpecificationNavigatorBackend.Migrations
                     b.Navigation("Conversation");
                 });
 
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.UserSelection", b =>
+                {
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.Conversation", "Conversation")
+                        .WithMany("UserSelections")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.PropertyItem", b =>
+                {
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.ClassItem", "Domain")
+                        .WithMany()
+                        .HasForeignKey("DataSpecificationId", "DomainIri")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Domain");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ReplyMessage", b =>
+                {
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.UserMessage", "PrecedingUserMessage")
+                        .WithOne()
+                        .HasForeignKey("DataSpecificationNavigatorBackend.Model.ReplyMessage", "PrecedingUserMessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PrecedingUserMessage");
+                });
+
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.UserMessage", b =>
                 {
                     b.HasOne("DataSpecificationNavigatorBackend.Model.ReplyMessage", "ReplyMessage")
-                        .WithOne("PrecedingUserMessage")
-                        .HasForeignKey("DataSpecificationNavigatorBackend.Model.UserMessage", "ReplyMessageId");
+                        .WithOne()
+                        .HasForeignKey("DataSpecificationNavigatorBackend.Model.UserMessage", "ReplyMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ReplyMessage");
+                });
+
+            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ObjectPropertyItem", b =>
+                {
+                    b.HasOne("DataSpecificationNavigatorBackend.Model.ClassItem", "Range")
+                        .WithMany()
+                        .HasForeignKey("DataSpecificationId", "RangeIri")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Range");
                 });
 
             modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.Conversation", b =>
                 {
                     b.Navigation("Messages");
-                });
 
-            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.DataSpecificationItem", b =>
-                {
-                    b.Navigation("ItemMappingsTable");
-
-                    b.Navigation("ItemSuggestionsTable");
-                });
-
-            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.ReplyMessage", b =>
-                {
-                    b.Navigation("ItemSuggestions");
-
-                    b.Navigation("PrecedingUserMessage")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DataSpecificationNavigatorBackend.Model.UserMessage", b =>
-                {
-                    b.Navigation("ItemMappings");
+                    b.Navigation("UserSelections");
                 });
 #pragma warning restore 612, 618
         }

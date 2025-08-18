@@ -103,10 +103,13 @@ public class ConversationService(
 			else
 			{
 				_logger.LogInformation("User selected properties: [{SelectedProperties}]", conversation.UserSelections);
+				List<string> iriUserSelections = conversation.UserSelections
+					.Select(selection => selection.SelectedPropertyIri)
+					.ToList();
 				List<PropertyItem> selectedProperties = await _database.DataSpecificationItems
 						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
 								&& item.DataSpecificationId == conversation.DataSpecification.Id
-								&& conversation.UserSelections.Any(s => s.SelectedPropertyIri == item.Iri))
+								&& iriUserSelections.Contains(item.Iri))
 						.Select(item => (PropertyItem)item)
 						.ToListAsync();
 				_logger.LogDebug("Found the following selected properties in the database: {PropertyLabels}", selectedProperties.Select(p => p.Label));
@@ -161,11 +164,11 @@ public class ConversationService(
 		_logger.LogInformation("The LLM suggested the following properties: [{SuggestedProperties}]",
 			suggestions.Select(s => s.SuggestedProperty.Label));
 
-		await _database.UserSelections
-			.Where(s => s.ConversationId == conversation.Id)
-			.ExecuteDeleteAsync();
 		conversation.UserSelections.Clear();
 		conversation.SuggestedMessage = null;
+
+		// Remove all previous user selections because a new user message has been added.
+		_database.UserSelections.RemoveRange(conversation.UserSelections);
 		await _database.SaveChangesAsync();
 		return userMessage;
 	}
@@ -301,12 +304,16 @@ public class ConversationService(
 		}
 
 		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(conversation.DataSpecification, userMessage, conversation.DataSpecificationSubstructure, itemsToAdd);
-		conversation.SuggestedMessage = suggestedMessage;
-		await _database.UserSelections
+		/*await _database.UserSelections
 			.Where(s => s.ConversationId == conversation.Id)
-			.ExecuteDeleteAsync();
-		conversation.UserSelections = userSelections;
+			.ExecuteDeleteAsync();*/
+
+		// Remove all previous selections before adding the newly updated ones.
+		_database.UserSelections.RemoveRange(conversation.UserSelections);
+
 		await _database.UserSelections.AddRangeAsync(userSelections);
+		conversation.UserSelections = userSelections;
+		conversation.SuggestedMessage = suggestedMessage;
 
 		await _database.SaveChangesAsync();
 		return suggestedMessage;
@@ -435,7 +442,11 @@ public class ConversationService(
 				_logger.LogError("The property {PropertyLabel} does not have its domain in the substructure.", property.Label);
 				continue;
 			}
-			
+
+			// User selections apply to properties.
+			// (because only properties can be selected by the user)
+			UserSelection? userSelection = userSelections
+				.FirstOrDefault(selection => selection.SelectedPropertyIri == property.Iri);
 			if (property is ObjectPropertyItem objectProperty)
 			{
 				domainInSubstructure.ObjectProperties.Add(new SubstructureObjectProperty
@@ -443,33 +454,21 @@ public class ConversationService(
 					Iri = property.Iri,
 					Label = property.Label,
 					Domain = property.DomainIri,
-					Range = objectProperty.RangeIri
+					Range = objectProperty.RangeIri,
+					IsOptional = userSelection?.IsOptional ?? false
 				});
 			}
 			else if (property is DatatypePropertyItem datatypeProperty)
 			{
-				UserSelection? userSelection = userSelections
-					.FirstOrDefault(selection => selection.SelectedPropertyIri == property.Iri);
-
-				bool isSelectTarget = true;
-				string? filterExpression = null;
-				bool isOptional = false;
-				if (userSelection is not null)
-				{
-					isSelectTarget = userSelection.IsSelectTarget;
-					filterExpression = userSelection.FilterExpression;
-					isOptional = userSelection.IsOptional;
-				}
-
 				domainInSubstructure.DatatypeProperties.Add(new SubstructureDatatypeProperty
 				{
 					Iri = property.Iri,
 					Label = property.Label,
 					Domain = property.DomainIri,
 					Range = datatypeProperty.RangeDatatypeIri,
-					IsSelectTarget = isSelectTarget,
-					FilterExpression = filterExpression,
-					IsOptional = isOptional
+					IsSelectTarget = userSelection?.IsSelectTarget ?? true,
+					FilterExpression = userSelection?.FilterExpression,
+					IsOptional = userSelection?.IsOptional ?? false
 				});
 			}
 			else

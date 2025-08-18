@@ -1,6 +1,7 @@
 ﻿using DataSpecificationNavigatorBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigatorBackend.Model;
 using System.Text;
+using VDS.RDF.Parsing.Validation;
 using static DataSpecificationNavigatorBackend.Model.DataSpecificationSubstructure;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer.SparqlTranslation;
@@ -14,8 +15,22 @@ public class SparqlTranslationService(
 	{
 		if (substructure.ClassItems.Count == 0)
 			return "SELECT * WHERE {}";
-		var graph = FromDataSpecification(substructure);
-		return GenerateSparqlQuery(graph);
+		QueryGraph graph = FromDataSpecification(substructure);
+		string sparqlQuery = GenerateSparqlQuery(graph);
+		SparqlQueryValidator validator = new();
+		var validationResult = validator.Validate(sparqlQuery);
+		if (validationResult.IsValid)
+		{
+			_logger.LogDebug("Generated SPARQL query is valid.");
+		}
+		else
+		{
+			_logger.LogError("The generated SPARQL query is invalid.");
+			_logger.LogError("Validation error: {Err}", validationResult.Error);
+			_logger.LogError("Validation message: {Msg}", validationResult.Message);
+			_logger.LogError("Validation warnings: {Warn}", validationResult.Warnings);
+		}
+		return sparqlQuery;
 	}
 
 	private QueryGraph FromDataSpecification(DataSpecificationSubstructure substructure)
