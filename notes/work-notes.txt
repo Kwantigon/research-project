@@ -435,17 +435,6 @@ Pokud se neliší:
 	6. Říct si o mapping a předat (substructure + selected properties + domains + ranges), aby LLM mapoval jen na ty předané itemy.
 	7. Přidat itemy do současného substructure.
 
-Ukládání data specification item funguje.
-Ukládání zpráv funguje.
-
-Přemýšlím, jestli ItemMapping a SuggestedProperties by se měly vázat na UserMessage.
-- ItemMapping určitě, to dává smysl.
-- SuggestedProperties asi taky. Ale co by teda ReplyMessage měl obsahovat, případně vlastnit?
-
-Kde jsem skončil:
-- Aktualizoval jsem model v hlavním projektu.
-- Aktualizoval jsem data specification service, dataspecer connector atd. v hlavním projektu.
-
 Plán na zítra:
 - Chtěl bych zkusit přidat unit tests pro data specification service.
 - Vytvořit DSV soubor, který obsahuje pár itemů.
@@ -456,25 +445,27 @@ Plán na zítra:
 - Vytvořit OWL soubor s několika itemy.
 - Ověřit, že když DSV není, tak to použije OWL a bude vracet správné itemy.
 
-Apparently nemá smysl pouštět testy když se mi projekt stejně nezbuildí.
-Nejdřív dám všechno zpracování do pořádku.
-
-AddMappedItemsToSubstructure(DataSpecificationSubstructure substructure, IReadOnlyCollection<DataSpecificationItemMapping> mappings)
-- Proč vlastně přidávám "mappings".
-- Proč nepřidávám přímo "data specification items"?
-- Jediná výhoda je, že v mapping mám "IsSelectTarget".
-- Mapping komplikuje přidání selected items.
-
-Došel jsem k generování ReplyMessage. Otázka je, co všechno by ReplyMessage měl obsahovat?
-- Myslím, že to nechám tak, jak to do teď bylo.
-- Mapping text, Sparql text, atd.
-- Myslím, že přidám i mapped items a suggestions, ale označím jako not mapped?
-
-Přidání nové zprávy a generování odpovědi funguje.
-Suggested message funguje.
-Nefunguje mi add suggested property.
-
 !!!To do: Když uživatel přidá pouze item v "more to consider", tak se mi to nenapojí správně na substructure. Nemám tam hranu do substructure.
 - Vypadá to, že se to trochu rozbije.
 - Summary je prázdný.
-Databáze mi špatně vrací ItemType. I property má type class.
+
+Rozšířil jsem Sparql podporou pro OPTIONAL a FILTER.
+Musím ale nějak dostat tyto hodnoty z frontendu na backend a do substructure.
+
+Začíná se rozrůstat to, co všechno uživatel si může vybírat.
+- V budoucnu toho bude možná více.
+- Teď to je FilterExpression a IsOptional a možná nechám uživatele to zvolit i jako IsSelectTarget.
+- To všechno musím předat do metody, která přidává data specification item do substructure.
+- Musím si zavést novou třídu UserSelection - bude i nová tabulka v databázi.
+- Třída bude obsahovat věci, které uživatel si naklikal, napsal.
+
+Do větve pro zpracování následované zprávy musím přidat:
+- Místo UserSelectedItems teď budu pracovat s UserSelections.
+- Vytáhnu si itemy z databáze jako je to teď.
+- Předám itemy a user selections do metody pro přidání do substructure.
+Upravím přidání do substructure:
+- Pokud userSelections je empty, tak zpracování jako do teď. Jedná se nejspíše o první zprávu.
+- Jinak vždycky, když narazím na property, tak si vyhledám v user selection a vytáhnu to, co potřebuju.
+
+Myslím si, že nedám možnost použít indirect suggestions.
+- Teoreticky to může být property, který je libovolně daleko od current substructure. Pak bych docela marně hledal cestu ne?
