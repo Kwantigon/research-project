@@ -2,6 +2,7 @@
 using DataSpecificationNavigatorBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigatorBackend.BusinessCoreLayer.DTO;
 using DataSpecificationNavigatorBackend.BusinessCoreLayer.Facade;
+using DataSpecificationNavigatorBackend.BusinessCoreLayer.SparqlTranslation;
 using DataSpecificationNavigatorBackend.ConnectorsLayer;
 using DataSpecificationNavigatorBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigatorBackend.ConnectorsLayer.LlmConnectors;

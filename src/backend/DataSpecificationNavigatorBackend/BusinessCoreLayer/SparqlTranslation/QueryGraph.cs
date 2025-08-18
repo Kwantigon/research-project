@@ -69,6 +69,8 @@ public class DatatypeNode
 
 	public bool IsSelectTarget { get; set; }
 
+	public string? FilterExpression { get; set; }
+
 	internal string? VariableName { get; set; }
 }
 

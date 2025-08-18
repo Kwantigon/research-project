@@ -32,6 +32,8 @@ public class DataSpecificationSubstructure
 					 
 		public required string Range { get; set; }
 
+		public string? FilterExpression { get; set; }
+
 		public bool IsOptional { get; set; } = false;
 	}
 }

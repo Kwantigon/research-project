@@ -7,13 +7,6 @@ namespace DataSpecificationNavigatorBackend.BusinessCoreLayer.SparqlTranslation;
 public class SparqlTranslationService(
 	ILogger<SparqlTranslationService> logger) : ISparqlTranslationService
 {
-	/*
-	 * To do: This seems to work fine.
-	 *				but I want to make the Sparql query a bit more readable
-	 *				by having better variable names.
-	 *				Will come back to this later.
-	 */
-
 	private readonly ILogger<SparqlTranslationService> _logger = logger;
 
 	public string TranslateSubstructure(DataSpecificationSubstructure substructure)
@@ -68,6 +61,7 @@ public class SparqlTranslationService(
 					PropertyLabel = datatypeProperty.Label,
 					Range = datatypeProperty.Range,
 					IsSelectTarget = true,   // For now, we treat all datatype properties as select targets.
+					FilterExpression = datatypeProperty.FilterExpression,
 					IsOptional = datatypeProperty.IsOptional
 				});
 			}
@@ -103,7 +97,7 @@ public class SparqlTranslationService(
 		sparql.Append("SELECT DISTINCT "); // Will add the SELECT targets later.
 		sparql.AppendLine();
 
-		sparql.AppendLine("WHERE {");
+		sparql.Append("WHERE {"); // Not using AppendLine because the method GenerateNode will add the new line.
 		var visited = new HashSet<QueryNode>();
 		foreach (var root in graph.Roots)
 		{
@@ -129,7 +123,10 @@ public class SparqlTranslationService(
 		string indent = new string(' ', indentLevel * 2);
 
 		// Triple for the type of the variable.
+		sparql.AppendLine();
+		sparql.AppendLine($"{indent}# {node.Label}");
 		sparql.AppendLine($"{indent}{currentVar} a <{node.Iri}> .");
+		sparql.AppendLine(); // Add an empty line for readability.
 
 		if (node.IsSelectTarget)
 			selectTargets.Add(currentVar);
@@ -140,13 +137,21 @@ public class SparqlTranslationService(
 			if (dtProp.IsOptional)
 			{
 				sparql.AppendLine($"{indent}OPTIONAL {{ {currentVar} <{dtProp.PropertyIri}> {dtProp.VariableName} . }}");
-				selectTargets.Add(dtProp.VariableName!);
 			}
 			else
 			{
 				sparql.AppendLine($"{indent}{currentVar} <{dtProp.PropertyIri}> {dtProp.VariableName} .");
 			}
+
+			if (dtProp.IsSelectTarget)
+			{
+				selectTargets.Add(dtProp.VariableName!);
+			}
+
+			if (!string.IsNullOrWhiteSpace(dtProp.FilterExpression))
+				sparql.AppendLine($"{indent}  FILTER({dtProp.FilterExpression.Replace("{var}", dtProp.VariableName)})");
 		}
+		sparql.AppendLine(); // Add an empty line for readability.
 
 		// Object properties
 		foreach (QueryEdge edge in node.OutgoingEdges)
