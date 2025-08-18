@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -56,30 +58,42 @@ interface Suggestions {
   indirectConnections: GroupedSuggestions[];
 }
 
-interface DatatypeProperty {
+interface SubstructureDatatypeProperty {
   Iri: string;
   Label: string;
   Domain: string;
   Range: string;
 }
 
-interface ObjectProperty {
+interface SubstructureObjectProperty {
   Iri: string;
   Label: string;
   Domain: string;
   Range: string;
 }
 
-interface ClassItem {
+interface SubstructureClass {
   Iri: string;
   Label: string;
   IsSelectTarget: boolean;
-  ObjectProperties: ObjectProperty[];
-  DatatypeProperties: DatatypeProperty[];
+  ObjectProperties: SubstructureObjectProperty[];
+  DatatypeProperties: SubstructureDatatypeProperty[];
 }
 
 interface DataSpecificationSubstructure {
-  ClassItems: ClassItem[];
+  ClassItems: SubstructureClass[];
+}
+
+// A new interface to represent the items selected for expansion
+interface SelectedItemPayload {
+  iri: string;
+  isOptional: boolean;
+  filterExpression: string;
+}
+
+interface SelectedSuggestedItem extends SuggestedItem {
+  isOptional: boolean;
+  filterExpression: string;
 }
 
 
@@ -428,7 +442,7 @@ function ConversationPageMock() {
 	const [messages, setMessages] = useState<(SystemMessage | UserMessage)[]>(mockMessages);
 	const [currentMessage, setCurrentMessage] = useState<string>("");
 	const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null);
-	const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SuggestedItem[]>([]);
+	  const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SelectedSuggestedItem[]>([]);
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<{ item: SuggestedItem | MappedItem, parentMessageId: string } | null>(null);
 	const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(true);
@@ -443,8 +457,9 @@ function ConversationPageMock() {
   const [dataSubstructure, setDataSubstructure] = useState<DataSpecificationSubstructure | null>(mockSubstructure);
   const [isSubstructureLoading, setIsSubstructureLoading] = useState<boolean>(false);
   const [substructureError, setSubstructureError] = useState<string | null>(null);
-
 	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
+  const [dialogIsOptional, setDialogIsOptional] = useState<boolean>(false);
+  const [dialogFilterExpression, setDialogFilterExpression] = useState<string>("");
 
 	const fetchMessages = async () => {
 		setIsFetchingMessages(false);
@@ -579,9 +594,23 @@ function ConversationPageMock() {
 
 	const handleAddItemToMessage = () => {
 		if (selectedItemForSummary && isSuggestedItem(selectedItemForSummary.item) && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
-			const updatedSelectedItems = [...selectedItemsForExpansion, selectedItemForSummary.item];
+			const newItem: SelectedSuggestedItem = {
+        ...selectedItemForSummary.item,
+        isOptional: dialogIsOptional,
+        filterExpression: dialogFilterExpression
+      };
+
+			const updatedSelectedItems = [...selectedItemsForExpansion, newItem];
 			setSelectedItemsForExpansion(updatedSelectedItems);
 			setIsSummaryDialogOpen(false);
+
+			const payload: SelectedItemPayload[] = updatedSelectedItems.map(item => ({
+        iri: item.iri,
+        isOptional: item.isOptional,
+        filterExpression: item.filterExpression
+      }));
+			console.log("Added items to message payload: " + JSON.stringify(payload));
+			setDialogIsOptional(false);
 
 			//setIsFetchingSuggestedMessage(true);
 
@@ -881,9 +910,28 @@ function ConversationPageMock() {
               isSuggestedItem(selectedItemForSummary.item) ? (
                 // If it's a suggested item, show the button to add it to the message
                 !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                  <Button onClick={() => handleAddItemToMessage()} className="mt-4" disabled={!!summaryError}>
-                    Add item to my message
-                  </Button>
+                  <>
+                    <div className="flex items-center space-x-2 mt-4">
+                      <Checkbox
+                        id="optional-item"
+                        checked={dialogIsOptional}
+                        onCheckedChange={(checked) => setDialogIsOptional(!!checked)}
+                      />
+                      <Label htmlFor="optional-item">Add as OPTIONAL</Label>
+                    </div>
+                    <div className="mt-4">
+                      <Label htmlFor="filter-expression">Filter Expression</Label>
+                      <Input
+                        id="filter-expression"
+                        placeholder="e.g., {var} > 100"
+                        value={dialogFilterExpression}
+                        onChange={(e) => setDialogFilterExpression(e.target.value)}
+                      />
+                    </div>
+                    <Button onClick={() => handleAddItemToMessage()} className="mt-4">
+                      Add item to my message
+                    </Button>
+                  </>
                 ) : (
                   <p className="mt-4 text-sm text-green-600 font-semibold">
                     This item has been added to your message.

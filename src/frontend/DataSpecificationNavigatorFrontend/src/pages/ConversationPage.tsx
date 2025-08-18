@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -56,6 +58,11 @@ interface Suggestions {
   indirectConnections: GroupedSuggestions[];
 }
 
+interface SelectedSuggestedItem extends SuggestedItem {
+  isOptional: boolean;
+  filterExpression: string;
+}
+
 // Type guard to check if a message is a ReplyMessage
 const isSystemMessage = (message: UserMessage | SystemMessage): message is SystemMessage => {
 	return message.sender === "System";
@@ -68,7 +75,7 @@ function ConversationPage() {
 	const [messages, setMessages] = useState<(SystemMessage | UserMessage)[]>([]);
 	const [currentMessage, setCurrentMessage] = useState<string>("");
 	const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null);
-	const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SuggestedItem[]>([]);
+			const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SelectedSuggestedItem[]>([]);
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<{ item: SuggestedItem | MappedItem, parentMessageId: string } | null>(null);
 	const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(true);
@@ -79,6 +86,8 @@ function ConversationPage() {
 	const [mostRecentUserMessage, setMostRecentUserMessage] = useState<string | null>(null);
 	const [isWaitingForReplyMessage, setIsWaitingForReplyMessage] = useState<boolean>(false);
 	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
+  const [dialogIsOptional, setDialogIsOptional] = useState<boolean>(false);
+  const [dialogFilterExpression, setDialogFilterExpression] = useState<string>("");
 
 	const fetchMessages = async () => {
 		try {
@@ -216,8 +225,16 @@ function ConversationPage() {
 	};
 
 	const handleAddItemToMessage = async () => {
-		if (selectedItemForSummary && isSuggestedItem(selectedItemForSummary.item) && !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
-			const updatedSelectedItems = [...selectedItemsForExpansion, selectedItemForSummary.item];
+		if (selectedItemForSummary && isSuggestedItem(selectedItemForSummary.item)
+				&& !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri)) {
+
+			const newItem: SelectedSuggestedItem = {
+        ...selectedItemForSummary.item,
+        isOptional: dialogIsOptional,
+        filterExpression: dialogFilterExpression
+      };
+
+			const updatedSelectedItems = [...selectedItemsForExpansion, newItem];
 			setSelectedItemsForExpansion(updatedSelectedItems);
 			setIsSummaryDialogOpen(false);
 
@@ -228,7 +245,11 @@ function ConversationPage() {
 					method: "PUT",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						itemIriList: updatedSelectedItems.map(item => item.iri)
+						userSelections: updatedSelectedItems.map(item => ({
+							propertyIri: item.iri,
+							isOptional: item.isOptional,
+							filterExpression: item.filterExpression
+						}))
 					})
 				});
 				if (!response.ok) {
@@ -242,6 +263,8 @@ function ConversationPage() {
 				console.log(error);
 			} finally {
 				setIsFetchingSuggestedMessage(false);
+				setDialogIsOptional(false);
+				setDialogFilterExpression("");
 			}
 		}
 	};
@@ -507,9 +530,28 @@ function ConversationPage() {
               isSuggestedItem(selectedItemForSummary.item) ? (
                 // If it's a suggested item, show the button to add it to the message
                 !selectedItemsForExpansion.some(item => item.iri === selectedItemForSummary.item.iri) ? (
-                  <Button onClick={() => handleAddItemToMessage()} className="mt-4">
-                    Add item to my message
-                  </Button>
+                  <>
+                    <div className="flex items-center space-x-2 mt-4">
+                      <Checkbox
+                        id="optional-item"
+                        checked={dialogIsOptional}
+                        onCheckedChange={(checked) => setDialogIsOptional(!!checked)}
+                      />
+                      <Label htmlFor="optional-item">Add as OPTIONAL</Label>
+                    </div>
+                    <div className="mt-4">
+                      <Label htmlFor="filter-expression">Filter Expression</Label>
+                      <Input
+                        id="filter-expression"
+                        placeholder="e.g., {var} > 100"
+                        value={dialogFilterExpression}
+                        onChange={(e) => setDialogFilterExpression(e.target.value)}
+                      />
+                    </div>
+                    <Button onClick={() => handleAddItemToMessage()} className="mt-4">
+                      Add item to my message
+                    </Button>
+                  </>
                 ) : (
                   <p className="mt-4 text-sm text-green-600 font-semibold">
                     This item has been added to your message.
