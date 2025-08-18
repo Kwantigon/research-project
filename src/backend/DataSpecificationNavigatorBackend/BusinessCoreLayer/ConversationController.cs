@@ -119,7 +119,7 @@ public class ConversationController(
 		);
 	}
 
-	public async Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload)
+	public async Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutUserSelectedItemsDTO payload)
 	{
 		_logger.LogDebug("Searching for the conversation with ID={Id}", conversationId);
 		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
@@ -130,8 +130,7 @@ public class ConversationController(
 		}
 
 		// Make sure the items in the payload are unique
-		HashSet<string> uniqueIris = [.. payload.ItemIriList];
-		_logger.LogDebug("Searching for the selected items.");
+		HashSet<string> uniqueIris = [.. payload.UserSelections.Select(s => s.PropertyIri)];
 		List<DataSpecificationItem> selectedItems = await _dataSpecificationService.GetDataSpecificationItemsAsync(
 			conversation.DataSpecification.Id, uniqueIris.ToList());
 
@@ -142,7 +141,29 @@ public class ConversationController(
 			return Results.BadRequest(new ErrorDTO() { Reason = "One or more selected items are not present in the data specification." });
 		}
 
-		string? suggestedMessage = await _conversationService.UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(conversation, uniqueIris);
+		List<UserSelection?> userSelections = payload.UserSelections
+			.Select(selection =>
+			{
+				if (uniqueIris.Contains(selection.PropertyIri))
+				{
+					return new UserSelection()
+					{
+						ConversationId = conversation.Id,
+						Conversation = conversation,
+						SelectedPropertyIri = selection.PropertyIri,
+						IsOptional = selection.IsOptional,
+						IsSelectTarget = selection.IsSelectTarget,
+						FilterExpression = selection.FilterExpression
+					};
+				}
+				else
+				{
+					return null;
+				}
+			})
+			.Where(selection => selection != null)
+			.ToList();
+		string? suggestedMessage = await _conversationService.UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(conversation, uniqueIris, userSelections!);
 		if (string.IsNullOrEmpty(suggestedMessage))
 		{
 			_logger.LogError("The suggested message is either null or empty.");

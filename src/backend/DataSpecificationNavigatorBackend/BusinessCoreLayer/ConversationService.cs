@@ -3,6 +3,7 @@ using DataSpecificationNavigatorBackend.ConnectorsLayer;
 using DataSpecificationNavigatorBackend.ConnectorsLayer.Abstraction;
 using DataSpecificationNavigatorBackend.Model;
 using Microsoft.EntityFrameworkCore;
+using static DataSpecificationNavigatorBackend.Model.DataSpecificationSubstructure;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer;
 
@@ -87,13 +88,13 @@ public class ConversationService(
 				// Create a new data specification substructure with the newly mapped items.
 				conversation.DataSpecificationSubstructure = new DataSpecificationSubstructure();
 				List<DataSpecificationItem> itemsToAdd = mappings.Select(m => m.Item).ToList();
-				AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd);
+				AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd, []); // No user selections at this point, so passing an empty list.
 			}
 		}
 		else // User sent the suggested message as is, without any modifications.
 		{
 			_logger.LogDebug("User did not modify the suggested message.");
-			if (conversation.UserSelectedProperties.Count == 0)
+			if (conversation.UserSelections.Count == 0)
 			{
 				_logger.LogError("User sent the suggested message but there are no items for expansion selected by the user in the conversation.");
 				// Just do nothing, I think.
@@ -101,17 +102,18 @@ public class ConversationService(
 			}
 			else
 			{
-				_logger.LogInformation("User selected properties: [{SelectedProperties}]", string.Join(", ", conversation.UserSelectedProperties));
+				_logger.LogInformation("User selected properties: [{SelectedProperties}]", conversation.UserSelections);
 				List<PropertyItem> selectedProperties = await _database.DataSpecificationItems
 						.Where(item => (item.Type == ItemType.ObjectProperty || item.Type == ItemType.DatatypeProperty)
 								&& item.DataSpecificationId == conversation.DataSpecification.Id
-								&& conversation.UserSelectedProperties.Contains(item.Iri))
+								&& conversation.UserSelections.Any(s => s.SelectedPropertyIri == item.Iri))
 						.Select(item => (PropertyItem)item)
 						.ToListAsync();
 				_logger.LogDebug("Found the following selected properties in the database: {PropertyLabels}", selectedProperties.Select(p => p.Label));
 
 				var foundProperties = selectedProperties.Select(p => p.Iri).ToHashSet();
-				var missingProperties = conversation.UserSelectedProperties
+				var missingProperties = conversation.UserSelections
+					.Select(s => s.SelectedPropertyIri)
 					.Where(iri => !foundProperties.Contains(iri))
 					.ToList();
 				if (missingProperties.Count > 0)
@@ -143,7 +145,7 @@ public class ConversationService(
 					}
 
 					_logger.LogDebug("Adding the selected properties and their domains and ranges to the conversation substructure.");
-					AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd);
+					AddDataSpecItemsToConversationSubstructure(conversation, itemsToAdd, conversation.UserSelections);
 
 					// Doing this mapping so that the frontend can show which words or phrases in the user message correspond to which items.
 					_logger.LogDebug("Mapping the user message to the conversation data specification substructure.");
@@ -159,7 +161,10 @@ public class ConversationService(
 		_logger.LogInformation("The LLM suggested the following properties: [{SuggestedProperties}]",
 			suggestions.Select(s => s.SuggestedProperty.Label));
 
-		conversation.UserSelectedProperties?.Clear();
+		await _database.UserSelections
+			.Where(s => s.ConversationId == conversation.Id)
+			.ExecuteDeleteAsync();
+		conversation.UserSelections.Clear();
 		conversation.SuggestedMessage = null;
 		await _database.SaveChangesAsync();
 		return userMessage;
@@ -245,7 +250,10 @@ public class ConversationService(
 		return replyMessage;
 	}
 
-	public async Task<string?> UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(Conversation conversation, HashSet<string> selectedPropertiesIri)
+	public async Task<string?> UpdateSelectedPropertiesAndGenerateSuggestedMessageAsync(
+		Conversation conversation,
+		HashSet<string> selectedPropertiesIri,
+		List<UserSelection> userSelections)
 	{
 		_logger.LogDebug("Searching for the selected items.");
 		IEnumerable<PropertyItem> selectedProperties = await _database.DataSpecificationItems
@@ -267,7 +275,7 @@ public class ConversationService(
 		if (userMessage is null)
 		{
 			_logger.LogError("The conversation does not contain any user messages.");
-			conversation.UserSelectedProperties?.Clear();
+			conversation.UserSelections.Clear();
 			return null;
 		}
 
@@ -294,7 +302,11 @@ public class ConversationService(
 
 		string suggestedMessage = await _llmConnector.GenerateSuggestedMessageAsync(conversation.DataSpecification, userMessage, conversation.DataSpecificationSubstructure, itemsToAdd);
 		conversation.SuggestedMessage = suggestedMessage;
-		conversation.UserSelectedProperties = selectedPropertiesIri.ToList();
+		await _database.UserSelections
+			.Where(s => s.ConversationId == conversation.Id)
+			.ExecuteDeleteAsync();
+		conversation.UserSelections = userSelections;
+		await _database.UserSelections.AddRangeAsync(userSelections);
 
 		await _database.SaveChangesAsync();
 		return suggestedMessage;
@@ -382,7 +394,10 @@ public class ConversationService(
 		return suggestedProperties;
 	}
 
-	private void AddDataSpecItemsToConversationSubstructure(Conversation conversation, IReadOnlyCollection<DataSpecificationItem> itemsToAdd)
+	private void AddDataSpecItemsToConversationSubstructure(
+		Conversation conversation,
+		IReadOnlyCollection<DataSpecificationItem> itemsToAdd,
+		IReadOnlyCollection<UserSelection> userSelections)
 	{
 		DataSpecificationSubstructure substructure = conversation.DataSpecificationSubstructure;
 
@@ -397,7 +412,7 @@ public class ConversationService(
 			}
 			else
 			{
-				DataSpecificationSubstructure.ClassItem classItem = new()
+				SubstructureClass classItem = new()
 				{
 					Iri = classToAdd.Iri,
 					Label = classToAdd.Label,
@@ -412,7 +427,7 @@ public class ConversationService(
 																	.Where(item => item.Type is ItemType.ObjectProperty || item.Type is ItemType.DatatypeProperty);
 		foreach (PropertyItem property in propertiesToAdd)
 		{
-			DataSpecificationSubstructure.ClassItem? domainInSubstructure = substructure.ClassItems.Find(c => c.Iri == property.DomainIri);
+			SubstructureClass? domainInSubstructure = substructure.ClassItems.Find(c => c.Iri == property.DomainIri);
 			if (domainInSubstructure is null)
 			{
 				// At this point, all properties to be added should have their domains and range in the substructure.
@@ -420,40 +435,47 @@ public class ConversationService(
 				_logger.LogError("The property {PropertyLabel} does not have its domain in the substructure.", property.Label);
 				continue;
 			}
-			string? rangeIri;
+			
 			if (property is ObjectPropertyItem objectProperty)
 			{
-				rangeIri = objectProperty.RangeIri;
+				domainInSubstructure.ObjectProperties.Add(new SubstructureObjectProperty
+				{
+					Iri = property.Iri,
+					Label = property.Label,
+					Domain = property.DomainIri,
+					Range = objectProperty.RangeIri
+				});
 			}
 			else if (property is DatatypePropertyItem datatypeProperty)
 			{
-				rangeIri = datatypeProperty.RangeDatatypeIri;
+				UserSelection? userSelection = userSelections
+					.FirstOrDefault(selection => selection.SelectedPropertyIri == property.Iri);
+
+				bool isSelectTarget = true;
+				string? filterExpression = null;
+				bool isOptional = false;
+				if (userSelection is not null)
+				{
+					isSelectTarget = userSelection.IsSelectTarget;
+					filterExpression = userSelection.FilterExpression;
+					isOptional = userSelection.IsOptional;
+				}
+
+				domainInSubstructure.DatatypeProperties.Add(new SubstructureDatatypeProperty
+				{
+					Iri = property.Iri,
+					Label = property.Label,
+					Domain = property.DomainIri,
+					Range = datatypeProperty.RangeDatatypeIri,
+					IsSelectTarget = isSelectTarget,
+					FilterExpression = filterExpression,
+					IsOptional = isOptional
+				});
 			}
 			else
 			{
 				_logger.LogError("Property has unexpected type: {PropertyType}.", property.GetType().Name);
 				continue;
-			}
-
-			DataSpecificationSubstructure.PropertyItem propertyItem = new()
-			{
-				Iri = property.Iri,
-				Label = property.Label,
-				Domain = property.DomainIri,
-				Range = rangeIri
-			};
-
-			switch (property.Type)
-			{
-				case ItemType.Class:
-					_logger.LogError("Expected only properties in the mappedProperties collection. Found a class instead.");
-					break;
-				case ItemType.ObjectProperty:
-					domainInSubstructure.ObjectProperties.Add(propertyItem);
-					break;
-				case ItemType.DatatypeProperty:
-					domainInSubstructure.DatatypeProperties.Add(propertyItem);
-					break;
 			}
 		}
 

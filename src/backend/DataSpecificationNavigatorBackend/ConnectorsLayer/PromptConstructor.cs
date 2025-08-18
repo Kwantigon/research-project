@@ -187,7 +187,7 @@ public class PromptConstructor : IPromptConstructor
 		List<object> flattenedSubstructure = new();
 		foreach (var classItem in substructure.ClassItems)
 		{
-			flattenedSubstructure.Add(new DataSpecificationSubstructure.ClassItem()
+			flattenedSubstructure.Add(new DataSpecificationSubstructure.SubstructureClass()
 			{
 				Iri = classItem.Iri,
 				Label = classItem.Label,

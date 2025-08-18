@@ -22,5 +22,5 @@ public interface IConversationController
 
 	Task<IResult> DeleteConversationAsync(int conversationId);
 
-	Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutDataSpecItemsDTO payload);
+	Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutUserSelectedItemsDTO payload);
 }

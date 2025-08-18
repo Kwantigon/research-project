@@ -1,6 +1,7 @@
 ﻿using DataSpecificationNavigatorBackend.BusinessCoreLayer.Abstraction;
 using DataSpecificationNavigatorBackend.Model;
 using System.Text;
+using static DataSpecificationNavigatorBackend.Model.DataSpecificationSubstructure;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer.SparqlTranslation;
 
@@ -23,19 +24,19 @@ public class SparqlTranslationService(
 		Dictionary<string, QueryNode> nodeMap = [];
 
 		// Create all nodes.
-		foreach (DataSpecificationSubstructure.ClassItem classItem in substructure.ClassItems)
+		foreach (DataSpecificationSubstructure.SubstructureClass classItem in substructure.ClassItems)
 		{
 			QueryNode node = graph.GetOrCreateNode(classItem.Iri, classItem.Label, classItem.IsSelectTarget);
 			nodeMap[node.Iri] = node;
 		}
 
 		// Add edges to nodes (object properties and datatype properties).
-		foreach (DataSpecificationSubstructure.ClassItem classItem in substructure.ClassItems)
+		foreach (SubstructureClass classItem in substructure.ClassItems)
 		{
 			QueryNode node = nodeMap[classItem.Iri];
 
 			// Add object properties.
-			foreach (DataSpecificationSubstructure.PropertyItem objectProperty in classItem.ObjectProperties)
+			foreach (SubstructureObjectProperty objectProperty in classItem.ObjectProperties)
 			{
 				if (!nodeMap.TryGetValue(objectProperty.Range, out QueryNode? targetNode))
 				{
@@ -53,7 +54,7 @@ public class SparqlTranslationService(
 			}
 
 			// Add datatype properties.
-			foreach (DataSpecificationSubstructure.PropertyItem datatypeProperty in classItem.DatatypeProperties)
+			foreach (SubstructureDatatypeProperty datatypeProperty in classItem.DatatypeProperties)
 			{
 				node.DatatypeProperties.Add(new DatatypeNode
 				{

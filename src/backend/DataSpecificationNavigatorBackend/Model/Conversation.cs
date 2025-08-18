@@ -22,7 +22,7 @@ public class Conversation
 
 	public virtual DataSpecificationSubstructure DataSpecificationSubstructure { get; set; } = new();
 
-	public List<string> UserSelectedProperties { get; set; } = []; // IRIs of items.
+	public virtual List<UserSelection> UserSelections { get; set; } = [];
 
 	public string? SuggestedMessage { get; set; }
 

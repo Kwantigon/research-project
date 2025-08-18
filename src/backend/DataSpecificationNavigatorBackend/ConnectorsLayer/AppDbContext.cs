@@ -31,6 +31,8 @@ public class AppDbContext : DbContext
 
 	public DbSet<DataSpecificationPropertySuggestion> PropertySuggestions { get; set; }
 
+	public DbSet<UserSelection> UserSelections { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		#region DataSpecificationItem
@@ -116,5 +118,13 @@ public class AppDbContext : DbContext
 				// Not handling the possible null value because I want to throw an exception if the deserialization fails.
 			.HasColumnType("json");
 		#endregion Conversation
+
+		#region UserSelection
+		modelBuilder.Entity<UserSelection>()
+			.HasOne(selection => selection.Conversation)
+			.WithMany(conversation => conversation.UserSelections)
+			.HasForeignKey(selection => selection.ConversationId)
+			.OnDelete(DeleteBehavior.Cascade);
+		#endregion UserSelection
 	}
 }
