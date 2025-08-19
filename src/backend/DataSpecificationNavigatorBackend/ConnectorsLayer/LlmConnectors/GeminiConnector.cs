@@ -12,6 +12,11 @@ public class GeminiConnector : ILlmConnector
 	private const int _retryAttempts = 3; // If the response processor fails to extract the necessary classes, retry the prompt this many times.
 	private GenerativeModel? _gemini;
 
+	/*
+	 * To do: The Gemini API could return an error response
+	 * if the model is not available or if the API key is invalid.
+	 * Catch those errors and handle them when calling SendPromptAsync.
+	 */
 	public GeminiConnector(
 		ILogger<GeminiConnector> logger,
 		IConfiguration appSettings,
@@ -22,17 +27,17 @@ public class GeminiConnector : ILlmConnector
 		_promptConstructor = promptConstructor;
 		_responseProcessor = responseProcessor;
 
-		string? apiKeyFile = appSettings["Llm:ApiKeyFile"];
+		string? apiKeyFile = appSettings["Llm:Gemini:ApiKeyFile"];
 		if (apiKeyFile is null)
 		{
-			throw new Exception("The key Llm:ApiKeyFile is missing in the config file.");
+			throw new Exception("The key Llm:Gemini:ApiKeyFile is missing in the config file.");
 		}
 		string apiKey = File.ReadAllText(apiKeyFile);
 
-		string? model = appSettings["Llm:Model"];
+		string? model = appSettings["Llm:Gemini:Model"];
 		if (model is null)
 		{
-			throw new Exception("The key Llm:Model is missing in the config file.");
+			throw new Exception("The key Llm:Gemini:Model is missing in the config file.");
 		}
 
 		GoogleAi googleAi = new(apiKey);
