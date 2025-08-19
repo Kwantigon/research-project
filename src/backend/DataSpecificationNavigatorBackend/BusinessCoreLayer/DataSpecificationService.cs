@@ -24,6 +24,7 @@ public class DataSpecificationService(
 		string? owl;
 		if (string.IsNullOrEmpty(dsv))
 		{
+			// Failed to export the DSV file, try to export the OWL file directly.
 			_logger.LogError("Failed to export the DSV file from Dataspecer.");
 			owl = await _dataspecerConnector.ExportOwlFileFromPackageAsync(dataspecerPackageUuid);
 			if (string.IsNullOrEmpty(owl))
@@ -34,8 +35,22 @@ public class DataSpecificationService(
 		}
 		else
 		{
-			_logger.LogTrace("Converting DSV to OWL.");
-			owl = _rdfProcessor.ConvertDsvGraphToOwlGraph(dsv);
+			_logger.LogDebug("Converting DSV to OWL.");
+			try
+			{
+				owl = _rdfProcessor.ConvertDsvGraphToOwlGraph(dsv);
+			}
+			catch (Exception ex)
+			{
+				// Failed to convert DSV to OWL, try to export the OWL file directly.
+				_logger.LogError(ex, "An exception occured during DSV to OWL conversion.");
+				owl = await _dataspecerConnector.ExportOwlFileFromPackageAsync(dataspecerPackageUuid);
+				if (string.IsNullOrEmpty(owl))
+				{
+					_logger.LogError("Failed to export the DSV file and the OWL file from Dataspecer.");
+					return null;
+				}
+			}
 		}
 
 		DataSpecification dataSpecification = new DataSpecification()

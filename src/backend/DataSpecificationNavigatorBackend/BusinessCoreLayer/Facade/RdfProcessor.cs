@@ -4,7 +4,8 @@ using VDS.RDF.Writing;
 
 namespace DataSpecificationNavigatorBackend.BusinessCoreLayer.Facade;
 
-public class RdfProcessor : IRdfProcessor
+public class RdfProcessor(
+	ILogger<RdfProcessor> logger) : IRdfProcessor
 {
 	private const string DSV_CLASS_PROFILE = "https://w3id.org/dsv#ClassProfile";
 	private const string DSV_OBJECT_PROPERTY_PROFILE = "https://w3id.org/dsv#ObjectPropertyProfile";
@@ -29,6 +30,8 @@ public class RdfProcessor : IRdfProcessor
 	private const string OWL_CLASS = "http://www.w3.org/2002/07/owl#Class";
 	private const string OWL_OBJECT_PROPERTY = "http://www.w3.org/2002/07/owl#ObjectProperty";
 	private const string OWL_DATATYPE_PROPERTY = "http://www.w3.org/2002/07/owl#DatatypeProperty";
+
+	private readonly ILogger<RdfProcessor> _logger = logger;
 
 	public string ConvertDsvGraphToOwlGraph(string dsv)
 	{
@@ -290,11 +293,25 @@ public class RdfProcessor : IRdfProcessor
 		 * Parsing directly from string doesn't work well with the RDF files from Dataspecer.
 		 * I'll save into a file and then parse from file. That seems to always work.
 		 */
-		const string rdfFile = "./rdf-content.ttl";
+		const string tempDir = "./temp";
+		const string rdfFile = $"{tempDir}/rdf-content.ttl";
 		File.WriteAllText(rdfFile, rdfString);
+
 		IGraph graph = new Graph();
-		graph.LoadFromFile(rdfFile);
-		return graph;
+		try
+		{
+			graph.LoadFromFile(rdfFile);
+			return graph;
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "Failed to create an RDF graph from the rdfString.");
+			if (Directory.Exists(tempDir))
+			{
+				Directory.Delete(tempDir, recursive: true);
+			}
+			throw;
+		}
 	}
 
 	private string WriteGraphToString(IGraph graph)
