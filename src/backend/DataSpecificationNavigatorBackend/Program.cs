@@ -108,6 +108,11 @@ app.MapGet("/conversations/{conversationId}/messages/{messageId}",
 		return endpoint;
 	});
 
+app.MapGet(
+	"/conversations/{conversationId}/data-specification-substructure",
+	async (int conversationId,
+				IConversationController controller) => await controller.GetDataSpecificationSubstructureAsync(conversationId));
+
 app.MapPost("/conversations/{conversationId}/messages",
 				async ([FromRoute] int conversationId,
 							[FromBody] PostConversationMessagesDTO payload,

@@ -186,6 +186,21 @@ public class ConversationController(
 		}
 	}
 
+	public async Task<IResult> GetDataSpecificationSubstructureAsync(int conversationId)
+	{
+		Conversation? conversation = await _conversationService.GetConversationAsync(conversationId);
+		if (conversation is null)
+		{
+			return Results.NotFound(new ErrorDTO { Reason = $"Conversation with ID {conversationId} not found." });
+		}
+		DataSpecificationSubstructure substructure = conversation.DataSpecificationSubstructure;
+		if (substructure == null)
+		{
+			_logger.LogWarning("Conversation with ID {Id} does not have a data specification substructure.", conversationId);
+			return Results.Ok(new DataSpecificationSubstructure());
+		}
+		return Results.Ok(substructure);
+	}
 
 	private async Task<ConversationMessageDTO> BuildMessageDTO(Message message)
 	{

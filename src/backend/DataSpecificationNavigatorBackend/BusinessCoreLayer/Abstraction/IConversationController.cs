@@ -9,11 +9,6 @@ public interface IConversationController
 
 	Task<IResult> GetConversationAsync(int conversationId);
 
-	/// <summary>
-	/// Get messages in a conversation.
-	/// </summary>
-	/// <param name="conversationId">The ID of the conversation.</param>
-	/// <returns>All messages in the conversation ordered by their timestamps.</returns>
 	Task<IResult> GetConversationMessagesAsync(int conversationId);
 
 	Task<IResult> GetMessageAsync(int conversationId, Guid messageId);
@@ -23,4 +18,6 @@ public interface IConversationController
 	Task<IResult> DeleteConversationAsync(int conversationId);
 
 	Task<IResult> StoreUserSelectionAndGetSuggestedMessage(int conversationId, PutUserSelectedItemsDTO payload);
+
+	Task<IResult> GetDataSpecificationSubstructureAsync(int conversationId);
 }

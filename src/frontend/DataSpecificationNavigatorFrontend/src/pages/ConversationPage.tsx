@@ -63,6 +63,36 @@ interface SelectedSuggestedItem extends SuggestedItem {
   filterExpression: string;
 }
 
+interface SubstructureDatatypeProperty {
+  iri: string;
+  label: string;
+  domain: string;
+  range: string;
+	//isOptional: boolean;
+	//isSelectTarget: boolean;
+	//filterExpression?: string;
+}
+
+interface SubstructureObjectProperty {
+  iri: string;
+  label: string;
+  domain: string;
+  range: string;
+	//isOptional: boolean;
+}
+
+interface SubstructureClass {
+  iri: string;
+  label: string;
+  isSelectTarget: boolean;
+  objectProperties: SubstructureObjectProperty[];
+  datatypeProperties: SubstructureDatatypeProperty[];
+}
+
+interface DataSpecificationSubstructure {
+  classItems: SubstructureClass[];
+}
+
 // Type guard to check if a message is a ReplyMessage
 const isSystemMessage = (message: UserMessage | SystemMessage): message is SystemMessage => {
 	return message.sender === "System";
@@ -88,6 +118,10 @@ function ConversationPage() {
 	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
   const [dialogIsOptional, setDialogIsOptional] = useState<boolean>(false);
   const [dialogFilterExpression, setDialogFilterExpression] = useState<string>("");
+	const [isSubstructureDialogOpen, setIsSubstructureDialogOpen] = useState<boolean>(false);
+	const [dataSpecificationSubstructure, setDataSpecificationSubstructure] = useState<DataSpecificationSubstructure | null>(null);
+	const [isSubstructureLoading, setIsSubstructureLoading] = useState<boolean>(false);
+	const [substructureError, setSubstructureError] = useState<string | null>(null);
 
 	const fetchMessages = async () => {
 		try {
@@ -269,8 +303,28 @@ function ConversationPage() {
 		}
 	};
 
-	const isSelectedItemFromMostRecentAnswer = selectedItemForSummary?.parentMessageId === mostRecentReplyMessageId;
+	const handleShowSubstructure = async () => {
+		setIsSubstructureDialogOpen(true);
+		setIsSubstructureLoading(true);
+		setSubstructureError(null);
+		try {
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/data-specification-substructure`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch data substructure.');
+			}
+			const data: DataSpecificationSubstructure = await response.json();
+			console.log("Got substructure data.");
+			console.log(data);
+			setDataSpecificationSubstructure(data);
+		} catch (error) {
+			console.error('Error fetching data substructure:', error);
+			setSubstructureError('Could not load the data specification substructure.');
+		} finally {
+			setIsSubstructureLoading(false);
+		}
+	};
 
+	const isSelectedItemFromMostRecentAnswer = selectedItemForSummary?.parentMessageId === mostRecentReplyMessageId;
 	return (
 		<div className="flex flex-col h-full p-4">
 			<div ref={messagesEndRef} className="flex-1 overflow-y-auto border rounded-md p-4 space-y-4">
@@ -507,6 +561,12 @@ function ConversationPage() {
 					}}
 				/>
 				<Button onClick={handleSendMessage} disabled={isWaitingForReplyMessage}>SEND</Button>
+				<Button 
+          onClick={handleShowSubstructure} 
+          disabled={isFetchingMessages || isWaitingForReplyMessage}
+        >
+          Show Substructure
+        </Button>
 			</div>
 
 			<Dialog open={isSummaryDialogOpen} onOpenChange={setIsSummaryDialogOpen}>
@@ -569,6 +629,73 @@ function ConversationPage() {
 					</div>
 				</DialogContent>
 			</Dialog>
+
+			{/* Dialog for Data Specification Substructure */}
+      <Dialog open={isSubstructureDialogOpen} onOpenChange={setIsSubstructureDialogOpen}>
+        <DialogContent className="max-w-3xl h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Data Specification Substructure</DialogTitle>
+          </DialogHeader>
+          {isSubstructureLoading ? (
+            <div className="flex-1 flex items-center justify-center">
+              <svg className="animate-spin -ml-1 mr-2 h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="ml-2">Loading substructure...</p>
+            </div>
+          ) : substructureError ? (
+            <p className="text-red-500">{substructureError}</p>
+          ) : dataSpecificationSubstructure && dataSpecificationSubstructure.classItems.length > 0 ? (
+            <div className="flex-1 overflow-y-auto p-4 border rounded-md bg-gray-50">
+              {dataSpecificationSubstructure.classItems.map((classItem) => (
+                <div key={classItem.iri} className="mb-6 p-4 border-l-4 border-blue-500 bg-white shadow-sm rounded-md">
+                  <h3 className="text-lg font-bold text-blue-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                    </svg>
+                    {classItem.label}
+                    {classItem.isSelectTarget && (
+                      <span className="ml-2 text-xs font-semibold text-white bg-green-500 px-2 py-1 rounded-full">SELECT Target</span>
+                    )}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-2">IRI: {classItem.iri}</p>
+                  
+                  {classItem.objectProperties.length > 0 && (
+                    <div className="mt-4 pl-4 border-l-2 border-gray-200">
+                      <h4 className="font-semibold text-gray-700">Object Properties:</h4>
+                      <ul className="list-disc list-inside text-sm">
+                        {classItem.objectProperties.map((prop) => (
+                          <li key={prop.iri} className="mt-1">
+                            <span className="font-medium text-gray-600">{prop.label}</span>:
+                            <span className="ml-2 text-xs text-gray-500">({prop.domain} &rarr; {prop.range})</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {classItem.datatypeProperties.length > 0 && (
+                    <div className="mt-4 pl-4 border-l-2 border-gray-200">
+                      <h4 className="font-semibold text-gray-700">Datatype Properties:</h4>
+                      <ul className="list-disc list-inside text-sm">
+                        {classItem.datatypeProperties.map((prop) => (
+                          <li key={prop.iri} className="mt-1">
+                            <span className="font-medium text-gray-600">{prop.label}</span>:
+                            <span className="ml-2 text-xs text-gray-500">({prop.range})</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No data specification substructure to display.</p>
+          )}
+        </DialogContent>
+      </Dialog>
 		</div>
 	);
 }
