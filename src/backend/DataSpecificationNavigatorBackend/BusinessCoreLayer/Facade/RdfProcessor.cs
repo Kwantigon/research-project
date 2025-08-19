@@ -293,22 +293,22 @@ public class RdfProcessor(
 		 * Parsing directly from string doesn't work well with the RDF files from Dataspecer.
 		 * I'll save into a file and then parse from file. That seems to always work.
 		 */
-		const string tempDir = "./temp";
-		const string rdfFile = $"{tempDir}/rdf-content.ttl";
-		File.WriteAllText(rdfFile, rdfString);
-
-		IGraph graph = new Graph();
+		const string rdfFile = "./rdf-content.ttl";
 		try
 		{
+			File.WriteAllText(rdfFile, rdfString);
+
+			IGraph graph = new Graph();
 			graph.LoadFromFile(rdfFile);
+			File.Delete(rdfFile);
 			return graph;
 		}
 		catch (Exception ex)
 		{
 			_logger.LogError(ex, "Failed to create an RDF graph from the rdfString.");
-			if (Directory.Exists(tempDir))
+			if (File.Exists(rdfFile))
 			{
-				Directory.Delete(tempDir, recursive: true);
+				File.Delete(rdfFile);
 			}
 			throw;
 		}
