@@ -328,8 +328,9 @@ public class ConversationService(
 			return true;
 		}
 
+		DataSpecification dataSpecification = conversation.DataSpecification;
 		_database.Conversations.Remove(conversation);
-		_database.DataSpecifications.Remove(conversation.DataSpecification);
+		_database.DataSpecifications.Remove(dataSpecification);
 		try
 		{
 			await _database.SaveChangesAsync();
