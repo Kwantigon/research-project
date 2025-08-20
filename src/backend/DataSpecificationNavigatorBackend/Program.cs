@@ -13,19 +13,18 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-	// Scoped services (created per request).
 	.AddScoped<IConversationService, ConversationService>()
 	.AddScoped<IConversationController, ConversationController>()
 	.AddScoped<IDataSpecificationService, DataSpecificationService>()
 	.AddScoped<IDataSpecificationController, DataSpecificationController>()
 	.AddScoped<IDataspecerConnector, DataspecerConnector>()
-	.AddScoped<ILlmConnector, GeminiConnector>()
+	//.AddScoped<ILlmConnector, GeminiConnector>()
+	.AddScoped<ILlmConnector, OllamaConnector>()
 	.AddScoped<IRdfProcessor, RdfProcessor>()
 	.AddScoped<ILlmResponseProcessor, ResponseProcessor>()
 	.AddScoped<ILlmConnector, GeminiConnector>()
 	.AddScoped<ISparqlTranslationService, SparqlTranslationService>()
-
-	.AddSingleton<IPromptConstructor, PromptConstructor>() // Singleton because I don't want to load templates from files every time there is a request.
+	.AddScoped<IPromptConstructor, PromptConstructor>()
 	;
 
 builder.Services.AddCors(options =>
