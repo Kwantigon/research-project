@@ -1,1 +1,0 @@
-The file insurance.owl.ttl is taken from https://github.com/datadotworld/cwd-benchmark-data/blob/main/ACME_Insurance/ontology/insurance.ttl#L12. It is a file used in the paper arXiv:2311.07509v1 (A BENCHMARK TO UNDERSTAND THE ROLE OF KNOWLEDGE GRAPHS ON LARGE LANGUAGE MODEL’S ACCURACY FOR QUESTION ANSWERING ON ENTERPRISE SQL DATABASES).
