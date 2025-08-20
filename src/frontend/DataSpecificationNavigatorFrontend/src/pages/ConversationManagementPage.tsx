@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, FolderOpen, PlusCircle } from "lucide-react";
+import { Trash2, FolderOpen/*, PlusCircle*/ } from "lucide-react";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'; // Import Dialog components
@@ -168,12 +168,12 @@ function ConversationManagementPage() {
 
 	return (
 		<div className="p-4">
-			<div className="flex justify-between items-center mb-4">
+			{/*<div className="flex justify-between items-center mb-4">
 				<h2 className="text-2xl font-bold">Manage conversations</h2>
 				<Button onClick={() => setIsNewConversationDialogOpen(true)}>
 					<PlusCircle className="mr-2 h-4 w-4" /> Create new conversation
 				</Button>
-			</div>
+			</div>*/}
 
 			{showNoConversationSelectedMessage && (
 				<div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
