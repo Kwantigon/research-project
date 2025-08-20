@@ -469,3 +469,19 @@ Upravím přidání do substructure:
 
 Myslím si, že nedám možnost použít indirect suggestions.
 - Teoreticky to může být property, který je libovolně daleko od current substructure. Pak bych docela marně hledal cestu ne?
+
+To do:
+0. Některé itemy v mapped items nemají summary a mapped from words.
+1. Možná pro generování suggested message předat i filtr, který uživatel zadal.
+2. Na frontendu povolit filtrování pouze pro datatype properties.
+	- To bude vyžadovat trochu refactoring frontendu (hlavně reprezentace tříd).
+3. Suggested properties: pro každý item zobrazit pouze up to 4 properties, abych zabránil tomu, že LLM prostě nabídne všechno z té třídy.
+4. Myslím, že opravdu odeberu možnost navrhovat indirect connections.
+	- Nebo minimálně nebude možné je přidávat.
+	- Jen je zobrazím, že existují.
+	- Ale s tím bude problém to, že uživatel přidá property a bude pak chtít přidat další property, která byla indirect connection, ale teď není. Ale LLM to uživateli nenabídne.
+5. Unit tests.
+6. Ošetřit případ, kdy LLM call fails.
+7. Když mapuju do substructure, tak musím ověřit, že LLM mi namapovalo všechno. Pokud ne, tak pořád musím zobrazit všechny itemy v substructure, ne jen ty namapované itemy na slova.
+	- Nebudu už zobrazovat mapped items seznam. Stejně to jakoby bude vidět ve split screenu v substructure.
+	- MUSÍM zvýraznit slova/fráze v current message a tam zobrazím summary atd.
