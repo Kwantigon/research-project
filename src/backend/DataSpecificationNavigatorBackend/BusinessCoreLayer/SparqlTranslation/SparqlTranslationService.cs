@@ -122,8 +122,8 @@ public class SparqlTranslationService(
 		sparql.AppendLine("}");
 
 		// Add SELECT targets.
-		sparql.Insert(7, string.Join(" ", selectTargets) + " ");
-		// index == 7 because we're inserting after "SELECT "
+		sparql.Insert(16, string.Join(" ", selectTargets) + " ");
+		// index == 16 because we're inserting after "SELECT DISTINCT "
 
 		return sparql.ToString();
 	}
@@ -142,7 +142,6 @@ public class SparqlTranslationService(
 		sparql.AppendLine();
 		sparql.AppendLine($"{indent}# {node.Label}");
 		sparql.AppendLine($"{indent}{currentVar} a <{node.Iri}> .");
-		sparql.AppendLine(); // Add an empty line for readability.
 
 		if (node.IsSelectTarget)
 			selectTargets.Add(currentVar);
@@ -167,7 +166,6 @@ public class SparqlTranslationService(
 			if (!string.IsNullOrWhiteSpace(dtProp.FilterExpression))
 				sparql.AppendLine($"{indent}  FILTER({dtProp.FilterExpression.Replace("{var}", dtProp.VariableName)})");
 		}
-		sparql.AppendLine(); // Add an empty line for readability.
 
 		// Object properties
 		foreach (QueryEdge edge in node.OutgoingEdges)
