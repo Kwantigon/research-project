@@ -105,7 +105,7 @@ function ConversationPage() {
 	const [messages, setMessages] = useState<(SystemMessage | UserMessage)[]>([]);
 	const [currentMessage, setCurrentMessage] = useState<string>("");
 	const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null);
-			const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SelectedSuggestedItem[]>([]);
+	const [selectedItemsForExpansion, setSelectedItemsForExpansion] = useState<SelectedSuggestedItem[]>([]);
 	const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState<boolean>(false);
 	const [selectedItemForSummary, setSelectedItemForSummary] = useState<{ item: SuggestedItem | MappedItem, parentMessageId: string } | null>(null);
 	const [isFetchingMessages, setIsFetchingMessages] = useState<boolean>(true);
@@ -122,6 +122,27 @@ function ConversationPage() {
 	const [dataSpecificationSubstructure, setDataSpecificationSubstructure] = useState<DataSpecificationSubstructure | null>(null);
 	const [isSubstructureLoading, setIsSubstructureLoading] = useState<boolean>(false);
 	const [substructureError, setSubstructureError] = useState<string | null>(null);
+
+	/* New code
+	const fetchSubstructure = async () => {
+    setIsSubstructureLoading(true);
+    setSubstructureError(null);
+
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/data-specification-substructure`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data substructure.");
+      }
+      const data: DataSpecificationSubstructure = await response.json();
+      setDataSpecificationSubstructure(data);
+    } catch (error) {
+      console.error("Error fetching substructure", error);
+      setSubstructureError("Could not load the data specification substructure.");
+    } finally {
+      setIsSubstructureLoading(false);
+    }
+  };
+	*/
 
 	const fetchMessages = async () => {
 		try {
