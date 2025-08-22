@@ -667,14 +667,14 @@ function ConversationPageMock() {
 											/>
 											<Label htmlFor="optional-item">Add as OPTIONAL</Label>
 										</div>
-										{isDatatypeProperty(suggestedPropertySelectedForSummary.property)
-											&& (!suggestionIsSelected(suggestedPropertySelectedForSummary.property)) && (<div className="mt-4">
+										{isDatatypeProperty(suggestedPropertySelectedForSummary.property) && (<div className="mt-4">
 											<Label htmlFor="filter-expression">Filter expression</Label>
 											<Input
 												id="filter-expression"
 												placeholder="e.g., {var} > 100"
 												value={suggestedPropertyFilterExpression}
 												onChange={(e) => setSuggestedPropertyFilterExpression(e.target.value)}
+												disabled={suggestionIsSelected(suggestedPropertySelectedForSummary.property)}
 											/>
 										</div>)}
 										{/* Add or Remove button */}
