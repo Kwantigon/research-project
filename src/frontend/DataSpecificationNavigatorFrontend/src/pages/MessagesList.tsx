@@ -13,7 +13,7 @@ import type {
 	GroupedSuggestions,
 	SelectedSuggestedProperty,
 	SuggestedProperty,
-} from "./ConversationPageMock";
+} from "./ConversationPage";
 
 const isDatatypeProperty = (property: SuggestedProperty) => {
 	return property.type === "DatatypeProperty";
