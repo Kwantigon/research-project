@@ -5,9 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import MessagesList from "./MessagesList";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { Label } from "@radix-ui/react-label";
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -652,18 +652,18 @@ function ConversationPageMock() {
 						<div className="py-4">
 							<>
 								<p>{suggestedPropertySelectedForSummary.property.summary}</p>
-								<p className="mt-2 text-sm text-gray-700 font-semibold">
+								<p className="mt-2 mb-4 text-sm text-gray-700 font-semibold">
 									Reason for suggestion:<br />
 									<span className="font-normal">{suggestedPropertySelectedForSummary.property.reason}</span>
 								</p>
-								<p></p>
 								{isSuggestionFromCurrentReply ? (
 									<>
-										<div className="flex items-center space-x-2 mt-4">
+										<div className="flex items-center space-x-2">
 											<Checkbox
 												id="optional-item"
 												checked={suggestedPropertyAddAsOptional}
 												onCheckedChange={(checked) => setSuggestedPropertyAddAsOptional(!!checked)}
+												className="w-6 h-6 border-2 border-gray-700 data-[state=checked]:bg-gray-700"
 											/>
 											<Label htmlFor="optional-item">Add as OPTIONAL</Label>
 										</div>
