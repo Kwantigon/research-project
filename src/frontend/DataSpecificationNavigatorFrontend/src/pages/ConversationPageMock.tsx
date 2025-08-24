@@ -5,6 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from "react-router-dom";
+import { Send } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+
 import MessagesList from "./MessagesList";
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_API_URL;
@@ -17,7 +21,7 @@ export interface Message {
 }
 export interface WelcomeMessage extends Message {
 	dataSpecificationSummary: string;
-	suggestedMessage: string;
+	suggestedFirstMessage: string;
 	type: "WelcomeMessage";
 }
 export interface UserMessage extends Message {
@@ -50,7 +54,7 @@ export interface SuggestedProperty {
 }
 
 export interface GroupedSuggestions {
-	domain: string;
+	itemExpanded: string;
 	suggestions: SuggestedProperty[];
 }
 
@@ -63,14 +67,18 @@ export interface SubstructureDatatypeProperty {
 	iri: string;
 	label: string;
 	domain: string;
+	domainLabel: string;
 	range: string;
+	rangeLabel: string;
 }
 
 export interface SubstructureObjectProperty {
 	iri: string;
 	label: string;
 	domain: string;
+	domainLabel: string;
 	range: string;
+	rangeLabel: string;
 }
 
 export interface SubstructureClass {
@@ -95,20 +103,34 @@ function renderMessageWithMappedItems(
 	mappedItems: MappedItem[],
 	onMappedItemClick: (item: MappedItem) => void
 ) {
-	// sort spans by start index (just in case backend sends unordered)
-	const sortedByStartPositions = [...mappedItems].sort((a, b) => a.startIndex - b.startIndex);
+	// Split mapped items into anchored (have valid indices) vs unanchored
+	const anchoredItems = mappedItems.filter(
+		(item) =>
+			typeof item.startIndex === "number" &&
+			typeof item.endIndex === "number" &&
+			item.startIndex >= 0 &&
+			item.startIndex < item.endIndex &&
+			text.substring(item.startIndex, item.endIndex) === item.mappedPhrase
+	);
 
-	const elements: React.ReactNode[] = [];
+	const unanchoredItems = mappedItems.filter(
+		(item) => !anchoredItems.includes(item)
+	);
+
+	// sort spans by start index (just in case backend sends unordered)
+	const sortedByStartPositions = anchoredItems.sort((a, b) => a.startIndex - b.startIndex);
+
+	const anchoredElements: React.ReactNode[] = [];
 	let lastIndex = 0;
 
 	sortedByStartPositions.forEach((item, i) => {
-		// push the text before this item.
+		// Add the text before this item.
 		if (item.startIndex > lastIndex) {
-			elements.push(<span key={`text-${i}`}>{text.slice(lastIndex, item.startIndex)}</span>);
+			anchoredElements.push(<span key={`text-${i}`}>{text.slice(lastIndex, item.startIndex)}</span>);
 		}
 
-		// push the clickable words.
-		elements.push(
+		// Add the clickable words.
+		anchoredElements.push(
 			<button
 				key={`span-${i}`}
 				onClick={() => onMappedItemClick(item)}
@@ -121,34 +143,69 @@ function renderMessageWithMappedItems(
 		lastIndex = item.endIndex;
 	});
 
-	// push any trailing text after the last item.
+	// Add any trailing text after the last item.
 	if (lastIndex < text.length) {
-		elements.push(<span key="text-end">{text.slice(lastIndex)}</span>);
+		anchoredElements.push(<span key="text-end">{text.slice(lastIndex)}</span>);
 	}
 
-	return <>{elements}</>;
+	//return <>{elements}</>;
+	return (
+		<div>
+			<p className="leading-relaxed">{anchoredElements}</p>
+
+			{unanchoredItems.length > 0 && (
+				<div className="mt-2">
+					<Popover>
+						<PopoverTrigger asChild>
+							<Button variant="link" size="sm" className="text-xs p-0 h-auto">
+								+{unanchoredItems.length} {unanchoredItems.length > 1 ? "items" : "item"} not directly mapped to any phrases
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-64" side="top" align="start">
+							<p className="text-sm font-semibold mb-2">Referenced items</p>
+							<ul className="space-y-1">
+								{unanchoredItems.map((item) => (
+									<li key={item.iri}>
+										<Button
+											variant="link"
+											className="p-0 h-auto text-sm text-blue-600 underline cursor-pointer"
+											onClick={(e) => {
+												e.preventDefault();
+												onMappedItemClick(item);
+											}}
+										>
+											{item.label}
+										</Button>
+									</li>
+								))}
+							</ul>
+						</PopoverContent>
+					</Popover>
+				</div>
+			)}
+		</div>
+	);
 }
 
 const mockMessages: (WelcomeMessage | UserMessage | ReplyMessage)[] = [
 	{
 		id: "welcome-1",
 		type: "WelcomeMessage",
-		text: "Welcome to the OWL Data Chatbot!",
+		text: "Welcome to the Energy Knowledge Chatbot!",
 		timestamp: new Date().toISOString(),
-		dataSpecificationSummary:
-			"This data specification covers renewable energy and related policies.",
-		suggestedMessage: "Ask about wind power, solar energy, or subsidies."
+		dataSpecificationSummary: "This ontology describes renewable energy concepts, technologies, and related policies.",
+		suggestedFirstMessage: "Ask about solar energy, wind power, or government subsidies."
 	},
 	{
 		id: "user-1",
 		type: "UserMessage",
-		text: "What is solar energy?",
-		timestamp: new Date().toISOString(),
+		text: "Tell me about solar energy.",
+		timestamp: new Date().toISOString()
 	},
 	{
 		id: "reply-1",
 		type: "ReplyMessage",
-		text: "Here are some suggestions related to solar energy:",
+		text: "Here are some things related to solar energy:",
 		timestamp: new Date().toISOString(),
 		mappedItems: [
 			{
@@ -156,54 +213,62 @@ const mockMessages: (WelcomeMessage | UserMessage | ReplyMessage)[] = [
 				label: "Solar Energy",
 				summary: "Energy derived from sunlight using panels or mirrors.",
 				mappedPhrase: "solar energy",
-				startIndex: 8,
-				endIndex: 20,
-			},
+				startIndex: 14,
+				endIndex: 26,
+			}
 		],
 		sparqlQuery: "SELECT ?panel WHERE { ?panel a :SolarPanel }",
 		suggestions: {
 			directConnections: [
 				{
-					domain: "RenewableEnergy",
+					itemExpanded: "SolarEnergy",
 					suggestions: [
 						{
 							iri: "http://example.org/ontology#SolarPanel",
 							label: "Solar Panel",
-							connection: "→ part of → Solar Energy",
-							reason: "Solar panels are the main component.",
+							connection: "-> hasPanel -> Solar Panel",
+							reason: "Solar panels are the main component of solar energy systems.",
 							summary: "Devices that convert sunlight into electricity.",
-							type: "ObjectProperty",
+							type: "ObjectProperty"
 						},
-					],
-				},
+						{
+							iri: "http://example.org/ontology#installedCapacity",
+							label: "Installed Capacity",
+							connection: "-> installedCapacity -> float",
+							reason: "Capacity describes the amount of energy installed.",
+							summary: "The rated power output capacity of a solar system.",
+							type: "DatatypeProperty"
+						}
+					]
+				}
 			],
 			indirectConnections: [
 				{
-					domain: "EnergyPolicy",
+					itemExpanded: "GovernmentSubsidy",
 					suggestions: [
 						{
-							iri: "http://example.org/ontology#TaxIncentive",
-							label: "Tax Incentive",
-							connection: "← encourages ← Solar Energy",
-							reason: "Governments incentivize solar adoption.",
-							summary: "Tax benefits provided for using solar power.",
-							type: "DatatypeProperty",
-						},
-					],
-				},
-			],
-		},
+							iri: "http://example.org/ontology#GovernmentSubsidy",
+							label: "Government Subsidy",
+							connection: "<- supports <- Government Subsidy",
+							reason: "Government subsidies support solar energy adoption.",
+							summary: "Financial support to encourage solar installations.",
+							type: "DatatypeProperty"
+						}
+					]
+				}
+			]
+		}
 	},
 	{
 		id: "user-2",
 		type: "UserMessage",
-		text: "Tell me more about wind power.",
-		timestamp: new Date().toISOString(),
+		text: "And wind power?",
+		timestamp: new Date().toISOString()
 	},
 	{
 		id: "reply-2",
 		type: "ReplyMessage",
-		text: "Wind power is widely used. Here are related suggestions:",
+		text: "Here are some things connected to wind power:",
 		timestamp: new Date().toISOString(),
 		mappedItems: [
 			{
@@ -211,54 +276,62 @@ const mockMessages: (WelcomeMessage | UserMessage | ReplyMessage)[] = [
 				label: "Wind Power",
 				summary: "Harnessing wind energy to produce electricity.",
 				mappedPhrase: "wind power",
-				startIndex: 13,
-				endIndex: 23,
-			},
+				startIndex: 17,
+				endIndex: 27,
+			}
 		],
 		sparqlQuery: "SELECT ?turbine WHERE { ?turbine a :WindTurbine }",
 		suggestions: {
 			directConnections: [
 				{
-					domain: "RenewableEnergy",
+					itemExpanded: "WindPower",
 					suggestions: [
 						{
 							iri: "http://example.org/ontology#WindTurbine",
 							label: "Wind Turbine",
-							connection: "→ part of → Wind Power",
-							reason: "Wind turbines are essential for wind power.",
+							connection: "-> hasTurbine -> Wind Turbine",
+							reason: "Wind turbines are essential components of wind power.",
 							summary: "Towers that capture wind and generate electricity.",
-							type: "ObjectProperty",
+							type: "ObjectProperty"
 						},
-					],
-				},
+						{
+							iri: "http://example.org/ontology#averageWindSpeed",
+							label: "Average Wind Speed",
+							connection: "-> averageWindSpeed -> float",
+							reason: "Wind power is strongly dependent on wind speed.",
+							summary: "Average wind speed at the installation site.",
+							type: "DatatypeProperty"
+						}
+					]
+				}
 			],
 			indirectConnections: [
 				{
-					domain: "Environment",
+					itemExpanded: "NoisePollution",
 					suggestions: [
 						{
 							iri: "http://example.org/ontology#NoisePollution",
 							label: "Noise Pollution",
-							connection: "← caused by ← Wind Power",
-							reason: "Wind turbines can create local noise.",
-							summary: "Noise produced by rotating blades.",
-							type: "DatatypeProperty",
-						},
-					],
-				},
-			],
-		},
+							connection: "<- causedBy <- Noise Pollution",
+							reason: "Wind turbines can generate local noise.",
+							summary: "Environmental side effect of wind power.",
+							type: "DatatypeProperty"
+						}
+					]
+				}
+			]
+		}
 	},
 	{
 		id: "user-3",
 		type: "UserMessage",
-		text: "How about hydropower?",
-		timestamp: new Date().toISOString(),
+		text: "What about hydropower?",
+		timestamp: new Date().toISOString()
 	},
 	{
 		id: "reply-3",
 		type: "ReplyMessage",
-		text: "Hydropower suggestions are as follows:",
+		text: "Hydropower connects to the following items:",
 		timestamp: new Date().toISOString(),
 		mappedItems: [
 			{
@@ -269,86 +342,93 @@ const mockMessages: (WelcomeMessage | UserMessage | ReplyMessage)[] = [
 				startIndex: 11,
 				endIndex: 21,
 			},
+			{
+				iri: "http://example.org/ontology#ABC",
+				label: "Mock item ABC",
+				summary: "Summary for the mock item ABC.",
+				mappedPhrase: "",
+				startIndex: -1,
+				endIndex: -1,
+			},
+			{
+				iri: "http://example.org/ontology#DEF",
+				label: "Mock item DEF",
+				summary: "Summary for the mock item DEF.",
+				mappedPhrase: "",
+				startIndex: -1,
+				endIndex: -1,
+			}
 		],
 		sparqlQuery: "SELECT ?dam WHERE { ?dam a :HydroDam }",
 		suggestions: {
 			directConnections: [
 				{
-					domain: "RenewableEnergy",
+					itemExpanded: "Hydropower",
 					suggestions: [
 						{
 							iri: "http://example.org/ontology#HydroDam",
 							label: "Hydro Dam",
-							connection: "→ part of → Hydropower",
-							reason: "Dams store water for electricity generation.",
+							connection: "-> hasDam -> Hydro Dam",
+							reason: "Dams are used in hydropower systems.",
 							summary: "Large structures that control water flow.",
-							type: "ObjectProperty",
-						},
-					],
-				},
+							type: "ObjectProperty"
+						}
+					]
+				}
 			],
 			indirectConnections: [
 				{
-					domain: "Environment",
+					itemExpanded: "FishMigration",
 					suggestions: [
 						{
 							iri: "http://example.org/ontology#FishMigration",
 							label: "Fish Migration",
-							connection: "← affected by ← Hydropower",
-							reason: "Dams impact aquatic ecosystems.",
+							connection: "<- affectedBy <- Fish Migration",
+							reason: "Dams disrupt aquatic ecosystems.",
 							summary: "Fish migration patterns disrupted by dams.",
-							type: "DatatypeProperty",
-						},
-					],
-				},
-			],
-		},
-	},
-	{
-		id: "user-4",
-		type: "UserMessage",
-		text: "Show me connections with energy policy.",
-		timestamp: new Date().toISOString(),
-	},
-	{
-		id: "reply-4",
-		type: "ReplyMessage",
-		text: "Here are some policy-related connections:",
-		timestamp: new Date().toISOString(),
-		mappedItems: [],
-		sparqlQuery: "SELECT ?policy WHERE { ?policy a :EnergyPolicy }",
-		suggestions: {
-			directConnections: [
-				{
-					domain: "EnergyPolicy",
-					suggestions: [
-						{
-							iri: "http://example.org/ontology#Subsidy",
-							label: "Subsidy",
-							connection: "→ supports → Renewable Energy",
-							reason: "Policies often include subsidies.",
-							summary: "Financial support by governments.",
-							type: "DatatypeProperty",
-						},
-						{
-							iri: "http://example.org/ontology#CarbonTax",
-							label: "Carbon Tax",
-							connection: "→ discourages → Fossil Fuels",
-							reason: "Carbon taxes promote renewables indirectly.",
-							summary: "A tax on fossil fuel emissions.",
-							type: "DatatypeProperty",
-						},
-					],
-				},
-			],
-			indirectConnections: [],
-		},
-	},
+							type: "DatatypeProperty"
+						}
+					]
+				}
+			]
+		}
+	}
 ];
-
 
 const mockSubstructure: DataSpecificationSubstructure = {
 	classItems: [
+		{
+			iri: "http://example.org/ontology#SolarEnergy",
+			label: "Solar Energy",
+			isSelectTarget: true,
+			objectProperties: [
+				{
+					iri: "http://example.org/ontology#hasPanel",
+					label: "hasPanel",
+					domain: "Solar Energy",
+					domainLabel: "Solar Energy",
+					range: "Solar Panel",
+					rangeLabel: "Solar Panel"
+				}
+			],
+			datatypeProperties: [
+				{
+					iri: "http://example.org/ontology#installedCapacity",
+					label: "installedCapacity",
+					domain: "Solar Energy",
+					domainLabel: "Solar Energy",
+					range: "float",
+					rangeLabel: "float"
+				}
+			]
+		},
+		{
+			iri: "http://example.org/ontology#SolarPanel",
+			label: "Solar Panel",
+			isSelectTarget: false,
+			objectProperties: [],
+			datatypeProperties: []
+		},
 		{
 			iri: "http://example.org/ontology#WindPower",
 			label: "Wind Power",
@@ -356,23 +436,21 @@ const mockSubstructure: DataSpecificationSubstructure = {
 			objectProperties: [
 				{
 					iri: "http://example.org/ontology#hasTurbine",
-					label: "has Turbine",
+					label: "hasTurbine",
 					domain: "Wind Power",
-					range: "Wind Turbine"
-				},
-				{
-					iri: "http://example.org/ontology#hasLocation",
-					label: "has Location",
-					domain: "Wind Power",
-					range: "Location"
+					domainLabel: "Wind Power",
+					range: "Wind Turbine",
+					rangeLabel: "Wind Turbine"
 				}
 			],
 			datatypeProperties: [
 				{
-					iri: "http://example.org/ontology#installedCapacity",
-					label: "Installed Capacity",
+					iri: "http://example.org/ontology#averageWindSpeed",
+					label: "averageWindSpeed",
 					domain: "Wind Power",
-					range: "float"
+					domainLabel: "Wind Power",
+					range: "float",
+					rangeLabel: "float"
 				}
 			]
 		},
@@ -380,51 +458,59 @@ const mockSubstructure: DataSpecificationSubstructure = {
 			iri: "http://example.org/ontology#WindTurbine",
 			label: "Wind Turbine",
 			isSelectTarget: false,
-			objectProperties: [
-				{
-					iri: "http://example.org/ontology#locatedAt",
-					label: "located At",
-					domain: "Wind Turbine",
-					range: "Location"
-				}
-			],
-			datatypeProperties: [
-				{
-					iri: "http://example.org/ontology#capacity",
-					label: "Capacity",
-					domain: "Wind Turbine",
-					range: "float"
-				},
-				{
-					iri: "http://example.org/ontology#height",
-					label: "Height",
-					domain: "Wind Turbine",
-					range: "float"
-				}
-			]
+			objectProperties: [],
+			datatypeProperties: []
 		},
 		{
-			iri: "http://example.org/ontology#Location",
-			label: "Location",
+			iri: "http://example.org/ontology#Hydropower",
+			label: "Hydropower",
+			isSelectTarget: true,
+			objectProperties: [
+				{
+					iri: "http://example.org/ontology#hasDam",
+					label: "hasDam",
+					domain: "Hydropower",
+					domainLabel: "Hydropower",
+					range: "Hydro Dam",
+					rangeLabel: "Hydro Dam"
+				}
+			],
+			datatypeProperties: []
+		},
+		{
+			iri: "http://example.org/ontology#HydroDam",
+			label: "Hydro Dam",
 			isSelectTarget: false,
 			objectProperties: [],
-			datatypeProperties: [
+			datatypeProperties: []
+		},
+		{
+			iri: "http://example.org/ontology#EnergyPolicy",
+			label: "Energy Policy",
+			isSelectTarget: true,
+			objectProperties: [
 				{
-					iri: "http://example.org/ontology#latitude",
-					label: "Latitude",
-					domain: "Location",
-					range: "float"
+					iri: "http://example.org/ontology#provides",
+					label: "provides",
+					domain: "Energy Policy",
+					domainLabel: "Energy Policy",
+					range: "Subsidy",
+					rangeLabel: "Subsidy"
 				},
 				{
-					iri: "http://example.org/ontology#longitude",
-					label: "Longitude",
-					domain: "Location",
-					range: "float"
+					iri: "http://example.org/ontology#imposes",
+					label: "imposes",
+					domain: "Energy Policy",
+					domainLabel: "Energy Policy",
+					range: "Carbon Tax",
+					rangeLabel: "Carbon Tax"
 				}
-			]
+			],
+			datatypeProperties: []
 		}
 	]
 };
+
 
 
 function ConversationPageMock() {
@@ -452,7 +538,7 @@ function ConversationPageMock() {
 	const [selectedPropertiesForExpansion, setSelectedPropertiesForExpansion] = useState<SelectedSuggestedProperty[]>([]);
 
 	const [userMessageInput, setUserMessageInput] = useState<string>("");
-	const [suggestedMessage, setSuggestedMessage] = useState<string | null>(null);
+	const [suggestedMessage, setSuggestedMessage] = useState<string | null>("This is a very long mock suggested message: aaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccc wwwwwwwwwwwwwwwwwwwwwww");
 	const [isFetchingSuggestedMessage, setIsFetchingSuggestedMessage] = useState<boolean>(false);
 	const [fetchSuggestedMessageError, setFetchSuggestedMessageError] = useState<string | null>(null);
 	const [isSendingUserMessage, setIsSendingUserMessage] = useState<boolean>(false);
@@ -460,21 +546,90 @@ function ConversationPageMock() {
 
 	const fetchMessages = async () => {
 		setIsFetchingMessages(true);
-		await new Promise(f => setTimeout(f, 500));
+		setFetchMessagesError(null);
+
+		try {
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/messages`);
+			if (!response.ok) {
+				console.error("Fetch messages response status: " + response.status);
+				console.error(response.body);
+				throw new Error("Error fetching messages.");
+			}
+
+			const data = await response.json();
+			console.log(`Successfully fetched ${data.length} messages in the conversation.`);
+			setMessages(data);
+
+			// Look for the most recent reply message.
+			if (data.length > 1) {
+				let replyMsgFound: boolean = false;
+				let userMsgFound: boolean = false;
+				for (let i = data.length - 1; i >= 0; i--) {
+					if (data[i].type == "ReplyMessage" && !replyMsgFound) {
+						setCurrentReplyMessage(data[i] as ReplyMessage);
+						replyMsgFound = true;
+					}
+					if (data[i].type == "UserMessage" && !userMsgFound) {
+						setCurrentUserMessage(data[i] as UserMessage);
+						userMsgFound = true;
+					}
+					if (replyMsgFound && userMsgFound) {
+						break;
+					}
+				}
+
+				if (!replyMsgFound || !userMsgFound) {
+					console.log("ERROR: there is more than 1 message in the conversation but a reply message or an user message is missing.");
+				}
+			}
+
+		} catch (error) {
+			console.error(error);
+			setFetchMessagesError("Failed to retrieve messages in the conversation.");
+		} finally {
+			setIsFetchingMessages(false);
+		}
+	};
+
+	const fetchSubstructure = async () => {
+		setIsFetchingSubstructure(true);
+		setFetchSubstructureError(null);
+
+		try {
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/data-specification-substructure`);
+			if (!response.ok) {
+				console.error("Fetch substructure response status: " + response.status);
+				console.error(response.body);
+				throw new Error("Error fetching the conversation's data specification substructure.");
+			}
+
+			const data: DataSpecificationSubstructure = await response.json();
+			console.log(`Successfully fetched the substructure containing ${data.classItems.length} class items.`);
+			setDataSpecificationSubstructure(data);
+		} catch (error) {
+			console.error(error);
+			setFetchSubstructureError('Failed to retrieve the mapped data specification items.');
+		} finally {
+			setIsFetchingSubstructure(false);
+		}
+	}
+
+	useEffect(() => {
+		//fetchMessages();
+		//fetchSubstructure();
+
 		setMessages(mockMessages);
-		const data = mockMessages;
-		console.log(data.length);
 		// Look for the most recent reply message.
-		if (data.length > 1) {
+		if (mockMessages.length > 1) {
 			let replyMsgFound: boolean = false;
 			let userMsgFound: boolean = false;
-			for (let i = data.length - 1; i >= 0; i--) {
-				if (data[i].type == "ReplyMessage" && !replyMsgFound) {
-					setCurrentReplyMessage(data[i] as ReplyMessage);
+			for (let i = mockMessages.length - 1; i >= 0; i--) {
+				if (mockMessages[i].type == "ReplyMessage" && !replyMsgFound) {
+					setCurrentReplyMessage(mockMessages[i] as ReplyMessage);
 					replyMsgFound = true;
 				}
-				if (data[i].type == "UserMessage" && !userMsgFound) {
-					setCurrentUserMessage(data[i] as UserMessage);
+				if (mockMessages[i].type == "UserMessage" && !userMsgFound) {
+					setCurrentUserMessage(mockMessages[i] as UserMessage);
 					userMsgFound = true;
 				}
 				if (replyMsgFound && userMsgFound) {
@@ -487,20 +642,7 @@ function ConversationPageMock() {
 			}
 		}
 		setIsFetchingMessages(false);
-	};
-
-	const fetchSubstructure = async () => {
-		console.log("Simulating substructure fetch.");
-		setIsFetchingSubstructure(true);
-		setFetchSubstructureError(null);
-		await new Promise(f => setTimeout(f, 1000));
 		setDataSpecificationSubstructure(mockSubstructure);
-		setIsFetchingSubstructure(false);
-	};
-
-	useEffect(() => {
-		fetchMessages();
-		fetchSubstructure();
 	}, []);
 
 	useEffect(() => {
@@ -509,7 +651,7 @@ function ConversationPageMock() {
 		}
 	}, [messages]);
 
-	const handleSendMessage = async () => {
+	const handleSendUserMessage = async () => {
 		if (userMessageInput.trim() === "") return;
 
 		// Add user's message to conversation
@@ -582,7 +724,47 @@ function ConversationPageMock() {
 		} finally {
 			setIsSendingUserMessage(false);
 		}
+
+		fetchSubstructure();
 	};
+
+	const fetchSuggestedMessage = async () => {
+		console.log("Selected properties:");
+		selectedPropertiesForExpansion.forEach(p => console.log(`{ ${p.label}, ${p.isOptional}, ${p.filterExpression} }`));
+
+		setFetchSuggestedMessageError(null);
+		setIsFetchingSuggestedMessage(true);
+		// Call back end API to get the suggested message.
+		try {
+			const response = await fetch(`${BACKEND_API_URL}/conversations/${conversationId}/user-selected-items`, {
+				method: "PUT",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					userSelections: selectedPropertiesForExpansion.map(item => ({
+						propertyIri: item.iri,
+						isOptional: item.isOptional,
+						filterExpression: item.filterExpression
+					}))
+				})
+			});
+			if (!response.ok) {
+				console.error("Fetch suggested message response status: " + response.status);
+				console.error(response.body);
+				throw new Error("Error fetching the suggested message.");
+			}
+			const data = await response.json();
+			setSuggestedMessage(data.suggestedMessage);
+			setUserMessageInput(data.suggestedMessage);
+		}
+		catch (error) {
+			console.log(error);
+			setFetchSuggestedMessageError("Failed to generate a suggested message.");
+		} finally {
+			setIsFetchingSuggestedMessage(false);
+			setSuggestedPropertyAddAsOptional(false);
+			setSuggestedPropertyFilterExpression("");
+		}
+	}
 
 	const handleSuggestedPropertyClick = async (property: SuggestedProperty, replyMsg: ReplyMessage) => {
 		setSuggestedPropertySelectedForSummary({ property, replyMsg });
@@ -613,13 +795,6 @@ function ConversationPageMock() {
 	const removeSelectedProperty = (iri: string) => {
 		const updatedSelectedItems = selectedPropertiesForExpansion.filter(item => item.iri !== iri);
 		setSelectedPropertiesForExpansion(updatedSelectedItems);
-	}
-
-	const fetchSuggestedMessage = async () => {
-		// Send the selectedItemsForExpansion array to backend.
-		console.log("Selected properties:");
-		selectedPropertiesForExpansion.forEach(p => console.log(`{ ${p.label}, ${p.isOptional}, ${p.filterExpression} }`));
-		console.log("Fetching the suggested message.");
 	}
 
 	const handleCheckboxSuggestedPropertyToggle = (
@@ -653,10 +828,15 @@ function ConversationPageMock() {
 	return (
 		<div className="flex h-full p-4 gap-4">
 			{/* LEFT: Chat messages */}
-			<div className={`flex flex-col ${showSubstructure ? "flex-[2]" : "flex-1"}`}>
+			<div className={`flex flex-col ${showSubstructure ? "flex-[2]" : "flex-1"} overflow-y-auto`}>
 				<div className="flex justify-end mb-2">
-					<Button variant="outline" size="sm" onClick={() => setShowSubstructure(!showSubstructure)}>
-						{showSubstructure ? "Hide mapped data specification items" : "Show mapped data specification items"}
+					<Button
+						size="sm"
+						className="bg-blue-600 hover:bg-blue-700 text-white rounded-full
+												p-3 flex items-center justify-center shadow-md"
+						onClick={() => setShowSubstructure(!showSubstructure)}
+					>
+						{showSubstructure ? <><ChevronRight size={16} />Hide mapped data specification items</> : <><ChevronLeft size={16} />Show mapped data specification items</>}
 					</Button>
 				</div>
 
@@ -685,7 +865,6 @@ function ConversationPageMock() {
 							currentReplyMessageId={currentReplyMessage?.id ?? null}
 						/>
 					)}
-
 					{/* Display a rotating circle while waiting for reply */}
 					{isSendingUserMessage ? (
 						<div className="flex justify-start">
@@ -700,15 +879,16 @@ function ConversationPageMock() {
 					) : sendUserMessageError && (
 						<Card className="flex justify-start bg-red-50 border-red-200 max-w-2xl">
 							<CardContent className="p-3">
+								<p className="text-red-700 font-medium">Failed to send your message.</p>
 								<p className="text-sm text-red-600 mt-1">{sendUserMessageError}</p>
-								<Button
+								{/*<Button
 									variant="outline"
 									size="sm"
 									className="mt-2"
-									onClick={handleSendMessage}
+									onClick={handleSendUserMessage}
 								>
 									Try Again
-								</Button>
+								</Button>*/}
 							</CardContent>
 						</Card>
 					)}
@@ -739,7 +919,7 @@ function ConversationPageMock() {
 				{/* Current user message */}
 				{currentUserMessage && (
 					<Card className="mt-4 bg-blue-50">
-						<CardContent className="p-4">
+						<CardContent>
 							{isSendingUserMessage ? (
 								// Current message as plain text.
 								<p className="text-gray-800">{currentUserMessage.text}</p>
@@ -768,17 +948,25 @@ function ConversationPageMock() {
 						onChange={(e) => setUserMessageInput(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								handleSendMessage();
+								handleSendUserMessage();
 							}
 						}}
+						disabled={isSendingUserMessage}
 					/>
-					<Button onClick={handleSendMessage} disabled={isSendingUserMessage}>SEND</Button>
+					<Button
+						onClick={handleSendUserMessage}
+						disabled={isSendingUserMessage}
+						className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 flex items-center justify-center 
+    										shadow-md transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
+					>
+						<Send size={20} />
+					</Button>
 				</div>
 			</div>
 
 			{/* RIGHT: Substructure sidebar (toggleable) */}
 			{showSubstructure && (
-				<div className="1/4 border rounded-md p-4 flex flex-col bg-gray-50">
+				<div className="w-75 border-l overflow-y-auto px-2 bg-gray-50">
 					<h2 className="text-lg font-bold mb-2">Mapped data specification items</h2>
 					{isFetchingSubstructure ? (
 						<p>Loading items...</p>
@@ -789,7 +977,6 @@ function ConversationPageMock() {
 							{dataSpecificationSubstructure.classItems.map((classItem) => (
 								<div key={classItem.iri} className="p-3 border-l-4 border-blue-500 bg-white shadow-sm rounded-md">
 									<h3 className="text-base font-semibold text-blue-800">{classItem.label}</h3>
-									<p className="text-xs text-gray-500 mb-1">IRI: {classItem.iri}</p>
 									{classItem.objectProperties.length > 0 && (
 										<div className="mt-2">
 											<h4 className="text-sm font-medium text-gray-700">Object properties:</h4>
@@ -797,7 +984,7 @@ function ConversationPageMock() {
 												{classItem.objectProperties.map((prop) => (
 													<li key={prop.iri}>
 														<span className="font-medium">{prop.label}</span>
-														<span className="ml-1 text-xs text-gray-500">({prop.domain} → {prop.range})</span>
+														<span className="ml-1 text-xs text-gray-500">(→ {prop.rangeLabel})</span>
 													</li>
 												))}
 											</ul>
@@ -812,7 +999,7 @@ function ConversationPageMock() {
 												{classItem.datatypeProperties.map((prop) => (
 													<li key={prop.iri}>
 														<span className="font-medium">{prop.label}</span>
-														<span className="ml-1 text-xs text-gray-500">({prop.range})</span>
+														<span className="ml-1 text-xs text-gray-500">({prop.rangeLabel})</span>
 													</li>
 												))}
 											</ul>
@@ -838,9 +1025,16 @@ function ConversationPageMock() {
 
 						<div className="py-4">
 							<p>{mappedItemSelectedForSummary?.summary}</p>
-							<p className="mt-2 text-sm text-gray-700 font-semibold">
-								Mapped from: <span className="font-normal">{mappedItemSelectedForSummary?.mappedPhrase}</span>
-							</p>
+							{(mappedItemSelectedForSummary.mappedPhrase !== "") ? (
+								<p className="mt-6 text-sm text-gray-700 font-semibold">
+									{'('}Mapped from: <span className="font-normal">{mappedItemSelectedForSummary.mappedPhrase}</span>{')'}
+								</p>
+							) : (
+								<p className="mt-6 text-sm text-gray-700 font-semibold">
+									{'('}Not directly mapped to a phrase.{')'}
+								</p>
+							)
+							}
 						</div>
 					</DialogContent>
 				</Dialog>
@@ -863,38 +1057,6 @@ function ConversationPageMock() {
 								</p>
 								{isSuggestionFromCurrentReply ? (
 									<>
-										{/*<div className="flex items-center space-x-2">
-											<Checkbox
-												id="optional-item"
-												checked={selectedPropertiesForExpansion.find(p => p.iri === suggestedPropertySelectedForSummary.property.iri)?.isOptional ?? suggestedPropertyAddAsOptional}
-												onCheckedChange={(checked) => {
-													const selected = selectedPropertiesForExpansion.find(p => p.iri === suggestedPropertySelectedForSummary.property.iri);
-													if (selected) {
-														selected.isOptional = !!checked;
-													} else {
-														setSuggestedPropertyAddAsOptional(!!checked);
-													}
-												}}
-												className="w-6 h-6 border-2 border-gray-700 data-[state=checked]:bg-gray-700"
-											/>
-											<Label htmlFor="optional-item">Add as OPTIONAL</Label>
-										</div>*/}
-										{/*isDatatypeProperty(suggestedPropertySelectedForSummary.property) && (<div className="mt-4">
-											<Label htmlFor="filter-expression">Filter expression</Label>
-											<Input
-												id="filter-expression"
-												placeholder="e.g., {var} > 100"
-												value={selectedPropertiesForExpansion.find(p => p.iri === suggestedPropertySelectedForSummary.property.iri)?.filterExpression ?? suggestedPropertyFilterExpression}
-												onChange={(e) => {
-													const selected = selectedPropertiesForExpansion.find(p => p.iri === suggestedPropertySelectedForSummary.property.iri);
-													if (selected) {
-														selected.filterExpression = e.target.value;
-													} else {
-														setSuggestedPropertyFilterExpression(e.target.value);
-													}
-												}}
-											/>
-										</div>)*/}
 										{/* Add or Remove button */}
 										{suggestionIsSelected(suggestedPropertySelectedForSummary.property) ? (
 											<Button
