@@ -1,0 +1,2 @@
+To, že některý property se ve feature objeví 2x (jednou pod třídou A, kde A je range a podruhé pod třídou B, kde B je domain), tak nemusí nutně být bug.
+	- Nechal jsem to tak, protože se mi zdálo docela hezké, že je vidět, že ta properta spojuje ty 2 třídy.

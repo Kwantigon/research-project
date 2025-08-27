@@ -485,3 +485,56 @@ To do:
 7. Když mapuju do substructure, tak musím ověřit, že LLM mi namapovalo všechno. Pokud ne, tak pořád musím zobrazit všechny itemy v substructure, ne jen ty namapované itemy na slova.
 	- Nebudu už zobrazovat mapped items seznam. Stejně to jakoby bude vidět ve split screenu v substructure.
 	- MUSÍM zvýraznit slova/fráze v current message a tam zobrazím summary atd.
+
+Narazil jsem na to, že když nefunguje LLM (že třeba vrací špatné IRI itemů atd.), tak mi to prostě spadne.
+- Musím to ošetřit.
+- Modely s cca 45Gb si vymýšlí IRIčka. Já je pak nemůžu najít v databázi.
+
+Vyřešit:
+- Musím vymyslet fallback v případě, že LLM nenamapuje slova/fráze na current substructure.
+- Taky vymslet fallback pro případ, že LLM vrátí neexistující IRI.
+- Může se stát, že více itemů má stejný label.
+	Třeba fyzická osoba v testovacím package existuje několikrát.
+	Je to matoucí pak zobrazovat jako více instancí.
+	Musím to sjednotit.
+- Myslím si, že v samotné zprávě to ukážu jako jednu třídu (group under the same label).
+- Ale v té substructure vpravo to ukážu jako více tříd.
+	Tzn. pro každou třídu taky ukážu její IRI.
+
+- !! Revertnout SPARQL query (měl jsem to dobře).			✅
+- !! Implementovat strategii pro Ollama.					✅
+- !! Naklikat lepší příklad v Dataspeceru, něco co je blíž lidem, ať se to dá pochopit.
+	(turistický cíl, restaurace, něco)						✅
+- !!Ošetřit, když mi LLM vrátí nějaký error.
+	- Implementovat fallback (nabídnout náhodné itemy).		✅
+	V případě nenamapování do datové specifikace nemůžu nic dělat, takže vrátit error.
+	Zkontrolovat, že stejnou frázi nemám namapovanou dvakrát. Pokud ano, tak jednu vyhodit.	✅
+	To samé pro suggested message.	✅
+	Ale pro suggestions můžu mít fallback, že nabídnu nějaké náhodné properties tříd, které už jsou v substructure.	✅
+- !!Ošetřit případ chybného DSV i OWL. Nějak to třeba oznámit?	✅ (napíšu do dokumentace, že očekávám DSV nebo OWL, jinak to nefunguje)
+- !!Unit testy.
+- Issues v githubu od P. Škoda.
+- Přidat confirm tlačítko pro mazání konverzací.	✅
+- Auto scroll v substructure sekci (když kliknu na property).
+- Použít prefixy ve SPARQL query.
+
+- Do dokumentace napsat omezení, že přidávám každý item (třídu nebo propertu) jen jednou. Takže některé typy dotazů nejsem schopen vyřešit.
+- Více tříd má stejný label, ale různé IRI.
+	Tady asi sloučit v části suggestions. Ale v části substructure to nechat.
+- Vyfiltrovat seznam suggested properties, abych nabízel každý unique property jen jednou.
+	Pokud mám domain i range nějaké property, tak v tom seznamu je dvakrát, jednou že expanduje domain a podruhé že expanduje range.
+- Rozmyslet si, jestli nemůžu podpořit přidání třídy vícekrát. Protože třída může mít property vedoucí na sebe (orgán veřejné moci -> má nadřízený orgán -> orgán veřejné moci)
+	V tuto chvíli moje sémantika znamená, že chci orgán veřejné moci, který má sebe jako nadřízený orgán veřejné moci.
+	Myslím, že bych to mohl takto upravit.
+
+Implementace nových promptů pro llama3.3:70b
+1. Přidat OwlAnnotation a RdfsComment do DataSpecificationItem třídy.	✅
+2. Upravit RdfProcessor, aby ukládal i OwlAnnotatin a RdfsComment.		✅
+3. Implementovat OllamaPromptConstructor, který serializuje DataSpecification jako list DataSpecificationItem v JSONu.				✅
+	- Vzít si všechny třídy z current context.
+	- Vyhledat v databázi všechny properties, kde třída je domain nebo range.
+	- POZOR: Pokud mám nějaký object property, tak musím vypsat jak domain, tak range.
+	- Nastavit "number of hops". Pokud je to např. 1, tak přidat nejbližší properties a pro každou object property domain/range přidat ještě jejich properties.
+	- Předat tuto lokalizovanou informaci do LLM.
+	- Formát bude samozřejmě JSON. List tříd a každá třída bude obsahovat list ObjectProperties a DatatypeProperties.
+4. Upravit všechny prompty pro llama3.3		✅
