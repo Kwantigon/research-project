@@ -1,0 +1,27 @@
+vstupni soubor bude nejake schema databazi.
+- ne nutne to, co mame ted.
+- klidne nejaky muj vlastni format.
+Definovat si minimalisticky workflow a interface.
+
+udelat si sample konverzaci nad mym prikladem.
+jeste nic neprogramovat, ale treba kreslit.
+musim udelat 2 veci:
+- experimentovat s LLM.
+- navrh user interface.
+
+Jak se LLM chova jenom s definici datove struktury a jak kdyz dodam semantickou vrstvu.
+kdyz v realnym svete sloupce nebudou tak hezky pojmenovane, ne tak jako je ze semanticke vrstvy.
+nazvy sloupcu a tabulek neodpovidaji a nedavaji uplne semanticky smysl.
+Zatim muj priklad v dataspeceru je vygenerovany tak, ze nazvy sloupců jsou dlouhé a mají nějaký smysl.
+
+Experiment:
+1. mam csv schemata (to jsem delal)
+2. stejne csv schema, ale bez popisku
+3. stejne csv ale zkracovat nazvy sloupcu
+zkusit tomu dat shacl shapes
+4. dat jen otologii a srovnat s tim csv
+
+dat dohromady seznam high level features pro zacatek. Uvest konkretni priklad.
+vystup debaty je nova datova struktura, ktera je kostra dotazu.
+
+za 14 dni detailnejsi experiment. Cely workflow s uzivatelem
