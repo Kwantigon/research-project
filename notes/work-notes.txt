@@ -526,4 +526,3 @@ Implementace nových promptů pro llama3.3:70b
 4. Upravit všechny prompty pro llama3.3		✅
 
 !! Opravit data specification service unit test.
-Rozšířit povídání o frontendu.

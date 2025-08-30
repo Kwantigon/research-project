@@ -1,3 +1,0 @@
-Otázky na konzultaci:
-1. Když mapuju otázku na itemy a existuje něco ambiguous, že slovo může znamenat více itemů, jak se zachovat? Přidat všechny itemy?
-2. Když během konverzace se stane, že LLM vrátí nějaký item pro který už mám summary, tak jak se zachovat? Nechám si původní summary nebo aktualizuju summary toho itemu tím novým summary?
