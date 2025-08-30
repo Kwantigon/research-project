@@ -10,8 +10,6 @@ Eventually musím ještě připsat navrhovanou strategii pro každou tady tu vě
 
 - I'm mapping words from user message to exactly one data specification item. But natural language is naturally ambiguous so one word could mean multiple things. I could maybe display the mapped items to the user and let them pick what they want. They could pick one or more mapped items.
 
-- Add support for data filtering in the Sparql query.
-
 - Select target is mapped only once when mapping to data specification. All suggestions later are treated as nontarget classes. There is room to think about this.
 
 - Lepší mapování MappedWords na user message.

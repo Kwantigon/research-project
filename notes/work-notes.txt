@@ -519,17 +519,10 @@ Vyřešit:
 - Auto scroll v substructure sekci (když kliknu na property).
 - Použít prefixy ve SPARQL query.
 
-- Do dokumentace napsat omezení, že přidávám každý item (třídu nebo propertu) jen jednou. Takže některé typy dotazů nejsem schopen vyřešit.
-- Více tříd má stejný label, ale různé IRI.
-	Tady asi sloučit v části suggestions. Ale v části substructure to nechat.
-- Vyfiltrovat seznam suggested properties, abych nabízel každý unique property jen jednou.
-	Pokud mám domain i range nějaké property, tak v tom seznamu je dvakrát, jednou že expanduje domain a podruhé že expanduje range.
-- Rozmyslet si, jestli nemůžu podpořit přidání třídy vícekrát. Protože třída může mít property vedoucí na sebe (orgán veřejné moci -> má nadřízený orgán -> orgán veřejné moci)
-	V tuto chvíli moje sémantika znamená, že chci orgán veřejné moci, který má sebe jako nadřízený orgán veřejné moci.
-	Myslím, že bych to mohl takto upravit.
-
 Implementace nových promptů pro llama3.3:70b
 1. Přidat OwlAnnotation a RdfsComment do DataSpecificationItem třídy.	✅
 2. Upravit RdfProcessor, aby ukládal i OwlAnnotatin a RdfsComment.		✅
 3. Implementovat OllamaPromptConstructor, který serializuje DataSpecification jako list DataSpecificationItem v JSONu.				✅
 4. Upravit všechny prompty pro llama3.3		✅
+
+!! Opravit data specification service unit test.
