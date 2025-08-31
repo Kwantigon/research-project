@@ -438,9 +438,9 @@ Implementace nových promptů pro llama3.3:70b
 
 ## 31. 8.
 Dnešní to do:
-- Vytvořit uživatelskou dokumentaci přímo v README.md
-- Popsat, jak pustit Dataspecer lokálně i s funkcionalitou pro redirect.
-- Napsat doporučení (mostly pro oponenta), že projekt by se měl pustit s Gemini.
+- Vytvořit uživatelskou dokumentaci.
+- Popsat, jak pustit Dataspecer lokálně i s funkcionalitou pro redirect. (deployment v docs)
+- Napsat doporučení (mostly pro oponenta), že projekt by se měl pustit s Gemini. (asi readme.md)
 	Ať si přidá free Gemini API key.
 	Pustí gemini větev.
 
