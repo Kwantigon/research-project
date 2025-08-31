@@ -1,2 +1,0 @@
-docker build --build-arg VITE_DATASPEC_NAVIGATOR_URL="http://localhost:8080" -t dataspecer .
-docker run -p 3000:80 dataspecer:latest
