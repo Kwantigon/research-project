@@ -358,42 +358,6 @@ Vypadá to, že templates fungují.
 Teď musím jen vhodně zformátovat current context když stavím prompt v PromptConstructor.
 Pak musím vhodně zpracovat data, která LLM vrací.
 
-Musím ještě trochu vyladit prvotní mapování.
-- Říkám, že pokud MappedWords je empty, tak to nemá vracet.
-- Ale pokud to namapuje 2 Class a není mezi nimi žádný property, tak si nejsem jistý, jestli to dává smysl.
-- Možná že to actually dává? Na začátku teda budu mít jen ty 2 Class, ale postupně to doplním o properties.
-
-Když jde o datatype property, tak já vytvářím objekt pro ten typ jako data spec item. To je špatně.
-Zdá se mi, že je moc komplikací s tím s vždycky ověřit, jestli data specification item už existuje nebo ne.
-- Při zpracování data specification si všechny itemy uložím. Pak už to nebudu muset řešit.
-
-Problém s navigací v DataSpecificationItem, když chci získat RangeItem. Někdy range je pouze datatype.
-- Momentálně to řeším tak, že pokud potřebuju RangeItem, tak ho vždycky explicitně najdu v databázi.
-- Myslím, že to vyřeším tak, že si uložím jednu instanci datových typů.
-
-Problémy:
-- Substructure se mi nepropisuje do databáze.
-
-To do:
-Zkontrolovat Sparql generation - myslím, že je správně, jenom nějak blbě přidávám do substructure, takže proto tam chyběly ty properties.
-Musím zkontrolovat, jak se zpracovává přidávání selected items.
-Musím se ujistit, že když user přidá property, tak
-1. Najdu v databázi property.
-2. Najdu domain i range itemy pro property.
-3. Všechny 3 přidám do substructure (pokud už něco v substructure je, tak nepřidávat).
-4. Říct si o mapping to substructure.
-5. Uložit mapping a asi se můžu vrátit.
-Ještě jednou projít zpracování suggested message.
-
-To do z konzultace:
-1. Napojit zobrazení podstruktury na backend.
-2. Zkusit si to na jiné datové specifikaci.
-3. Překopat kód modelu DataSpecificationItem.
-4. Přidat primitivní filtrování - uživatel napíše ručně string, který je filtr.
-5. Pokud možno, přidat OPTIONAL filtrování.
-6. Některé packages asi nemají dsv.ttl - pak vzít owl soubor (např. 
-2997c80e-62f6-4000-ac99-95da6e2c199b). Ale musím přečíst OWL a uložit si itemy.
-
 # 14. 8.
 
 Nové stahování data specification se zdá funkční.
@@ -435,71 +399,18 @@ Pokud se neliší:
 	6. Říct si o mapping a předat (substructure + selected properties + domains + ranges), aby LLM mapoval jen na ty předané itemy.
 	7. Přidat itemy do současného substructure.
 
-Plán na zítra:
-- Chtěl bych zkusit přidat unit tests pro data specification service.
-- Vytvořit DSV soubor, který obsahuje pár itemů.
-- Namockovat DataspecerConnector, aby vrátil obsah toho DSV souboru.
-- Ověřit, že mám všechny itemy.
-
-- Mock vrací null DSV.
-- Vytvořit OWL soubor s několika itemy.
-- Ověřit, že když DSV není, tak to použije OWL a bude vracet správné itemy.
-
-!!!To do: Když uživatel přidá pouze item v "more to consider", tak se mi to nenapojí správně na substructure. Nemám tam hranu do substructure.
-- Vypadá to, že se to trochu rozbije.
-- Summary je prázdný.
-
-Rozšířil jsem Sparql podporou pro OPTIONAL a FILTER.
-Musím ale nějak dostat tyto hodnoty z frontendu na backend a do substructure.
-
-Začíná se rozrůstat to, co všechno uživatel si může vybírat.
-- V budoucnu toho bude možná více.
-- Teď to je FilterExpression a IsOptional a možná nechám uživatele to zvolit i jako IsSelectTarget.
-- To všechno musím předat do metody, která přidává data specification item do substructure.
-- Musím si zavést novou třídu UserSelection - bude i nová tabulka v databázi.
-- Třída bude obsahovat věci, které uživatel si naklikal, napsal.
-
-Do větve pro zpracování následované zprávy musím přidat:
-- Místo UserSelectedItems teď budu pracovat s UserSelections.
-- Vytáhnu si itemy z databáze jako je to teď.
-- Předám itemy a user selections do metody pro přidání do substructure.
-Upravím přidání do substructure:
-- Pokud userSelections je empty, tak zpracování jako do teď. Jedná se nejspíše o první zprávu.
-- Jinak vždycky, když narazím na property, tak si vyhledám v user selection a vytáhnu to, co potřebuju.
-
-Myslím si, že nedám možnost použít indirect suggestions.
-- Teoreticky to může být property, který je libovolně daleko od current substructure. Pak bych docela marně hledal cestu ne?
-
 To do:
 0. Některé itemy v mapped items nemají summary a mapped from words.
-1. Možná pro generování suggested message předat i filtr, který uživatel zadal.
-2. Na frontendu povolit filtrování pouze pro datatype properties.
-	- To bude vyžadovat trochu refactoring frontendu (hlavně reprezentace tříd).
-3. Suggested properties: pro každý item zobrazit pouze up to 4 properties, abych zabránil tomu, že LLM prostě nabídne všechno z té třídy.
-4. Myslím, že opravdu odeberu možnost navrhovat indirect connections.
-	- Nebo minimálně nebude možné je přidávat.
-	- Jen je zobrazím, že existují.
-	- Ale s tím bude problém to, že uživatel přidá property a bude pak chtít přidat další property, která byla indirect connection, ale teď není. Ale LLM to uživateli nenabídne.
-5. Unit tests.
-6. Ošetřit případ, kdy LLM call fails.
-7. Když mapuju do substructure, tak musím ověřit, že LLM mi namapovalo všechno. Pokud ne, tak pořád musím zobrazit všechny itemy v substructure, ne jen ty namapované itemy na slova.
-	- Nebudu už zobrazovat mapped items seznam. Stejně to jakoby bude vidět ve split screenu v substructure.
-	- MUSÍM zvýraznit slova/fráze v current message a tam zobrazím summary atd.
+1. Možná pro generování suggested message předat i filtr, který uživatel zadal.		✅
+2. Na frontendu povolit filtrování pouze pro datatype properties.					✅
+3. Suggested properties: pro každý item zobrazit pouze up to 4 properties, abych zabránil tomu, že LLM prostě nabídne všechno z té třídy.		✅
+4. Unit tests.	✅
+5. Ošetřit případ, kdy LLM call fails.	✅
+6. Když mapuju do substructure, tak musím ověřit, že LLM mi namapovalo všechno. Pokud ne, tak pořád musím zobrazit všechny itemy v substructure, ne jen ty namapované itemy na slova.	✅
 
-Narazil jsem na to, že když nefunguje LLM (že třeba vrací špatné IRI itemů atd.), tak mi to prostě spadne.
-- Musím to ošetřit.
-- Modely s cca 45Gb si vymýšlí IRIčka. Já je pak nemůžu najít v databázi.
 
-Vyřešit:
-- Musím vymyslet fallback v případě, že LLM nenamapuje slova/fráze na current substructure.
-- Taky vymslet fallback pro případ, že LLM vrátí neexistující IRI.
-- Může se stát, že více itemů má stejný label.
-	Třeba fyzická osoba v testovacím package existuje několikrát.
-	Je to matoucí pak zobrazovat jako více instancí.
-	Musím to sjednotit.
-- Myslím si, že v samotné zprávě to ukážu jako jednu třídu (group under the same label).
-- Ale v té substructure vpravo to ukážu jako více tříd.
-	Tzn. pro každou třídu taky ukážu její IRI.
+- Musím vymyslet fallback v případě, že LLM nenamapuje slova/fráze na current substructure.		✅
+- Taky vymslet fallback pro případ, že LLM vrátí neexistující IRI.		✅
 
 - !! Revertnout SPARQL query (měl jsem to dobře).			✅
 - !! Implementovat strategii pro Ollama.					✅
@@ -525,4 +436,11 @@ Implementace nových promptů pro llama3.3:70b
 3. Implementovat OllamaPromptConstructor, který serializuje DataSpecification jako list DataSpecificationItem v JSONu.				✅
 4. Upravit všechny prompty pro llama3.3		✅
 
-!! Opravit data specification service unit test.
+## 31. 8.
+Dnešní to do:
+- Vytvořit uživatelskou dokumentaci přímo v README.md
+- Popsat, jak pustit Dataspecer lokálně i s funkcionalitou pro redirect.
+- Napsat doporučení (mostly pro oponenta), že projekt by se měl pustit s Gemini.
+	Ať si přidá free Gemini API key.
+	Pustí gemini větev.
+
