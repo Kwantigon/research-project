@@ -1,0 +1,32 @@
+## Motivace
+
+Na začátku musím jen krátce představit, co je Dataspecer, protože můj projekt s tím souvisí. Dataspecer je nástroj, jehož cílem je zjednodušit manuální práci se sémantickou datovou specifikací. Umožňuje uživateli definovat si svoji doménovou ontologii. Tento nástroj pak z této ontologie vygeneruje různé technické artefakty.
+
+Na začátku projektu jsme měli hypotézu, že když máme v Dataspeceru bohatou informaci o datové specifikaci a dáme ji jazykovému modelu, tak tomu bude dobře rozumět a dokáže nám pomoct se v ní navigovat. (co znamená navigovat se v datové specifikace? Nabízet rozšíření dotazu)
+
+## Použítý formát datové specifikace
+
+Na začátku jsem musel experimentovat a zjistit si, co všechno a v jakém formátu dávat jako vstup do jazykového modelu. To "co", bylo docela jasné. Vždycky musím dát datovou specifikaci a dotaz v přirozeném jazyce, když chci to mapování. Jestli musím dát ještě něco navíc, tak to se ukáže časem v projektu. To hlavní ale bylo v jakém formátu dávat tu datovou specifikaci. K tomu mi pomohl tento článek <>, kde autoři vyvodili závěr, že když položíme otázky v přirozeném jazyce nad knowledge grafem, tak dostaneme přesnější odpovědi, než kdybychom ty samé otázky položili nad SQL schématem. Samozřejmě tady musím zdůraznit, že porovnávali pouze mezi knowledge grafem a SQL schématem. Neporovnávali všechny možné formáty a ten článek neříká "knowledge graph je nejlepší co může být, používejte to pro LLM". Ale pro sebe jsem si z toho vzal, že knowledge graph bude dobrý základ. Takže jsem se rozhodl dávat do jazykového modelu datovou specifikaci v OWL formátu.
+
+## Vstupy a výstupy systému
+
+<na slajdu: Dataspecer -DSV-> můj systém -(dotaz v přirozeném jazyce, OWL)-> LLM -OWL entity-> můj systém -> frontend; uživatel -(package info, dotazy)-> můj systém; můj systém -(odpověď)-> uživatel>
+2 obrázky na slajdu:
+	- Uživatel poskytne package info, Dataspecer poskytne DSV.
+	- Uživatel pošle dotaz, já pošle prompt do LLM, vrátím odpověď.
+
+Teď mám jasně definované vstupy a výstupy systému. Uživatel mi poskytne informaci o tom, nad jakým Dataspecer balíčkem chce pokládat otázky. Já si z Dataspeceru vezmu DSV soubor a zkonvertuju ho na OWL. V dalším kroku mi uživatel pošle dotaz. Já pošlu dotaz a OWL do LLM. Zpracuju odpověď z jazykového modelu a výsledek prezentuju uživateli.
+
+## Jak to vypadá "v akci"
+
+Protože operace s jazykovým modelem trvají dlouho, tak nemám živou ukázku. Ale ukážu přiklad pomocí screenshotů.
+V Dataspeceru kliknu na "Ask in navigator" a jsem přesměrován do Data specification navigator. Objeví se okénko pro vytvoření konverzace. Zadám název konverzace a potvrdím. Když je konverzace úspěšně vytvořená, tak ji můžu otevřít. Systém vždycky pošle první zprávu, kde je krátké shrnutí mé datové specifikace a nějaké doporučení na co se můžu zeptat. Toto shrnutí i doporučení jsou vygenerovaná jazykovým modelem. Napíšu zprávu do chatu a pošlu. Dostanu odpověď, která obsahuje dvě hlavní části. SPARQL dotaz a doporučení. Kromě odpovědi můžete vidět 2 změny oproti předchozímu stavu.
+
+Tady napravo se zobrazují entity z datové specifikace, kterou jsem v průběhu konverzace dokázal namapovat. Zeptal jsem se na barrier-free destinations a to mi LLM namapoval na třídy tourist destination a barrier-free. Zároveň mi LLM namapoval i propertu té třídy tourist destination a to je properta barrier-free.
+
+Tady je text zprávy, kterou jsem já poslal. Protože odpověď od systému je dlouhá a moje zpráva se mi vyscrolluje pryč, tak ta zpráva je zobrazena tady, abych ji měl pořád na očích a nemusel scrollovat nahoru a podívat se, co jsem vlastně napsal. V tom textu jsou některá slova zvýrazněná. To jsou slova, která jazykový model dokázal namapovat do datové specifikace. Představují nějakou entitu ze specifikace. Já můžu kliknout na zvýrazněné slovo a systém mi zobrazí okno s popisem té entity. Tento popis je vygenerovaný jazykovým modelem.
+
+Možná jste si všimli, že jsem říkal, že mi LLM namapoval otázku na 3 věci, ale mám jen 2 zvýrazněná slova. Může se stát, že nějaká fráze nebo slovo se namapuje na více věcí ze specifikace. V tomto případě slovo barrier-free odpovídá jak třídě barrier-free, tak propertě barrier-free ve třídě tourist destination. V takovém případě já skryju ty extra namapované věci tady pod tím pluskem. Po kliknutí se mi rozbalí seznam těch extra namapovaných věcí a můžu na ně kliknout a zobrazit si popis.
+
+
+
