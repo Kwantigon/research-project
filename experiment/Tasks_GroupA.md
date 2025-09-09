@@ -1,6 +1,8 @@
-# SPARQL query task sheet – Group A
+# SPARQL query task sheet – Group A (experts)
 
-You are given an OWL ontology file (`ontology.owl`).
+You are given an OWL ontology file (`model.owl.ttl`) and the corresponding [data structure in Dataspecer](https://tool.dataspecer.com/data-specification-editor/editor?data-specification=d51bc125-f2f7-484b-8a57-f8f2b7291d69&data-psm-schema=94ed8b4f-28ec-4014-a4e9-f54bb03a1eab).
+
+
 Below are three questions written in natural language.
 Your task is to write a SPARQL query for each question.
 
@@ -51,6 +53,8 @@ Time taken: ____ minutes ____ seconds
 
 List all tourist destinations that have an elevator in the interior.
 If the information is available, indicate whether smoking is allowed.
+
+*Note: Some attributes, such as whether an elevator exists in the interior, are expressed as true/false (boolean) values.*
 
 Write your SPARQL query here:
 
