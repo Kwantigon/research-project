@@ -55,7 +55,7 @@
     tc:bezbariérovost [
         a bf:bezbariérový-přístup ;
         bf:výtah-u-hlavního-vstupu "false" ;
-        bf:výtah-v-interiéru "true"
+        bf:výtah-v-interiéru "false"
     ] .
 
 #################################################################

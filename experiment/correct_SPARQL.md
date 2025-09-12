@@ -1,4 +1,6 @@
-Question 1: **List all tourist destinations that have a capacity of at least 100 people.**
+## Question 1
+
+**List all tourist destinations that have a capacity of at least 100 people.**
 
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -16,7 +18,11 @@ WHERE {
 }
 ```
 
-Question 2: **List all tourist destinations that have barrier-free access with an elevator at the main entrance.**
+Answer: Castle A, Park A.
+
+## Question 2
+
+**List all tourist destinations that have barrier-free access with an elevator at the main entrance.**
 
 ```sparql
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -34,7 +40,11 @@ WHERE {
 }
 ```
 
-Question 3: **List all tourist destinations that have an elevator in the interior. For each destination, list whether smoking is allowed or not.**
+Answer: Castle A, Muzeum A.
+
+## Question 3
+
+**List all tourist destinations that have an elevator in the interior. For each destination, list whether smoking is allowed or not.**
 
 ```sparql
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -51,3 +61,5 @@ WHERE {
   FILTER (?v = "true") .
 }
 ```
+
+Answer: Castle A.
