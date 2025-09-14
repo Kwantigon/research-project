@@ -1,0 +1,131 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix tc: <https://slovník.gov.cz/datový/turistické-cíle/pojem/> .
+@prefix bf: <https://slovník.gov.cz/generický/bezbariérové-přístupy/pojem/> .
+@prefix qty: <https://slovník.gov.cz/generický/množství/pojem/> .
+
+#################################################################
+# Tourist Destination 1
+#################################################################
+
+<http://example.org/destination/castle-A>
+    a tc:turistický-cíl ;
+    rdfs:label "Castle A"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "150"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "true" ;
+        bf:výtah-v-interiéru "true"
+    ] ;
+    tc:kouření-povoleno "false" .
+
+#################################################################
+# Tourist Destination 2
+#################################################################
+
+<http://example.org/destination/museum-A>
+    a tc:turistický-cíl ;
+    rdfs:label "Museum A"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "80"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "true" ;
+        bf:výtah-v-interiéru "false"
+    ] ;
+    tc:kouření-povoleno "true" .
+
+#################################################################
+# Tourist Destination 3
+#################################################################
+
+<http://example.org/destination/park-A>
+    a tc:turistický-cíl ;
+    rdfs:label "Park A"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "500"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "false" ;
+        bf:výtah-v-interiéru "false"
+    ] .
+
+#################################################################
+# Tourist Destination 4
+#################################################################
+
+<http://example.org/destination/monument-B>
+    a tc:turistický-cíl ;
+    rdfs:label "Monument B"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "50"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "false" ;
+        bf:výtah-v-interiéru "false"
+    ] ;
+    tc:kouření-povoleno "false" .
+
+#################################################################
+# Tourist Destination 5
+#################################################################
+
+<http://example.org/destination/garden-B>
+    a tc:turistický-cíl ;
+    rdfs:label "Garden B"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "20"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "false" ;
+        bf:výtah-v-interiéru "false"
+    ] ;
+    tc:kouření-povoleno "false" .
+
+#################################################################
+# Tourist Destination 6
+#################################################################
+
+<http://example.org/destination/library-B>
+    a tc:turistický-cíl ;
+    rdfs:label "Library B"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "75"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "false" ;
+        bf:výtah-v-interiéru "false"
+    ] ;
+    tc:kouření-povoleno "false" .
+
+#################################################################
+# Tourist Destination 7
+#################################################################
+
+<http://example.org/destination/cafe-B>
+    a tc:turistický-cíl ;
+    rdfs:label "Cafe B"@en ;
+    tc:kapacita [
+        a qty:množství ;
+        qty:hodnota "30"^^xsd:integer
+    ] ;
+    tc:bezbariérovost [
+        a bf:bezbariérový-přístup ;
+        bf:výtah-u-hlavního-vstupu "false" ;
+        bf:výtah-v-interiéru "false"
+    ] ;
+    tc:kouření-povoleno "true" .
