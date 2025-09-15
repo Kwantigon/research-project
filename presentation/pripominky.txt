@@ -1,0 +1,63 @@
+Upravit diagramy s "user".
+- Na jeden slajd dát pouze "Specification editor" a Dataspecer. Vedle mít Frantu a že poskytuje informaci o té datové specifikaci.
+- Slajd 7 (user - navigator - LLM) je v pohodě. Místo "User" bych mohl mít toho Frantu.
+
+Slajd s architekturou je fajn, ale musím víc prodat tu obtížnost.
+- Kde a jak využívám LLM? Mapování, návrhy, verbalizace. Říct, že na ty návrhy teoreticky nemusím používat LLM.
+- Jo mapuju na koncepty v datové specifikaci. Pak musím highlightovat ve frontendu.
+- Aby to nevypadalo moc primitivně.
+
+--
+
+Přidat začátek a konec projektu do prvního slajdu.	✅
+
+Už v příkladu říct, že data se řídí podle nějaké **datové specifikace**. Ta popisuje strukturu a sémantiku těch dat.
+
+Slajd 3: Mluvil jsem o omezení na Dataspecer, ale neměl jsem žádný bod nebo obrázek.
+- Možná tady dát ten nový slajd: diagram "Specification editor" a Franta a Dataspecer.
+
+Místo "data specification **items**" používat "**concepts** from the data specification".
+
+Franta by neměl být v obleku. Je to někdo, kdo by mohl si nastudovat datovou specifikaci a pak si sám napsat SPARQL dotaz a získat data. Ale nemá čas na to.	✅
+- Zdůraznit, že existuje specifikace. Ten člověk by si ji mohl nastudovat.
+
+Trochu upravit ten motivační příklad.
+- Nejdřív uvést POUZE Frantu. "Franta je datový analytik a umí s daty pracovat. Ale nezná tady ty konkrétní data naší firmy. Nezná ty detaily a strukturu dat. Typicky existuje někdo, kdo zná ty technikálie a strukturu dat. Vyzná se v té datové specifikaci." A teď se na slajdu objeví Pepa.
+
+Scénář:
+- Objeví se Franta.
+- "Představte si, že jsme v nějaké firmě a tady máme Frantu. Franta je v našem případě datový analytik a umí s daty pracovat. Ale nezná tady ty konkrétní data naší firmy. Nezná tu **datovou specifikaci**, podle které se ta data řídí."
+- <asi sem zařadit tu zmínku a ukázku datové specifikace>
+- "Typicky ve firmě existuje někdo, kdo se vyzná v té **datové specifikaci**."
+- "Nazvěme si ho Pepa".
+- Objeví se Pepa.
+- "Franta půjde za ním a musí se dlouho spolu bavit o tom, co Franta potřebuje."
+- "Tady pak vzniká bottleneck, že každý, kdo něco potřebuje, stejně jako Franta, půjde za Pepou."
+- "V tomto projektu se budu snažit eliminovat toho Pepu. Teda ne pardon, eliminovat ten bottleneck, ne Pepu."
+- Ukázat další slajd, kde Pepa je nahrazen nějakým robotem.
+
+Slajd 3 je čistě textový.
+- Pokud upravím ten motivační příklad, tak můžu slajd 3 nahradit podobným obrázkem, akorát tam bude Franta a nějaký stroj / terminátor něco.
+- Nějakým způsobem znázornit, že ten robot umožní exploraci (něco jako art "consult the star charts").
+
+Někde zmínit, co to je datová specifikace a "probliknout" na obrazovce, že je dlouhá.
+- Je to detailní popis struktury a sémantiky dat.
+- Vypadá takto. Je prostě dlouhá a složitá. Vytváří se v Dataspeceru.
+
+Slajd "The software" posunout za slajdem s Frantou a robotem.
+- Tady řeknu, že ten software bude chatbot.
+
+Zoom do application layer.
+- Prolínal bych to s UI screenshoty.
+- "Říkal jsem, že si to rozkrokujeme a použijeme LLM na části, kde to je potřeba. Tak se podívejme na ty kroky."
+- "Když si uživatel vytvoří novou konverzaci o nějaké datové specifikaci, tak si tu specifikaci získám z Dataspeceru a poprosím LLM, aby vytvořil krátké shrnutí, o čem ta datová specifikace je. A navíc aby z té datové specifikace vybral několik zajímavých konceptů, na které se uživatel může zeptat. A to vrátím uživateli jako první zprávu."
+- Ukázat UI screenshot první zprávy. Nechat jen třeba první větu toho shrnutí a první návrh. Zbytek rozmazat. Rozmazat i sidebar s mapped items.
+- Když uživatel něco napíše, tak já pomocí LLM namapuju slova z té jeho zprávy na koncepty v datové specifikaci. Takže například když se uživatel zeptá na barrier-free destinations, LLM namapoval tento dotaz na koncepty "tourist destination" a "barrier-free access" a dal mi informaci, jaká slova zmiňují tyto koncepty. Díky tomu dokážu uživateli zvýraznit, že hele tady ta slova, která jsi použil, pro ně jsem dokázal identifikovat příslušné koncepty. Uživatel si může kliknout na to slovo a zobrazit si shrnutí toho namapovaného konceptu.
+- (V této části rozmazat ty návrhy)
+
+- Na základě těchto namapovaných konceptů pak zase použiju LLM, abych nabídnul uživateli jiné položky z datové specifikace, které jsou relevantní k tomu, co zatím mám namapované.
+- Ukázat část odpovědi s návrhy.
+
+- TODO: ještě LLM použiju na verbalizaci.
+
+Musím vymyslet, co vlastně říkat v části výsledků pilotní studie.
